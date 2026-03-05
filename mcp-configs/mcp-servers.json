@@ -9,11 +9,12 @@
       "description": "GitHub API — repos, issues, PRs, Actions"
     },
     "aws": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-aws"],
+      "command": "uvx",
+      "args": ["awslabs.aws-api-mcp-server@latest"],
       "env": {
-        "AWS_PROFILE": "$AWS_PROFILE",
-        "AWS_REGION": "$AWS_REGION"
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_API_MCP_ALLOW_UNRESTRICTED_LOCAL_FILE_ACCESS": "workdir"
       },
       "description": "AWS API — EC2, S3, RDS, ECS, Lambda, IAM"
     },

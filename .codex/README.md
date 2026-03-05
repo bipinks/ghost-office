@@ -21,7 +21,7 @@ If you prefer global config, run these commands once:
 
 ```bash
 codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
-codex mcp add aws --env AWS_PROFILE="$AWS_PROFILE" --env AWS_REGION="$AWS_REGION" -- npx -y @modelcontextprotocol/server-aws
+codex mcp add aws --env AWS_REGION="us-east-1" --env FASTMCP_LOG_LEVEL="ERROR" --env AWS_API_MCP_ALLOW_UNRESTRICTED_LOCAL_FILE_ACCESS="workdir" -- uvx awslabs.aws-api-mcp-server@latest
 codex mcp add docker -- npx -y @modelcontextprotocol/server-docker
 ```
 
