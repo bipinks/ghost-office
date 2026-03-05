@@ -18,39 +18,27 @@ sandbox_mode = "workspace-write"
 [mcp_servers.github]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]
-
-[mcp_servers.github.env]
-GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_PERSONAL_ACCESS_TOKEN"
+env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]
 
 [mcp_servers.aws]
-command = "uvx"
-args = ["awslabs.aws-api-mcp-server@latest"]
-
-[mcp_servers.aws.env]
-AWS_REGION = "us-east-1"
-FASTMCP_LOG_LEVEL = "ERROR"
-AWS_API_MCP_ALLOW_UNRESTRICTED_LOCAL_FILE_ACCESS = "workdir"
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-aws"]
+env_vars = ["AWS_PROFILE", "AWS_REGION"]
 
 [mcp_servers.cloudflare]
 command = "npx"
 args = ["-y", "@cloudflare/mcp-server-cloudflare"]
-
-[mcp_servers.cloudflare.env]
-CLOUDFLARE_API_TOKEN = "$CLOUDFLARE_API_TOKEN"
+env_vars = ["CLOUDFLARE_API_TOKEN"]
 
 [mcp_servers.vercel]
 command = "npx"
 args = ["-y", "@vercel/mcp-server-vercel"]
-
-[mcp_servers.vercel.env]
-VERCEL_TOKEN = "$VERCEL_TOKEN"
+env_vars = ["VERCEL_TOKEN"]
 
 [mcp_servers.supabase]
 command = "npx"
 args = ["-y", "@supabase/mcp-server-supabase"]
-
-[mcp_servers.supabase.env]
-SUPABASE_ACCESS_TOKEN = "$SUPABASE_ACCESS_TOKEN"
+env_vars = ["SUPABASE_ACCESS_TOKEN"]
 
 [mcp_servers.filesystem]
 command = "npx"
@@ -63,6 +51,4 @@ args = ["-y", "@modelcontextprotocol/server-docker"]
 [mcp_servers.kubernetes]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-kubernetes"]
-
-[mcp_servers.kubernetes.env]
-KUBECONFIG = "$KUBECONFIG"
+env_vars = ["KUBECONFIG"]
