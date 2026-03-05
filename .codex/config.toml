@@ -1,0 +1,67 @@
+# Project-local Codex configuration for DevOps Agent Hub.
+# This file is loaded by Codex when working inside this repository.
+
+model = "gpt-5.3-codex"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Keep project docs discoverable even if AGENTS.md is moved/renamed.
+project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "README.md"]
+
+[profiles.devops_strict]
+model_reasoning_effort = "xhigh"
+approval_policy = "untrusted"
+sandbox_mode = "workspace-write"
+
+# MCP servers mirrored from mcp-configs/mcp-servers.json.
+[mcp_servers.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+
+[mcp_servers.github.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_PERSONAL_ACCESS_TOKEN"
+
+[mcp_servers.aws]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-aws"]
+
+[mcp_servers.aws.env]
+AWS_PROFILE = "$AWS_PROFILE"
+AWS_REGION = "$AWS_REGION"
+
+[mcp_servers.cloudflare]
+command = "npx"
+args = ["-y", "@cloudflare/mcp-server-cloudflare"]
+
+[mcp_servers.cloudflare.env]
+CLOUDFLARE_API_TOKEN = "$CLOUDFLARE_API_TOKEN"
+
+[mcp_servers.vercel]
+command = "npx"
+args = ["-y", "@vercel/mcp-server-vercel"]
+
+[mcp_servers.vercel.env]
+VERCEL_TOKEN = "$VERCEL_TOKEN"
+
+[mcp_servers.supabase]
+command = "npx"
+args = ["-y", "@supabase/mcp-server-supabase"]
+
+[mcp_servers.supabase.env]
+SUPABASE_ACCESS_TOKEN = "$SUPABASE_ACCESS_TOKEN"
+
+[mcp_servers.filesystem]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "."]
+
+[mcp_servers.docker]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-docker"]
+
+[mcp_servers.kubernetes]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-kubernetes"]
+
+[mcp_servers.kubernetes.env]
+KUBECONFIG = "$KUBECONFIG"

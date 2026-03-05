@@ -1,0 +1,32 @@
+{
+  "name": "devops-agent-hub",
+  "version": "1.0.0",
+  "description": "Production-ready DevOps AI toolkit with specialized agents, skills, commands, and security guardrails for infrastructure, CI/CD, cloud operations, and reliable deployments.",
+  "main": "scripts/lib/utils.js",
+  "scripts": {
+    "test": "node scripts/tests/run-all.js",
+    "setup": "node scripts/setup.js",
+    "validate": "node scripts/validate-structure.js",
+    "lint:json": "node -e \"const fs=require('fs');const files=['.claude-plugin/plugin.json','.claude-plugin/marketplace.json','hooks/hooks.json','mcp-configs/mcp-servers.json'];files.forEach(f=>{try{JSON.parse(fs.readFileSync(f,'utf8'));console.log('✅ '+f)}catch(e){console.error('❌ '+f+': '+e.message);process.exit(1)}})\"",
+    "lint:plugin": "claude plugin validate .claude-plugin/plugin.json && claude plugin validate .claude-plugin/marketplace.json"
+  },
+  "keywords": [
+    "claude-code",
+    "devops",
+    "ai-agents",
+    "infrastructure",
+    "automation",
+    "terraform",
+    "kubernetes",
+    "docker",
+    "cicd",
+    "github-actions",
+    "laravel-forge",
+    "microsoft-365"
+  ],
+  "author": "Bipin Kareparambil",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

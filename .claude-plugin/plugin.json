@@ -1,0 +1,12 @@
+{
+  "name": "devops-agent-hub",
+  "version": "1.0.0",
+  "description": "Production-ready DevOps AI toolkit with specialized agents, skills, commands, and security guardrails for infrastructure, CI/CD, cloud operations, and reliable deployments.",
+  "author": {
+    "name": "Bipin Kareparambil"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/bipinks/devops-agent-hub",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./mcp-configs/mcp-servers.json"
+}
