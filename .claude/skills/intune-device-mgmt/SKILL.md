@@ -11,7 +11,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "#!/bin/bash\nif [ -z \"$AZURE_CLIENT_ID\" ] && [ -z \"$MS_GRAPH_TOKEN\" ]; then\n  echo '❌ [Hook] Intune credentials not configured. Set AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID.' >&2\n  exit 1\nfi\nif [ -n \"$AZURE_CLIENT_ID\" ] && [ -n \"$AZURE_CLIENT_SECRET\" ] && [ -n \"$AZURE_TENANT_ID\" ]; then\n  export ACCESS_TOKEN=$(scripts/ms-graph-token.sh 2>/dev/null)\n  export MS_GRAPH_TOKEN=\"$ACCESS_TOKEN\"\nfi"
+          command: "#!/bin/bash\nif [ -z \"$AZURE_CLIENT_ID\" ] && [ -z \"$MS_GRAPH_TOKEN\" ]; then\n  echo '❌ [Hook] Intune credentials not configured. Set AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID.' >&2\n  exit 1\nfi\nif [ -n \"$AZURE_CLIENT_ID\" ] && [ -n \"$AZURE_CLIENT_SECRET\" ] && [ -n \"$AZURE_TENANT_ID\" ]; then\n  export ACCESS_TOKEN=$(node scripts/ms365.mjs token 2>/dev/null)\n  export MS_GRAPH_TOKEN=\"$ACCESS_TOKEN\"\nfi"
 ---
 
 # Microsoft Intune Device Management

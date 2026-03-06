@@ -68,14 +68,45 @@ export AZURE_CLIENT_SECRET="app-secret"
 export AZURE_TENANT_ID="tenant-id"
 ```
 
-### Auto Token Refresh
-IMPORTANT: Before every Graph API call, refresh the token automatically:
+### Quick CLI Scripts
+IMPORTANT: For common user operations, use the helper script instead of raw API calls. It handles token refresh, SKU mapping, and output formatting automatically:
+
 ```bash
-# Get a fresh token (valid ~65 minutes)
-ACCESS_TOKEN=$(scripts/ms-graph-token.sh)
-export MS_GRAPH_TOKEN="$ACCESS_TOKEN"
+# User info + licenses
+node scripts/ms365.mjs info vaishak
+node scripts/ms365.mjs info user@company.com
+
+# List all users (or filter by name)
+node scripts/ms365.mjs list
+node scripts/ms365.mjs list john
+
+# Show available tenant licenses (with usage counts)
+node scripts/ms365.mjs licenses
+
+# Assign / remove a license
+node scripts/ms365.mjs assign-license user@company.com O365_BUSINESS_ESSENTIALS
+node scripts/ms365.mjs remove-license user@company.com FLOW_FREE
+
+# Create / edit / delete a user
+node scripts/ms365.mjs create user@company.com "Display Name" "TempP@ss1" "Department" "Job Title"
+node scripts/ms365.mjs edit user@company.com department "Engineering"
+node scripts/ms365.mjs edit user@company.com jobTitle "Senior Developer"
+node scripts/ms365.mjs delete user@company.com
+
+# Groups — list, view membership, add/remove
+node scripts/ms365.mjs list-groups
+node scripts/ms365.mjs list-groups "Dev"
+node scripts/ms365.mjs groups user@company.com
+node scripts/ms365.mjs add-to-group user@company.com "Developers"
+node scripts/ms365.mjs remove-from-group user@company.com "Developers"
 ```
-Always use `$ACCESS_TOKEN` in API calls. Never rely on a previously exported token — refresh before each operation to avoid expired token errors.
+
+### Standalone Token
+For custom Graph API calls beyond what the script covers, get a token:
+
+```bash
+ACCESS_TOKEN=$(node scripts/ms365.mjs token)
+```
 
 For PowerShell interactive sessions:
 ```powershell

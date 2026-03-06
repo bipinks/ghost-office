@@ -1,6 +1,6 @@
 # DevOps Agent Hub — Agent Instructions
 
-A **Claude Code native DevOps toolkit** with 11 specialized agents, 24 skills, 16 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
+A **Claude Code native DevOps toolkit** with 12 specialized agents, 25 skills, 17 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -23,6 +23,7 @@ A **Claude Code native DevOps toolkit** with 11 specialized agents, 24 skills, 1
 | database-ops | Database operations | Migrations, backups, replication, tuning |
 | container-reviewer | Docker/K8s review | Dockerfile, Compose, K8s manifest review |
 | ms-it-admin | Microsoft 365 & Entra ID administration | User provisioning, licensing, Teams, Exchange, Intune, Conditional Access |
+| file-manager | Local filesystem operations | Organize files, bulk rename, find duplicates, disk cleanup, permissions |
 
 ## Agent Orchestration
 Use agents proactively without user prompt:
@@ -35,6 +36,7 @@ Use agents proactively without user prompt:
 - Container configuration → **container-reviewer**
 - Database changes → **database-ops**
 - Microsoft 365/Entra ID tasks → **ms-it-admin**
+- File organization, cleanup, bulk ops → **file-manager**
 
 Use parallel execution for independent operations — launch multiple agents simultaneously.
 
