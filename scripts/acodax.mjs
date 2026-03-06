@@ -209,19 +209,32 @@ async function cmdListUsers(search) {
 async function cmdUserInfo(userId) {
   if (!userId) die("Usage: user-info <user-id>");
   const data = await api(`/api/user/${userId}`);
-  const u = data.data?.data || data.data || data.user || data;
+  const u = data.data || data.user || data;
+
+  // Detail endpoint may omit is_active — fall back to list endpoint
+  let status;
+  if (u.is_active !== undefined) {
+    status = u.is_active === 1 || u.is_active === true ? "Active" : "Inactive";
+  } else {
+    const listData = await api("/api/user", { qs: { search: u.username || u.email } });
+    const match = extractList(listData, "users").find(x => x.id === u.id);
+    status = match && (match.is_active === 1 || match.is_active === true) ? "Active" : "Inactive";
+  }
 
   const name = [u.first_name, u.last_name].filter(Boolean).join(" ") || u.name || "-";
+  const roles = (u.roles || []).map(r => r.name).join(", ") || u.role?.name || u.role_id || "-";
   console.log(`=== ${name} ===`);
   console.log(`  ID:         ${u.id}`);
   console.log(`  Username:   ${u.username || "-"}`);
   console.log(`  Email:      ${u.email || "-"}`);
   console.log(`  Phone:      ${u.phone || "-"}`);
-  console.log(`  Role:       ${u.role?.name || u.role_id || "-"}`);
-  console.log(`  Branch:     ${u.branch?.name || u.branch_id || "-"}`);
+  console.log(`  Role:       ${roles}`);
+  console.log(`  Branch:     ${u.branch_name || u.branch?.name || u.branch_id || "-"}`);
+  console.log(`  Company:    ${u.company_name || "-"}`);
   console.log(`  Language:   ${u.language || "-"}`);
   console.log(`  Timezone:   ${u.time_zone || "-"}`);
-  console.log(`  Status:     ${u.is_active === 1 || u.is_active === true ? "Active" : "Inactive"}`);
+  console.log(`  Status:     ${status}`);
+  console.log(`  Last Login: ${u.last_login_formated || "-"}`);
   console.log(`  Created:    ${u.created_at || "-"}`);
 }
 
