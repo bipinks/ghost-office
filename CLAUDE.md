@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A Claude Code native DevOps toolkit: 10 specialized agents, 21 skills, 16 slash commands, path-scoped rules, and infrastructure safety hooks for cloud operations, CI/CD, and deployment workflows.
+A Claude Code native DevOps toolkit: 11 specialized agents, 24 skills, 16 slash commands, path-scoped rules, and infrastructure safety hooks for cloud operations, CI/CD, and deployment workflows.
 
 ## Architecture
 

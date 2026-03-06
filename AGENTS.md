@@ -1,6 +1,6 @@
 # DevOps Agent Hub — Agent Instructions
 
-A **Claude Code native DevOps toolkit** with 10 specialized agents, 21 skills, 16 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
+A **Claude Code native DevOps toolkit** with 11 specialized agents, 24 skills, 16 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -22,6 +22,7 @@ A **Claude Code native DevOps toolkit** with 10 specialized agents, 21 skills, 1
 | monitoring-analyst | Observability and SLOs | Prometheus, Grafana, alerting setup |
 | database-ops | Database operations | Migrations, backups, replication, tuning |
 | container-reviewer | Docker/K8s review | Dockerfile, Compose, K8s manifest review |
+| ms-it-admin | Microsoft 365 & Entra ID administration | User provisioning, licensing, Teams, Exchange, Intune, Conditional Access |
 
 ## Agent Orchestration
 Use agents proactively without user prompt:
@@ -33,6 +34,7 @@ Use agents proactively without user prompt:
 - Cost inquiries → **cost-optimizer**
 - Container configuration → **container-reviewer**
 - Database changes → **database-ops**
+- Microsoft 365/Entra ID tasks → **ms-it-admin**
 
 Use parallel execution for independent operations — launch multiple agents simultaneously.
 
@@ -114,9 +116,9 @@ Use parallel execution for independent operations — launch multiple agents sim
 ## Project Structure
 ```
 .claude/
-  agents/        — 10 specialized DevOps subagents
+  agents/        — 11 specialized DevOps subagents
   commands/      — 16 slash commands
-  skills/        — 21 domain knowledge packs
+  skills/        — 24 domain knowledge packs
   rules/         — 12 always-follow guidelines (7 categories)
   settings.json  — Infrastructure safety hooks
 .mcp.json        — MCP server configurations (GitHub, AWS, Cloudflare, etc.)
