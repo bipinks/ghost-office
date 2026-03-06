@@ -1,4 +1,12 @@
 {
+  "project_type": "enterprise_erp",
+  "default_agent": "master-orchestrator",
+  "autonomy_enabled": true,
+  "parallel_task_execution": true,
+  "logging_enabled": true,
+  "auto_recovery_enabled": true,
+  "auto_test_required": true,
+  "devops_enabled": true,
   "hooks": {
     "PreToolUse": [
       {
@@ -6,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\nINPUT_JSON=\"$(cat)\"\nCMD=\"\"\n\nif command -v jq >/dev/null 2>&1; then\n  CMD=\"$(printf '%s' \"$INPUT_JSON\" | jq -r '.tool_input.command // empty' 2>/dev/null)\"\nfi\n\nif [ -z \"$CMD\" ] && [ -n \"${TOOL_INPUT_COMMAND:-}\" ]; then\n  CMD=\"$TOOL_INPUT_COMMAND\"\nfi\n\nif [ -z \"$CMD\" ]; then\n  exit 0\nfi\n\nif echo \"$CMD\" | grep -qE 'terraform (apply|destroy)|kubectl delete|aws .* delete'; then\n  echo '⚠️  [Hook] Destructive infrastructure operation detected!' >&2\n  echo 'Please verify:' >&2\n  echo '  1. You are targeting the correct environment' >&2\n  echo '  2. A terraform plan has been reviewed' >&2\n  echo '  3. Rollback procedures are documented' >&2\n  echo '  4. Team has been notified' >&2\nfi\n\nif echo \"$CMD\" | grep -qE 'terraform apply'; then\n  if echo \"$CMD\" | grep -qE '\\-auto-approve'; then\n    echo '⚠️  [Hook] Using -auto-approve detected! This skips the review step.' >&2\n    echo 'This should NEVER be used in production.' >&2\n  else\n    echo 'ℹ️  [Hook] Remember to review the plan output carefully before confirming.' >&2\n  fi\nfi"
+            "command": "#!/bin/bash\nINPUT_JSON=\"$(cat)\"\nCMD=\"\"\n\nif command -v jq >/dev/null 2>&1; then\n  CMD=\"$(printf '%s' \"$INPUT_JSON\" | jq -r '.tool_input.command // empty' 2>/dev/null)\"\nfi\n\nif [ -z \"$CMD\" ] && [ -n \"${TOOL_INPUT_COMMAND:-}\" ]; then\n  CMD=\"$TOOL_INPUT_COMMAND\"\nfi\n\nif [ -z \"$CMD\" ]; then\n  exit 0\nfi\n\nif echo \"$CMD\" | grep -qE 'terraform (apply|destroy)|kubectl delete|aws .* delete'; then\n  echo '⚠️  [Hook] Destructive infrastructure operation detected!' >&2\n  echo 'Please verify:' >&2\n  echo '  1. You are targeting the correct environment' >&2\n  echo '  2. A terraform plan has been reviewed' >&2\n  echo '  3. Rollback procedures are documented' >&2\n  echo '  4. Team has been notified' >&2\nfi\n\nif echo \"$CMD\" | grep -qE 'terraform apply'; then\n  if echo \"$CMD\" | grep -qE '\\-auto-approve'; then\n    echo '⚠️  [Hook] Using -auto-approve detected! This skips the review step.' >&2\n    echo 'This should NEVER be used in production.' >&2\n  else\n    echo 'ℹ️  [Hook] Remember to review the plan output carefully before confirming.' >&2\n  fi\nfi\n\nif echo \"$CMD\" | grep -qE 'php artisan migrate.*--force|docker compose.*down|rm -rf|DROP TABLE|DROP DATABASE'; then\n  echo '⚠️  [Hook] Potentially destructive operation detected!' >&2\n  echo 'Verify: correct environment, backup exists, rollback plan ready.' >&2\nfi"
           }
         ]
       }

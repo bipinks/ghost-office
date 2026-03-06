@@ -1,141 +1,144 @@
-# DevOps Agent Hub — Agent Instructions
+# Autonomous ERP Workspace — Agent Instructions
 
-A **Claude Code native DevOps toolkit** with 13 specialized agents, 26 skills, 18 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
+A **fully autonomous AI-driven ERP software company** with 16 specialized agents, 27 skills, 19 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
-2. **Infrastructure-as-Code** — All infrastructure changes through code, never manual
-3. **Security-First** — Never compromise on security; validate all configurations
-4. **Immutable Infrastructure** — Replace, don't modify; use versioned artifacts
-5. **Plan Before Apply** — Always review plans before applying infrastructure changes
+2. **Autonomous Operation** — Agents self-coordinate via the master orchestrator
+3. **Quality Gates** — Tests, security review, and approval before deployment
+4. **Knowledge-Driven** — All agents reference `.claude/memory/` for consistency
+5. **Parallel Execution** — Independent tasks run simultaneously for efficiency
+6. **Audit Everything** — Log all actions, decisions, and changes
+7. **Security-First** — Never compromise on security; validate all changes
 
-## Available Agents
+## Agent Roster
+
+### Master Orchestrator
+| Agent | Purpose | When Active |
+|-------|---------|-------------|
+| master-orchestrator | Central coordinator of all agents | Every task — plans, assigns, tracks, delivers |
+
+### Department Agents
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|
-| infra-planner | Infrastructure architecture design | VPC layouts, capacity planning, multi-tier design |
-| cicd-architect | CI/CD pipeline architecture | GitHub Actions, GitLab CI, Jenkins pipelines |
-| cloud-reviewer | Infrastructure code review | Terraform, CloudFormation, Pulumi reviews |
-| security-auditor | CIS benchmarks, OWASP | Security audits, compliance checks |
-| incident-responder | Incident triage and RCA | Production incidents, on-call triage |
-| cost-optimizer | Cloud cost analysis (FinOps) | Cost reviews, right-sizing, savings plans |
-| deployment-manager | Deployment orchestration | Blue/green, canary, rolling deployments |
-| monitoring-analyst | Observability and SLOs | Prometheus, Grafana, alerting setup |
-| database-ops | Database operations | Migrations, backups, replication, tuning |
-| container-reviewer | Docker/K8s review | Dockerfile, Compose, K8s manifest review |
-| ms-it-admin | Microsoft 365 & Entra ID administration | User provisioning, licensing, Teams, Exchange, Intune, Conditional Access |
-| file-manager | Local filesystem operations | Organize files, bulk rename, find duplicates, disk cleanup, permissions |
-| deployer | Remote project deployment via SSH | Git pull, Docker Compose, Django migrations, container restart, rollback |
+| architecture-agent | System design, tech decisions | New features, refactors, architecture reviews |
+| erp-product-manager | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
+| backend-engineer | Server-side code, APIs, logic | Backend features, API endpoints, integrations |
+| frontend-engineer | UI/UX, client-side code | Frontend features, UI bugs, responsive design |
+| database-engineer | Schema, queries, migrations | DB changes, migrations, query optimization |
+| qa-agent | Testing, quality assurance | Test writing, bug verification, regression testing |
+| security-agent | Security audits, vulnerabilities | Security reviews, pen testing, compliance |
+| devops-engineer | CI/CD, infrastructure, deploy | Pipeline setup, server config, deployments |
+| monitoring-agent | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
+| performance-agent | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
+| support-agent | User issues, triage, client ops | Bug reports, client setup, file operations |
+| documentation-agent | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
+
+### Specialist Agents (Domain-Specific)
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| ms-it-admin | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
+| acodax-erp-office-admin | Acodax ERP administration | ERP user management, roles, branches |
+| deployer | SSH deployment operations | Production/staging deployments via SSH |
 
 ## Agent Orchestration
-Use agents proactively without user prompt:
-- Infrastructure design requests → **infra-planner**
-- Terraform/IaC code written → **cloud-reviewer**
-- Security-sensitive changes → **security-auditor**
-- Deployment requests → **deployment-manager**
-- Production issues → **incident-responder**
-- Cost inquiries → **cost-optimizer**
-- Container configuration → **container-reviewer**
-- Database changes → **database-ops**
-- Microsoft 365/Entra ID tasks → **ms-it-admin**
-- File organization, cleanup, bulk ops → **file-manager**
-- Remote project deployments (SSH + Docker) → **deployer**
 
-Use parallel execution for independent operations — launch multiple agents simultaneously.
+### Automatic Assignment
+The master-orchestrator automatically routes tasks:
+- Feature requests → erp-product-manager → architecture-agent → engineers → qa-agent
+- Bug reports → support-agent → relevant engineer → qa-agent
+- Deployments → devops-engineer → monitoring-agent
+- Security concerns → security-agent (immediate priority)
+- Incidents → monitoring-agent → devops-engineer → engineers
+- Documentation → documentation-agent
+- Performance issues → performance-agent
+- Microsoft 365 tasks → ms-it-admin
+- Acodax ERP admin → acodax-erp-office-admin
+- SSH deployments → deployer
+
+### Parallel Execution
+Launch multiple agents simultaneously for independent tasks:
+- Backend + frontend implementation (after design phase)
+- Security review + architecture review (post-implementation)
+- Documentation + deployment preparation
+- Multiple investigation tracks during incidents
+
+## Workflows
+
+| Workflow | File | Phases |
+|----------|------|--------|
+| Feature Development | `.claude/workflows/feature-development.md` | Requirements → Design → Implement → Test → Review → Deploy |
+| Bug Fix | `.claude/workflows/bug-fix.md` | Triage → Investigate → Fix → Test → Deploy |
+| Release Process | `.claude/workflows/release-process.md` | Freeze → QA → Security → Staging → Approval → Production |
+| Production Incident | `.claude/workflows/production-incident.md` | Detect → Triage → Investigate → Mitigate → Resolve → Post-mortem |
+| Client Deployment | `.claude/workflows/client-deployment.md` | Requirements → Tenant → Config → Data → Deploy → Verify |
+
+## Knowledge Base
+
+All agents reference `.claude/memory/` before making decisions:
+| Document | Contents |
+|----------|----------|
+| `architecture.md` | System architecture, module structure, API design |
+| `coding-standards.md` | Laravel/PHP, Vue/TS conventions, git workflow |
+| `erp-domain.md` | ERP modules, business rules, multi-branch operations |
+| `deployment-standards.md` | Environment setup, deployment checklists, rollback |
+| `devops-runbook.md` | Server management, backups, CI/CD, troubleshooting |
+| `performance-guidelines.md` | Performance targets, optimization rules, caching |
 
 ## Security Guidelines
-**Before ANY infrastructure change:**
+**Before ANY change:**
 - No hardcoded secrets (API keys, passwords, tokens, certificates)
 - IAM follows least privilege principle
 - Encryption at rest enabled for all storage
 - Encryption in transit (TLS 1.2+) for all communication
-- Security groups restrict ingress to minimum required
-- No 0.0.0.0/0 ingress on sensitive ports (SSH, RDP, DB)
-- Audit logging enabled (CloudTrail, flow logs, access logs)
+- Multi-tenant data isolation verified
+- Audit logging for all data changes
 - Container images scanned for vulnerabilities
 
-**Secret management:** NEVER hardcode secrets. Use environment variables, secrets managers (Vault, AWS Secrets Manager), or sealed secrets. Rotate any exposed credentials immediately.
-
-**If security issue found:** STOP → use security-auditor agent → fix CRITICAL issues → rotate exposed credentials → review infrastructure for similar issues.
+**If security issue found:** STOP → use security-agent → fix CRITICAL issues → rotate exposed credentials → review for similar issues.
 
 ## Coding Style
-**Infrastructure-as-Code:**
-- Use modules/roles for reusable components
-- Add validation rules to all input variables
-- Include descriptions for all variables and outputs
-- Pin provider/tool versions explicitly
-- Use consistent naming: `{project}-{environment}-{resource}` format
+Reference `.claude/memory/coding-standards.md` for full details:
+- **PHP/Laravel**: PSR-12, thin controllers, service layer for business logic
+- **TypeScript/Vue**: Composition API, type-safe props, component-based architecture
+- **Database**: snake_case, branch_id on every table, soft deletes, audit columns
+- **API**: RESTful, versioned, consistent response envelope
+- **Git**: Conventional commits, feature branches, squash merge
 
-**File organization:**
-- Separate state per environment and component
-- Group by feature/domain, not by resource type
-- Keep files focused and under 400 lines
-- README.md for every module and role
-
-**Error handling:**
-- Validate inputs at module boundaries
-- Provide clear error messages for failed validations
-- Never silently ignore infrastructure issues
-- Log detailed context for operations
-
-## Testing Requirements
-**Infrastructure testing (all required):**
-1. **Static analysis** — `terraform validate`, `tflint`, `checkov`, `trivy`
-2. **Unit tests** — Module-level tests with Terratest or pytest
-3. **Integration tests** — Deploy to ephemeral environment, validate, destroy
-4. **Compliance tests** — CIS benchmark checks, policy-as-code (OPA, Sentinel)
-
-**Pipeline testing:**
-- Run all checks on every PR
-- Pin tool versions for reproducibility
-- Use test environments that mirror production
-- Clean up test resources after each run
-
-## Development Workflow
-1. **Plan** — Use infra-planner agent, identify requirements, design architecture
-2. **Implement** — Write IaC with best practices, use skills for domain knowledge
-3. **Review** — Use cloud-reviewer + security-auditor agents, address all findings
-4. **Test** — Static analysis, unit tests, integration tests
-5. **Deploy** — Use deployment-manager agent, monitor during and after
-6. **Monitor** — Use monitoring-analyst agent, set up SLOs and alerting
-
-## Git Workflow
-**Commit format:** `<type>: <description>` — Types: feat, fix, refactor, docs, test, chore, ci, infra
-
-**PR workflow:** Include terraform plan output → review with cloud-reviewer → require approval → merge to main → auto-deploy to staging → manual gate for production.
-
-## Architecture Patterns
-**Multi-tier design:** Public → Private → Data subnets across 3+ AZs.
-
-**Deployment strategies:** Blue/green for major releases, canary for high-risk changes, rolling for standard releases.
-
-**GitOps:** Git as single source of truth. ArgoCD/Flux for pull-based deployment. Kustomize overlays for environment-specific configuration.
-
-**Observability:** Four golden signals (latency, traffic, errors, saturation). SLI/SLO/error budget framework. Runbook-linked alerts.
-
-## Performance
-**Context management:** Prioritize high-impact infrastructure changes. Use agents in parallel for independent reviews. Cache frequently used patterns from skills.
-
-**Build troubleshooting:** Use container-reviewer for Docker issues → cloud-reviewer for IaC issues → monitoring-analyst for runtime issues.
+## Quality Requirements
+Every deliverable must meet:
+- [ ] Code follows coding standards
+- [ ] Tests written and passing (80%+ coverage)
+- [ ] Security review passed
+- [ ] Multi-tenant isolation verified
+- [ ] Documentation updated
+- [ ] Database migrations reversible
+- [ ] No breaking changes to existing APIs
 
 ## Project Structure
 ```
 .claude/
-  agents/        — 13 specialized DevOps subagents
-  commands/      — 18 slash commands
-  skills/        — 26 domain knowledge packs
-  rules/         — 12 always-follow guidelines (7 categories)
-  settings.json  — Infrastructure safety hooks
-.mcp.json        — MCP server configurations (GitHub, AWS, Cloudflare, etc.)
-scripts/         — Cross-platform Node.js utilities
-contexts/        — 4 dynamic context modes
-examples/        — 4 real-world CLAUDE.md templates
+  agents/         — 16 autonomous agents
+  commands/       — 19 slash commands
+  workflows/      — 5 workflow definitions
+  memory/         — 6 knowledge base documents
+  tools/          — 4 tool reference documents
+  skills/         — 27 domain knowledge packs
+  rules/          — 11 guidelines (7 categories)
+  settings.json   — Hooks and autonomous settings
+.mcp.json         — MCP server configurations (GitHub, AWS, MS365, etc.)
+scripts/          — Node.js utilities (ms365, acodax, validation)
+contexts/         — 4 dynamic context modes
+examples/         — CLAUDE.md templates for real projects
+docs/             — Architecture reports and documentation
 ```
 
 ## Success Metrics
-- All infrastructure changes go through code review
-- No security vulnerabilities in deployed infrastructure
+- All changes go through agent-coordinated quality gates
+- No security vulnerabilities in deployed code
 - Zero secrets exposed in code or logs
-- SLOs met for all production services
+- Tests passing with 80%+ coverage
+- Multi-tenant data isolation verified for every feature
 - Deployment rollback available within 5 minutes
 - Mean Time To Recovery (MTTR) under 30 minutes for SEV1
-- Cloud costs tracked with FinOps practices
+- Every feature has documentation and changelog entry
