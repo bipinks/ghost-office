@@ -84,11 +84,20 @@ All rules retained — they provide safety guardrails:
 - `common/`: coding-style, git-workflow, performance, security, testing
 - `cicd/`, `cloud/`, `docker/`, `kubernetes/`, `security/`, `terraform/`
 
-## 6. Hooks & Safety
+## 6. Hooks & Safety (7 hooks)
 
-Current hooks (retained and extended):
-- **PreToolUse (Bash)**: Warns on destructive infra operations (terraform apply/destroy, kubectl delete, aws delete)
-- **PostToolUse (Write|Edit)**: Scans for hardcoded secrets, Dockerfile best practices, YAML lint
+All hooks externalized to `.claude/hooks/` scripts:
+- **SessionStart (startup|resume|compact)**: `session-start.sh` — Injects ERP project context (branch, recent changes, critical rules)
+- **PreToolUse (Bash)**: `infra-safety-check.sh` — Warns on destructive infra operations (terraform apply/destroy, kubectl delete, aws delete)
+- **PreToolUse (Bash)**: `git-safety-check.sh` — Blocks force-push to protected branches (exit 2), warns on direct push
+- **PreToolUse (mcp__ms365__)**: `ms365-audit-log.sh` — Logs all MS365 operations for compliance audit trail
+- **PostToolUse (Write|Edit)**: `file-write-check.sh` — Scans for hardcoded secrets, Dockerfile best practices, YAML lint
+- **PostToolUse (Write|Edit)**: `migration-check.sh` — Enforces branch_id in new migration files (multi-tenant)
+- **PreCompact (auto|manual)**: `pre-compact.sh` — Preserves critical task context before auto-compaction
+
+### Permissions Configuration
+- **allowedTools**: Read-only tools auto-approved (Read, Glob, Grep, TodoWrite, Agent, WebSearch, MS365 list/get)
+- **deny**: Destructive commands blocked (rm -rf /, terraform destroy, DROP DATABASE, force-push to protected branches)
 
 ## 7. MCP Integrations (9 servers)
 
@@ -107,7 +116,8 @@ All retained — they provide external service access:
 ├── tools/          — 4 tool reference documents (NEW)
 ├── skills/         — 23 skills (4 removed: file-management, laravel-forge, serverless-patterns, gitops-patterns)
 ├── rules/          — All existing rules (preserved)
-└── settings.json   — Enhanced for autonomous operation
+├── hooks/          — 7 hook scripts (NEW: session-start, pre-compact, infra-safety, git-safety, file-write, migration, ms365-audit)
+└── settings.json   — Enhanced with hooks, permissions (allowedTools/deny), and autonomous operation
 ```
 
 ### Preserved Unchanged

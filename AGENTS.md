@@ -1,6 +1,6 @@
 # Autonomous ERP Workspace — Agent Instructions
 
-A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 23 skills, 17 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 23 skills, 17 commands, 5 workflows, 7 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -119,7 +119,8 @@ Every deliverable must meet:
   tools/          — 4 tool reference documents
   skills/         — 23 domain knowledge packs
   rules/          — 11 guidelines (7 categories)
-  settings.json   — Hooks and autonomous settings
+  hooks/          — 7 safety and audit hook scripts
+  settings.json   — Hooks, permissions, and autonomous settings
 .mcp.json         — MCP server configurations (GitHub, AWS, MS365, etc.)
 scripts/          — Node.js utilities (ms365, acodax, validation)
 contexts/         — 4 dynamic context modes

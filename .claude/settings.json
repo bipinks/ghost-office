@@ -7,7 +7,50 @@
   "auto_recovery_enabled": true,
   "auto_test_required": true,
   "devops_enabled": true,
+  "allowedTools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "TodoWrite",
+    "Agent",
+    "WebSearch",
+    "WebFetch",
+    "mcp__ms365__list-*",
+    "mcp__ms365__get-*",
+    "mcp__ms365__search-*",
+    "mcp__ms365__verify-login",
+    "mcp__ms365__list-accounts",
+    "mcp__filesystem__read_*",
+    "mcp__filesystem__list_*",
+    "mcp__filesystem__directory_tree",
+    "mcp__filesystem__search_files",
+    "mcp__filesystem__get_file_info",
+    "mcp__filesystem__list_allowed_directories"
+  ],
+  "deny": [
+    "Bash(rm -rf /)",
+    "Bash(terraform destroy)",
+    "Bash(kubectl delete namespace)",
+    "Bash(docker system prune -a --force)",
+    "Bash(git push --force origin main)",
+    "Bash(git push --force origin master)",
+    "Bash(git push --force origin production)",
+    "Bash(DROP DATABASE)",
+    "Bash(DROP TABLE)"
+  ],
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh",
+            "statusMessage": "Loading ERP workspace context..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -48,6 +91,18 @@
             "type": "command",
             "command": ".claude/hooks/migration-check.sh",
             "statusMessage": "Checking migration multi-tenant compliance..."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto|manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-compact.sh",
+            "statusMessage": "Preserving critical context before compaction..."
           }
         ]
       }

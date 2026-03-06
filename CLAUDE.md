@@ -17,7 +17,8 @@ All components live under `.claude/` for native auto-discovery:
 ├── tools/          — 4 tool reference documents
 ├── skills/         — 23 domain knowledge packs
 ├── rules/          — 11 always-follow guidelines (7 categories)
-└── settings.json   — Hooks and autonomous operation settings
+├── hooks/          — 7 safety and audit hook scripts
+└── settings.json   — Hooks, permissions, and autonomous operation settings
 ```
 
 ## Agent Team
@@ -86,26 +87,35 @@ Agents reference `.claude/memory/` for persistent context:
 
 ## Key Conventions
 
-- Agents use frontmatter: name, description, tools, model
+- Agents use frontmatter: name, description, tools, model, isolation
 - Skills directories contain a `SKILL.md` as the main instruction
 - Commands use `$ARGUMENTS` substitution
 - Rules use `paths` frontmatter for file-pattern scoping
 - Workflows define parallel and sequential execution phases
 - Memory files are the persistent knowledge base for all agents
-- All infrastructure changes require explicit confirmation
-- Never store secrets in plain text or commit them
+
+IMPORTANT: The following rules are enforced by hooks and MUST be followed:
+- NEVER store secrets, API keys, or passwords in code — use a secrets manager
+- NEVER force-push to protected branches (main, master, develop, production, staging)
+- NEVER run destructive infrastructure commands without explicit confirmation
+- All database tables MUST include `branch_id` for multi-tenant data isolation
+- All migrations MUST include rollback/down methods
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`
 
 ## Autonomous Operation
 
 The workspace enables Claude Code to:
 - Break down tasks and assign to specialized agents
-- Execute parallel work streams for independent subtasks
+- Execute parallel work streams for independent subtasks (with worktree isolation)
 - Run quality gates (tests, security review) before deployment
 - Manage full ERP feature lifecycle (requirements → deploy)
 - Handle incidents with structured triage and resolution
-- Maintain audit trails for all operations
+- Maintain audit trails for all operations (MS365 audit logging)
 - Reference the knowledge base for consistent decision-making
+- Auto-inject project context on session start/resume (SessionStart hook)
+- Preserve critical context before compaction (PreCompact hook)
+- Auto-approve read-only tools via permissions (allowedTools)
+- Block destructive commands via deny rules
 
 ## Testing
 
@@ -116,6 +126,20 @@ The workspace enables Claude Code to:
 - Verify workflows: `ls .claude/workflows/`
 - Verify memory: `ls .claude/memory/`
 - Run all tests: `npm test`
+
+## Hooks
+
+7 hook scripts in `.claude/hooks/` enforce safety and compliance:
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| `session-start.sh` | SessionStart | Injects ERP context on session start/resume/compact |
+| `pre-compact.sh` | PreCompact | Preserves critical context before auto-compaction |
+| `infra-safety-check.sh` | PreToolUse (Bash) | Warns on destructive infrastructure commands |
+| `git-safety-check.sh` | PreToolUse (Bash) | Blocks force-push to protected branches |
+| `file-write-check.sh` | PostToolUse (Write/Edit) | Scans for secrets, Dockerfile issues, YAML lint |
+| `migration-check.sh` | PostToolUse (Write/Edit) | Enforces branch_id in new migrations |
+| `ms365-audit-log.sh` | PreToolUse (MS365) | Logs all MS365 operations for audit |
 
 ## Important
 
