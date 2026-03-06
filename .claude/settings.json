@@ -1,5 +1,4 @@
 {
-  "description": "DevOps safety hooks — infrastructure guardrails and quality checks",
   "hooks": {
     "PreToolUse": [
       {

@@ -1,6 +1,6 @@
 # DevOps Agent Hub — Agent Instructions
 
-This is a **production-ready DevOps automation plugin** providing 10 specialized agents, 21 skills, 16 commands, and automated hook workflows for infrastructure, CI/CD, cloud management, and deployment automation.
+A **Claude Code native DevOps toolkit** with 10 specialized agents, 21 skills, 16 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -113,15 +113,16 @@ Use parallel execution for independent operations — launch multiple agents sim
 
 ## Project Structure
 ```
-agents/          — 10 specialized DevOps subagents
-skills/          — 21 domain knowledge packs
-commands/        — 16 slash commands
-rules/           — 12 always-follow guidelines (7 categories)
-hooks/           — 5 safety and quality automations
+.claude/
+  agents/        — 10 specialized DevOps subagents
+  commands/      — 16 slash commands
+  skills/        — 21 domain knowledge packs
+  rules/         — 12 always-follow guidelines (7 categories)
+  settings.json  — Infrastructure safety hooks
+.mcp.json        — MCP server configurations (GitHub, AWS, Cloudflare, etc.)
 scripts/         — Cross-platform Node.js utilities
 contexts/        — 4 dynamic context modes
 examples/        — 4 real-world CLAUDE.md templates
-mcp-configs/     — MCP server configurations
 ```
 
 ## Success Metrics

@@ -2,56 +2,53 @@
 
 ## Project Overview
 
-This is a DevOps-focused AI agent harness — a plugin system providing specialized agents, skills, commands, rules, and hooks for infrastructure automation, CI/CD, cloud management, and deployment workflows.
-
-## References
-
-- Project overview: @README.md
-- Plugin structure: @.claude-plugin/plugin.json
-- Available agents: @AGENTS.md
-- Contribution guide: @CONTRIBUTING.md
-- Beginner setup: @BEGINNERS-GUIDE.md
+A Claude Code native DevOps toolkit: 10 specialized agents, 21 skills, 16 slash commands, path-scoped rules, and infrastructure safety hooks for cloud operations, CI/CD, and deployment workflows.
 
 ## Architecture
 
-- **Agents** (`agents/`): Markdown-defined subagents for specific DevOps tasks
-- **Skills** (`skills/`): Domain knowledge packs with step-by-step workflows
-- **Commands** (`commands/`): Slash commands for quick task execution
-- **Rules** (`rules/`): Always-follow guidelines organized by domain
-- **Hooks** (`hooks/`): Event-driven automations for safety and quality
-- **Scripts** (`scripts/`): Cross-platform Node.js utilities
-- **Contexts** (`contexts/`): Dynamic system prompt injection by mode
+All components live under `.claude/` for native auto-discovery:
+
+- **Agents** (`.claude/agents/`): Subagents for specific DevOps tasks
+- **Commands** (`.claude/commands/`): Slash commands for quick task execution
+- **Skills** (`.claude/skills/`): Domain knowledge packs with step-by-step workflows
+- **Rules** (`.claude/rules/`): Always-follow guidelines organized by domain
+- **Settings** (`.claude/settings.json`): Hooks for infrastructure safety checks
+- **MCP** (`.mcp.json`): External service connections (GitHub, AWS, Cloudflare, etc.)
+
+## References
+
+- Agent reference: @AGENTS.md
+- Beginner setup: @BEGINNERS-GUIDE.md
+- Contribution guide: @CONTRIBUTING.md
 
 ## Key Conventions
 
-- All agents follow the frontmatter format: name, description, tools, model
-- Skills directories contain a `SKILL.md` file as the main instruction
-- Commands are slash commands (e.g., `/deploy`, `/infra-plan`) with `$ARGUMENTS` substitution
-- Rules have common/ (universal) + domain-specific directories with `paths` frontmatter
+- Agents use frontmatter: name, description, tools, model
+- Skills directories contain a `SKILL.md` as the main instruction
+- Commands use `$ARGUMENTS` substitution
+- Rules use `paths` frontmatter for file-pattern scoping
 - All infrastructure changes require explicit confirmation
 - Never store secrets in plain text or commit them
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`
-- Destructive skills use `context: fork` for isolated subagent execution
 
 ## File Patterns
 
-- Agent definitions: `agents/*.md`
-- Skill instructions: `skills/*/SKILL.md`
-- Skill supporting files: `skills/*/examples.md`, `skills/*/reference.md`
-- Command definitions: `commands/*.md`
-- Rule files: `rules/{domain}/*.md`
-- Hook configs: `hooks/hooks.json`
-- MCP configs: `mcp-configs/mcp-servers.json`
+- Agent definitions: `.claude/agents/*.md`
+- Slash commands: `.claude/commands/*.md`
+- Skill instructions: `.claude/skills/*/SKILL.md`
+- Rule files: `.claude/rules/{domain}/*.md`
+- Hooks/settings: `.claude/settings.json`
+- MCP config: `.mcp.json`
 
 ## Testing
 
 - Validate JSON: `node -e "JSON.parse(require('fs').readFileSync('FILE','utf8'))"`
-- Check structure: `find . -name "SKILL.md" -type f`
-- Verify hooks: `node scripts/hooks/session-start.js --dry-run`
-- Check $ARGUMENTS: `grep -L 'ARGUMENTS' commands/*.md`
+- Check structure: `find .claude -name "SKILL.md" -type f`
+- Verify agents: `ls .claude/agents/`
+- Verify commands: `ls .claude/commands/`
 
 ## Important
 
-- This is a plugin/configuration project — no compiled code
+- This is a Claude Code native project — no plugin install required
 - All content is markdown, JSON, and shell scripts
-- Follow the architecture and conventions documented in this repository
+- Components auto-discover from `.claude/` at session start

@@ -6,7 +6,7 @@ Welcome! If you're new to DevOps and wondering what this project does and how to
 
 ## What Is This Project?
 
-**DevOps Agent Hub** is a toolkit that makes AI coding assistants (like Claude Code, Codex, etc.) incredibly good at DevOps tasks. Think of it as a "brain upgrade" for your AI assistant — it teaches the AI about infrastructure, deployments, servers, and cloud services so it can actually help you do DevOps work.
+**DevOps Agent Hub** is a toolkit that makes Claude Code incredibly good at DevOps tasks. Think of it as a "brain upgrade" for your AI assistant — it teaches the AI about infrastructure, deployments, servers, and cloud services so it can actually help you do DevOps work.
 
 ### Simple Analogy
 Imagine you hired 10 expert DevOps engineers, each specializing in different areas. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
@@ -58,67 +58,37 @@ Plus:
 Open the project folder in your editor. You'll see:
 
 ```
-your-project/
-├── agents/       ← 10 AI "expert" definitions
-├── skills/       ← 21 knowledge guides with code examples
-├── commands/     ← 16 shortcut commands
-├── rules/        ← Safety and best practice rules (MUST be installed)
-├── hooks/        ← Automatic safety checks
-├── contexts/     ← Mode switching (dev/deploy/incident)
-├── examples/     ← Sample configs for real projects
-├── scripts/      ← Helper utilities
-└── mcp-configs/  ← External service connections
+devops-agent-hub/
+├── .claude/
+│   ├── agents/    ← 10 AI "expert" definitions
+│   ├── commands/  ← 16 shortcut commands
+│   ├── skills/    ← 21 knowledge guides with code examples
+│   ├── rules/     ← Safety and best practice rules
+│   └── settings.json ← Automatic safety hooks
+├── .mcp.json      ← External service connections
+├── contexts/      ← Mode switching (dev/deploy/incident)
+├── examples/      ← Sample configs for real projects
+└── scripts/       ← Helper utilities
 ```
 
-### Step 2: Install Rules (Mandatory) + Plugin (Optional)
+### Step 2: Start Claude Code
 
-**First, install the rules.** This is **mandatory** regardless of whether you use the plugin:
+Everything auto-discovers from `.claude/` — no install or copy step needed:
 
 ```bash
-# Required — common rules (security, git workflow, testing, coding style)
-cp -r rules/common/ ~/.claude/rules/common/
-
-# Also recommended — copy domain-specific rules you'll use
-cp -r rules/terraform/ ~/.claude/rules/terraform/
-cp -r rules/kubernetes/ ~/.claude/rules/kubernetes/
-cp -r rules/docker/ ~/.claude/rules/docker/
-cp -r rules/cicd/ ~/.claude/rules/cicd/
-cp -r rules/cloud/ ~/.claude/rules/cloud/
-cp -r rules/security/ ~/.claude/rules/security/
+cd devops-agent-hub
+claude
 ```
 
-> ⚠️ **Rules are mandatory, not optional.** Without them, the AI won't know critical guidelines like "never commit secrets" or "always review terraform plan before apply."
-
-**Then, optionally register as a plugin** (if your AI harness supports it):
+To use in your own project, copy `.claude/` into your project root:
 
 ```bash
-claude plugin marketplace add /path/to/devops-agent-hub
-claude plugin install devops-agent-hub@devops-agent-hub
-```
-
-This registers the agents, skills, commands, and hooks with the AI.
-
-**For Codex users**, no plugin install is required. Start Codex in this directory:
-
-```bash
-codex -C /path/to/devops-agent-hub
-```
-
-For stricter guardrails on infra tasks:
-
-```bash
-codex -C /path/to/devops-agent-hub -p devops_strict
-```
-
-**Or, use the one-line install script** (installs rules AND registers plugin):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/bipinks/devops-agent-hub/main/install.sh | bash
+cp -r devops-agent-hub/.claude/ your-project/.claude/
 ```
 
 ### Step 3: Start Using Commands
 
-Once installed, you can use **slash commands** in your AI assistant. Here are the most useful ones to start with:
+Slash commands are immediately available. Here are the most useful ones to start with:
 
 ---
 
@@ -244,26 +214,26 @@ Once installed, you can use **slash commands** in your AI assistant. Here are th
 If you're brand new to DevOps, here's a suggested learning order:
 
 ### Week 1-2: Basics
-1. **Read** `skills/docker-patterns/SKILL.md` — Learn Docker basics
+1. **Read** `.claude/skills/docker-patterns/SKILL.md` — Learn Docker basics
 2. **Try** `/docker-build` — Create your first Dockerfile
-3. **Read** `skills/github-workflows/SKILL.md` — Learn CI/CD basics
+3. **Read** `.claude/skills/github-workflows/SKILL.md` — Learn CI/CD basics
 4. **Try** `/github-setup` — Set up your first pipeline
 
 ### Week 3-4: Cloud & Infrastructure
-1. **Read** `skills/aws-patterns/SKILL.md` — Understand cloud services
-2. **Read** `skills/terraform-patterns/SKILL.md` — Learn Infrastructure-as-Code
+1. **Read** `.claude/skills/aws-patterns/SKILL.md` — Understand cloud services
+2. **Read** `.claude/skills/terraform-patterns/SKILL.md` — Learn Infrastructure-as-Code
 3. **Try** `/infra-plan` — Design your first architecture
 
 ### Week 5-6: Deployment & Operations
-1. **Read** `skills/laravel-forge/SKILL.md` — Server management
+1. **Read** `.claude/skills/laravel-forge/SKILL.md` — Server management
 2. **Try** `/forge-deploy` — Deploy an app
-3. **Read** `skills/monitoring-patterns/SKILL.md` — Learn observability
+3. **Read** `.claude/skills/monitoring-patterns/SKILL.md` — Learn observability
 4. **Try** `/monitor-setup` — Set up monitoring
 
 ### Week 7-8: Security & Advanced
-1. **Read** `rules/common/security.md` — Security fundamentals
+1. **Read** `.claude/rules/common/security.md` — Security fundamentals
 2. **Try** `/security-scan` — Audit your infrastructure
-3. **Read** `skills/kubernetes-patterns/SKILL.md` — Container orchestration
+3. **Read** `.claude/skills/kubernetes-patterns/SKILL.md` — Container orchestration
 4. **Try** `/k8s-deploy` — Deploy to Kubernetes
 
 ---
@@ -291,10 +261,10 @@ A "hook" is an automatic check that runs when certain actions happen. For exampl
 ## 💡 Tips for Beginners
 
 1. **Start small** — Don't try to learn everything at once. Pick one area (e.g., Docker) and master it.
-2. **Read the skills** — The `skills/*/SKILL.md` files are goldmines of practical knowledge with real code examples.
+2. **Read the skills** — The `.claude/skills/*/SKILL.md` files are goldmines of practical knowledge with real code examples.
 3. **Use commands freely** — The slash commands are safe to experiment with. They generate code/configs for you to review.
 4. **Check the examples** — The `examples/` folder has complete CLAUDE.md configs for real-world projects you can copy.
-5. **Follow the rules** — The `rules/` files contain critical best practices. Read `rules/common/security.md` first.
+5. **Follow the rules** — The `.claude/rules/` files contain critical best practices. Read `.claude/rules/common/security.md` first.
 6. **Don't fear mistakes, but be cautious** — Many IaC resources can be recreated, but **data is not reversible**. Deleting a database destroys its data permanently. Always work in dev/staging environments first, and never run destructive commands (like `terraform destroy`) on production without a backup.
 
 ---

@@ -3,10 +3,10 @@ node_modules/
 .devops-state/
 *.log
 
+# Claude Code local settings (personal overrides)
+.claude/settings.local.json
+
 # Environment and secrets
-.env
-.env.*
-!.env.example
 *.pem
 *.key
 *.crt

@@ -7,8 +7,7 @@
     "test": "node scripts/tests/run-all.js",
     "setup": "node scripts/setup.js",
     "validate": "node scripts/validate-structure.js",
-    "lint:json": "node -e \"const fs=require('fs');const files=['.claude-plugin/plugin.json','.claude-plugin/marketplace.json','hooks/hooks.json','mcp-configs/mcp-servers.json'];files.forEach(f=>{try{JSON.parse(fs.readFileSync(f,'utf8'));console.log('✅ '+f)}catch(e){console.error('❌ '+f+': '+e.message);process.exit(1)}})\"",
-    "lint:plugin": "claude plugin validate .claude-plugin/plugin.json && claude plugin validate .claude-plugin/marketplace.json"
+    "lint:json": "node -e \"const fs=require('fs');const files=['.claude/settings.json','.mcp.json'];files.forEach(f=>{try{JSON.parse(fs.readFileSync(f,'utf8'));console.log('✅ '+f)}catch(e){console.error('❌ '+f+': '+e.message);process.exit(1)}})\""
   },
   "keywords": [
     "claude-code",
