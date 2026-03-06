@@ -1,6 +1,6 @@
 # DevOps Agent Hub — Agent Instructions
 
-A **Claude Code native DevOps toolkit** with 12 specialized agents, 25 skills, 17 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
+A **Claude Code native DevOps toolkit** with 13 specialized agents, 26 skills, 18 commands, and infrastructure safety hooks for CI/CD, cloud management, and deployment automation.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -24,6 +24,7 @@ A **Claude Code native DevOps toolkit** with 12 specialized agents, 25 skills, 1
 | container-reviewer | Docker/K8s review | Dockerfile, Compose, K8s manifest review |
 | ms-it-admin | Microsoft 365 & Entra ID administration | User provisioning, licensing, Teams, Exchange, Intune, Conditional Access |
 | file-manager | Local filesystem operations | Organize files, bulk rename, find duplicates, disk cleanup, permissions |
+| deployer | Remote project deployment via SSH | Git pull, Docker Compose, Django migrations, container restart, rollback |
 
 ## Agent Orchestration
 Use agents proactively without user prompt:
@@ -37,6 +38,7 @@ Use agents proactively without user prompt:
 - Database changes → **database-ops**
 - Microsoft 365/Entra ID tasks → **ms-it-admin**
 - File organization, cleanup, bulk ops → **file-manager**
+- Remote project deployments (SSH + Docker) → **deployer**
 
 Use parallel execution for independent operations — launch multiple agents simultaneously.
 
@@ -118,9 +120,9 @@ Use parallel execution for independent operations — launch multiple agents sim
 ## Project Structure
 ```
 .claude/
-  agents/        — 11 specialized DevOps subagents
-  commands/      — 16 slash commands
-  skills/        — 24 domain knowledge packs
+  agents/        — 13 specialized DevOps subagents
+  commands/      — 18 slash commands
+  skills/        — 26 domain knowledge packs
   rules/         — 12 always-follow guidelines (7 categories)
   settings.json  — Infrastructure safety hooks
 .mcp.json        — MCP server configurations (GitHub, AWS, Cloudflare, etc.)
