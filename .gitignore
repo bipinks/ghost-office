@@ -3,8 +3,9 @@ node_modules/
 .devops-state/
 *.log
 
-# Claude Code local settings (personal overrides)
+# Claude Code local settings and runtime logs
 .claude/settings.local.json
+.claude/logs/
 
 # Environment and secrets
 *.pem
