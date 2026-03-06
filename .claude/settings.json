@@ -7,37 +7,42 @@
   "auto_recovery_enabled": true,
   "auto_test_required": true,
   "devops_enabled": true,
-  "allowedTools": [
-    "Read",
-    "Glob",
-    "Grep",
-    "TodoWrite",
-    "Agent",
-    "WebSearch",
-    "WebFetch",
-    "mcp__ms365__list-*",
-    "mcp__ms365__get-*",
-    "mcp__ms365__search-*",
-    "mcp__ms365__verify-login",
-    "mcp__ms365__list-accounts",
-    "mcp__filesystem__read_*",
-    "mcp__filesystem__list_*",
-    "mcp__filesystem__directory_tree",
-    "mcp__filesystem__search_files",
-    "mcp__filesystem__get_file_info",
-    "mcp__filesystem__list_allowed_directories"
-  ],
-  "deny": [
-    "Bash(rm -rf /)",
-    "Bash(terraform destroy)",
-    "Bash(kubectl delete namespace)",
-    "Bash(docker system prune -a --force)",
-    "Bash(git push --force origin main)",
-    "Bash(git push --force origin master)",
-    "Bash(git push --force origin production)",
-    "Bash(DROP DATABASE)",
-    "Bash(DROP TABLE)"
-  ],
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "TodoWrite",
+      "Agent",
+      "WebSearch",
+      "WebFetch",
+      "mcp__ms365__list-*",
+      "mcp__ms365__get-*",
+      "mcp__ms365__search-*",
+      "mcp__ms365__verify-login",
+      "mcp__ms365__list-accounts",
+      "mcp__filesystem__read_*",
+      "mcp__filesystem__list_*",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__search_files",
+      "mcp__filesystem__get_file_info",
+      "mcp__filesystem__list_allowed_directories"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(*terraform destroy*)",
+      "Bash(*kubectl delete namespace*)",
+      "Bash(*docker system prune -a --force*)",
+      "Bash(*git push --force*origin main*)",
+      "Bash(*git push --force*origin master*)",
+      "Bash(*git push --force*origin production*)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*DROP TABLE*)",
+      "Read(.env)",
+      "Read(*.pem)",
+      "Read(*.key)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -91,6 +96,66 @@
             "type": "command",
             "command": ".claude/hooks/migration-check.sh",
             "statusMessage": "Checking migration multi-tenant compliance..."
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/tool-failure.sh",
+            "statusMessage": "Logging tool failure..."
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/subagent-lifecycle.sh",
+            "statusMessage": "Tracking subagent start..."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/subagent-lifecycle.sh",
+            "statusMessage": "Tracking subagent completion..."
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|auth_success|elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/notification.sh",
+            "statusMessage": "Sending desktop notification..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/stop-validation.sh",
+            "statusMessage": "Running post-response validation..."
           }
         ]
       }

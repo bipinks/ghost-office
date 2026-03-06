@@ -17,7 +17,7 @@ All components live under `.claude/` for native auto-discovery:
 ├── tools/          — 4 tool reference documents
 ├── skills/         — 23 domain knowledge packs
 ├── rules/          — 11 always-follow guidelines (7 categories)
-├── hooks/          — 7 safety and audit hook scripts
+├── hooks/          — 11 safety, audit, and lifecycle hook scripts
 └── settings.json   — Hooks, permissions, and autonomous operation settings
 ```
 
@@ -56,12 +56,12 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 ## Knowledge Base
 
 Agents reference `.claude/memory/` for persistent context:
-- `architecture.md` — System architecture overview
-- `coding-standards.md` — ERP coding conventions (Laravel/PHP, Vue/TS)
-- `erp-domain.md` — Business rules, modules, multi-branch operations
-- `deployment-standards.md` — Staging/production deployment procedures
-- `devops-runbook.md` — Server management, CI/CD, backups
-- `performance-guidelines.md` — Optimization targets and rules
+- @.claude/memory/architecture.md — System architecture overview
+- @.claude/memory/coding-standards.md — ERP coding conventions (Laravel/PHP, Vue/TS)
+- @.claude/memory/erp-domain.md — Business rules, modules, multi-branch operations
+- @.claude/memory/deployment-standards.md — Staging/production deployment procedures
+- @.claude/memory/devops-runbook.md — Server management, CI/CD, backups
+- @.claude/memory/performance-guidelines.md — Optimization targets and rules
 
 ## Key Commands
 
@@ -87,7 +87,7 @@ Agents reference `.claude/memory/` for persistent context:
 
 ## Key Conventions
 
-- Agents use frontmatter: name, description, tools, model, isolation
+- Agents use frontmatter: name, description, tools, disallowedTools, model, maxTurns, skills, permissionMode, isolation
 - Skills directories contain a `SKILL.md` as the main instruction
 - Commands use `$ARGUMENTS` substitution
 - Rules use `paths` frontmatter for file-pattern scoping
@@ -129,7 +129,7 @@ The workspace enables Claude Code to:
 
 ## Hooks
 
-7 hook scripts in `.claude/hooks/` enforce safety and compliance:
+11 hook scripts in `.claude/hooks/` enforce safety, compliance, and observability:
 
 | Hook | Event | Purpose |
 |------|-------|---------|
@@ -140,6 +140,10 @@ The workspace enables Claude Code to:
 | `file-write-check.sh` | PostToolUse (Write/Edit) | Scans for secrets, Dockerfile issues, YAML lint |
 | `migration-check.sh` | PostToolUse (Write/Edit) | Enforces branch_id in new migrations |
 | `ms365-audit-log.sh` | PreToolUse (MS365) | Logs all MS365 operations for audit |
+| `subagent-lifecycle.sh` | SubagentStart/Stop | Tracks subagent spawn and completion |
+| `notification.sh` | Notification | Desktop alerts when Claude needs input |
+| `stop-validation.sh` | Stop | Post-response validation (staged secrets check) |
+| `tool-failure.sh` | PostToolUseFailure | Logs tool failures with diagnostic hints |
 
 ## Important
 
