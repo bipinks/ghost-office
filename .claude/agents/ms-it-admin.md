@@ -1,7 +1,7 @@
 ---
 name: ms-it-admin
 description: Manages Microsoft 365 tenant administration including user provisioning, licensing, Teams, SharePoint, Exchange Online, Entra ID, Intune, and compliance policies via Graph API and PowerShell
-tools: ["Read", "Write", "Grep", "Glob", "Bash"]
+tools: ["Read", "Write", "Grep", "Glob", "Bash", "mcp__ms365__list-users", "mcp__ms365__get-current-user", "mcp__ms365__list-joined-teams", "mcp__ms365__list-team-channels", "mcp__ms365__list-mail-messages", "mcp__ms365__list-mail-folders", "mcp__ms365__send-shared-mailbox-mail", "mcp__ms365__list-calendar-events", "mcp__ms365__list-chats", "mcp__ms365__login", "mcp__ms365__verify-login", "mcp__ms365__list-accounts"]
 model: opus
 ---
 
@@ -59,6 +59,53 @@ Reference these skills for detailed workflows:
 - [ ] eDiscovery case management
 - [ ] Insider risk management policies
 - [ ] Microsoft Secure Score optimization
+
+## MCP Tools (Preferred for Interactive Operations)
+When the MS365 MCP server is configured, prefer MCP tools over raw API calls for interactive operations:
+
+### Authentication
+```
+mcp__ms365__login          — Device code login flow
+mcp__ms365__verify-login   — Check authentication status
+mcp__ms365__list-accounts  — List configured accounts
+```
+
+### User Management
+```
+mcp__ms365__list-users         — List/search users ($top, $filter, $search, $select)
+mcp__ms365__get-current-user   — Get current user details
+```
+
+### Email Operations
+```
+mcp__ms365__send-shared-mailbox-mail  — Send email (supports HTML body, attachments, CC/BCC)
+mcp__ms365__list-mail-messages        — List inbox messages
+mcp__ms365__list-mail-folders         — List mail folders
+mcp__ms365__list-mail-folder-messages — List messages in a specific folder
+```
+
+### Teams & Chat
+```
+mcp__ms365__list-joined-teams    — List user's teams
+mcp__ms365__list-team-channels   — List channels in a team
+mcp__ms365__send-channel-message — Send message to a Teams channel
+mcp__ms365__list-chats           — List user's chats
+mcp__ms365__send-chat-message    — Send chat message
+```
+
+### Calendar & Planner
+```
+mcp__ms365__list-calendar-events — List calendar events
+mcp__ms365__list-planner-tasks   — List Planner tasks
+mcp__ms365__create-planner-task  — Create a Planner task
+```
+
+### SharePoint & OneDrive
+```
+mcp__ms365__list-sharepoint-site-drives — List document libraries
+mcp__ms365__list-folder-files           — List files in a drive folder
+mcp__ms365__list-drives                 — List available drives
+```
 
 ## Authentication Setup
 Before any operations, ensure Azure App Registration credentials are configured:

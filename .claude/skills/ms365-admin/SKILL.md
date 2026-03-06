@@ -176,6 +176,63 @@ $params = @{
 New-MgIdentityConditionalAccessPolicy @params
 ```
 
+## Email Operations (MCP)
+
+When the MS365 MCP server is configured, use MCP tools for email operations instead of raw Graph API calls.
+
+### Send Email
+Use `mcp__ms365__send-shared-mailbox-mail` with `userId` set to the sender's email:
+```json
+{
+  "userId": "sender@company.com",
+  "body": {
+    "Message": {
+      "subject": "Subject line",
+      "body": {
+        "contentType": "html",
+        "content": "<p>Email body in HTML</p>"
+      },
+      "toRecipients": [
+        { "emailAddress": { "address": "recipient@example.com", "name": "Recipient Name" } }
+      ],
+      "ccRecipients": [],
+      "bccRecipients": []
+    },
+    "SaveToSentItems": true
+  }
+}
+```
+
+### List Emails
+Use `mcp__ms365__list-mail-messages` with `$select` to limit fields:
+```
+select: ["id", "subject", "from", "toRecipients", "receivedDateTime", "bodyPreview", "isRead"]
+top: 10
+```
+
+### Search Emails
+Use `$search` with KQL syntax (wrap in double quotes):
+```
+search: "from:john@example.com"
+search: "subject:meeting AND hasAttachments:true"
+```
+
+## User Management (MCP)
+
+### List Users
+Use `mcp__ms365__list-users` with `$top`, `$select`, `$filter`, or `$search`:
+```
+top: 10
+select: ["displayName", "mail", "userPrincipalName", "jobTitle", "department", "assignedLicenses"]
+```
+
+### Search Users
+Requires `ConsistencyLevel: eventual`:
+```
+ConsistencyLevel: "eventual"
+search: "\"displayName:john\""
+```
+
 ## Best Practices
 1. **Automated provisioning** — Use Graph API for consistent user onboarding
 2. **Group-based licensing** — Assign licenses via groups, not individuals
