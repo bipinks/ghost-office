@@ -1,6 +1,6 @@
 # Autonomous ERP Workspace — Agent Instructions
 
-A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 23 skills, 18 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 23 skills, 17 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -113,7 +113,7 @@ Every deliverable must meet:
 ```
 .claude/
   agents/         — 14 autonomous agents
-  commands/       — 18 slash commands
+  commands/       — 17 slash commands
   workflows/      — 5 workflow definitions
   memory/         — 6 knowledge base documents
   tools/          — 4 tool reference documents

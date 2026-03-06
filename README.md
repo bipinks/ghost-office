@@ -69,7 +69,7 @@ devops-agent-hub/
 │   │   ├── server-provision.md      # /server-provision
 │   │   ├── forge-deploy.md          # /forge-deploy
 │   │   ├── ms365-provision.md       # /ms365-provision
-│   │   ├── incident-response.md     # /incident-response
+│   │   ├── investigate-incident.md   # /investigate-incident
 │   │   ├── backup.md                # /backup
 │   │   ├── monitor-setup.md         # /monitor-setup
 │   │   ├── db-migrate.md            # /db-migrate
@@ -123,7 +123,7 @@ devops-agent-hub/
 | Build CI/CD pipeline | `/cicd-setup` | cicd-architect |
 | Review Terraform code | *(use cloud-reviewer agent)* | cloud-reviewer |
 | Security audit | `/security-scan` | security-auditor |
-| Handle incident | `/incident-response` | incident-responder |
+| Handle incident | `/investigate-incident` | monitoring-agent |
 | Optimize cloud costs | `/cost-review` | cost-optimizer |
 | Deploy application | `/deploy` | deployment-manager |
 | Set up monitoring | `/monitor-setup` | monitoring-analyst |
@@ -150,7 +150,7 @@ devops-agent-hub/
 
 **Incident response:**
 ```bash
-/incident-response "High CPU on production web servers"
+/investigate-incident "High CPU on production web servers"
 ```
 
 ---

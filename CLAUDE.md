@@ -11,7 +11,7 @@ All components live under `.claude/` for native auto-discovery:
 ```
 .claude/
 ├── agents/         — 14 autonomous agents (1 orchestrator + 12 departments + 1 specialist)
-├── commands/       — 18 slash commands for task execution
+├── commands/       — 17 slash commands for task execution
 ├── workflows/      — 5 end-to-end workflow definitions
 ├── memory/         — 6 knowledge base documents (persistent context)
 ├── tools/          — 4 tool reference documents

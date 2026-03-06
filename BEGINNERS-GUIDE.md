@@ -197,7 +197,7 @@ Slash commands are immediately available. Here are the most useful ones to start
 
 **What you type:**
 ```
-/incident-response "API is returning 500 errors"
+/investigate-incident "API is returning 500 errors"
 ```
 
 **What happens:** The AI will:
