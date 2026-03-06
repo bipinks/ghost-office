@@ -1,6 +1,6 @@
 ---
 name: deploy-acodax-property
-description: Deployment configuration for Acodax Property — a Django project running on Docker Compose in production. Used by the deployer agent.
+description: Deployment configuration for Acodax Property — a Django project running on Docker Compose in production. Used by the devops-engineer agent.
 user-invocable: false
 allowed-tools: ["Read", "Bash"]
 ---

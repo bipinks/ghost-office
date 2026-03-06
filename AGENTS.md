@@ -1,6 +1,6 @@
 # Autonomous ERP Workspace — Agent Instructions
 
-A **fully autonomous AI-driven ERP software company** with 16 specialized agents, 27 skills, 19 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 27 skills, 19 commands, 5 workflows, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -28,18 +28,12 @@ A **fully autonomous AI-driven ERP software company** with 16 specialized agents
 | database-engineer | Schema, queries, migrations | DB changes, migrations, query optimization |
 | qa-agent | Testing, quality assurance | Test writing, bug verification, regression testing |
 | security-agent | Security audits, vulnerabilities | Security reviews, pen testing, compliance |
-| devops-engineer | CI/CD, infrastructure, deploy | Pipeline setup, server config, deployments |
+| devops-engineer | CI/CD, infrastructure, SSH deployments | Pipeline setup, server config, deployments, SSH deploys |
 | monitoring-agent | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
 | performance-agent | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
-| support-agent | User issues, triage, client ops | Bug reports, client setup, file operations |
+| support-agent | User issues, triage, ERP admin | Bug reports, client setup, Acodax ERP user/role management |
 | documentation-agent | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
-
-### Specialist Agents (Domain-Specific)
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
 | ms-it-admin | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
-| acodax-erp-office-admin | Acodax ERP administration | ERP user management, roles, branches |
-| deployer | SSH deployment operations | Production/staging deployments via SSH |
 
 ## Agent Orchestration
 
@@ -53,8 +47,8 @@ The master-orchestrator automatically routes tasks:
 - Documentation → documentation-agent
 - Performance issues → performance-agent
 - Microsoft 365 tasks → ms-it-admin
-- Acodax ERP admin → acodax-erp-office-admin
-- SSH deployments → deployer
+- Acodax ERP admin → support-agent
+- SSH deployments → devops-engineer
 
 ### Parallel Execution
 Launch multiple agents simultaneously for independent tasks:
@@ -118,7 +112,7 @@ Every deliverable must meet:
 ## Project Structure
 ```
 .claude/
-  agents/         — 16 autonomous agents
+  agents/         — 14 autonomous agents
   commands/       — 19 slash commands
   workflows/      — 5 workflow definitions
   memory/         — 6 knowledge base documents

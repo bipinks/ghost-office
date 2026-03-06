@@ -102,7 +102,7 @@ All retained — they provide external service access:
 ### New Structure
 ```
 .claude/
-├── agents/         — 13 new autonomous agents + master orchestrator + preserved agents
+├── agents/         — 12 department agents + master orchestrator + ms-it-admin specialist
 ├── commands/       — 9 new ERP commands + preserved essential commands
 ├── workflows/      — 5 workflow definitions (NEW)
 ├── memory/         — 6 knowledge base documents (NEW)

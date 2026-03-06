@@ -1,7 +1,7 @@
 # Deployment Scripts Reference
 
 ## Overview
-Reference for deployment automation scripts and tools used by the devops-engineer and deployer agent.
+Reference for deployment automation scripts and tools used by the devops-engineer agent.
 
 ## Docker Compose Deployment
 

@@ -6,7 +6,7 @@ argument-hint: "<project-folder> [branch]"
 
 # /acodax-deploy — Acodax Property Deployment
 
-Deploy $ARGUMENTS using the **deployer** agent with the **deploy-acodax-property** skill.
+Deploy $ARGUMENTS using the **devops-engineer** agent with the **deploy-acodax-property** skill.
 
 ## Workflow
 1. SSH into `ubuntu@acodax-property`

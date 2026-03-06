@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A **fully autonomous AI-driven ERP software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 15 specialized agents across product management, engineering, QA, security, DevOps, and support.
+A **fully autonomous AI-driven ERP software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 13 specialized agents across product management, engineering, QA, security, DevOps, and support.
 
 ## Architecture
 
@@ -10,7 +10,7 @@ All components live under `.claude/` for native auto-discovery:
 
 ```
 .claude/
-├── agents/         — 16 autonomous agents (1 orchestrator + 12 departments + 3 specialists)
+├── agents/         — 14 autonomous agents (1 orchestrator + 12 departments + 1 specialist)
 ├── commands/       — 19 slash commands for task execution
 ├── workflows/      — 5 end-to-end workflow definitions
 ├── memory/         — 6 knowledge base documents (persistent context)
@@ -35,18 +35,12 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 | database-engineer | Schema design, migrations, query optimization, backups |
 | qa-agent | Test strategy, test writing, bug verification, quality gates |
 | security-agent | Security audits, OWASP, CIS benchmarks, compliance |
-| devops-engineer | CI/CD, Docker, Kubernetes, infrastructure automation |
+| devops-engineer | CI/CD, Docker, Kubernetes, infrastructure automation, SSH deployments |
 | monitoring-agent | Observability, alerting, incident response, post-mortems |
 | performance-agent | Optimization, load testing, cost analysis, caching |
-| support-agent | User issue triage, client operations, file management |
+| support-agent | User issue triage, client operations, Acodax ERP administration |
 | documentation-agent | API docs, user guides, ADRs, changelog |
-
-### Specialist Agents (Preserved)
-| Agent | Role |
-|-------|------|
 | ms-it-admin | Microsoft 365 & Entra ID administration |
-| acodax-erp-office-admin | Acodax ERP user/role/branch management |
-| deployer | SSH-based project deployment (Docker Compose) |
 
 ## Workflows
 
