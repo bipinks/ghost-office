@@ -6,7 +6,7 @@ argument-hint: "[service or stack to monitor]"
 
 # /monitor-setup — Monitoring Setup
 
-Set up monitoring for $ARGUMENTS using the **monitoring-analyst** agent:
+Set up monitoring for $ARGUMENTS using the **monitoring-agent** agent:
 
 1. Design observability stack (metrics, logs, traces)
 2. Configure Prometheus/Grafana or Datadog

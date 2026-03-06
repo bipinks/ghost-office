@@ -225,8 +225,8 @@ If you're brand new to DevOps, here's a suggested learning order:
 3. **Try** `/infra-plan` — Design your first architecture
 
 ### Week 5-6: Deployment & Operations
-1. **Read** `.claude/skills/laravel-forge/SKILL.md` — Server management
-2. **Try** `/forge-deploy` — Deploy an app
+1. **Read** `.claude/skills/ansible-patterns/SKILL.md` — Server provisioning and config management
+2. **Read** `.claude/skills/nginx-patterns/SKILL.md` — Web server configuration
 3. **Read** `.claude/skills/monitoring-patterns/SKILL.md` — Learn observability
 4. **Try** `/monitor-setup` — Set up monitoring
 

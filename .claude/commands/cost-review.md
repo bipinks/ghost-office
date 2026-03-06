@@ -6,7 +6,7 @@ argument-hint: "[cloud provider or service]"
 
 # /cost-review — Cloud Cost Analysis
 
-Analyze cloud costs for $ARGUMENTS using the **cost-optimizer** agent:
+Analyze cloud costs for $ARGUMENTS using the **performance-agent** agent:
 
 1. Analyze current cloud spending by service
 2. Identify idle and underutilized resources

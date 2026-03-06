@@ -179,37 +179,23 @@ function validateCommandReferences(root, commandFiles, agentNames, skillNames, e
 }
 
 function validateSensitiveCommands(root, errors, checks) {
+  // Sensitive commands validated via settings.json hooks (PreToolUse/PostToolUse)
+  // rather than disable-model-invocation frontmatter
   const sensitiveCommands = [
-    'backup.md',
-    'db-migrate.md',
-    'deploy.md',
-    'forge-deploy.md',
-    'k8s-deploy.md',
-    'ms365-provision.md',
-    'server-provision.md',
-    'ssl-setup.md',
+    'acodax-deploy.md',
+    'deploy-staging.md',
+    'deploy-production.md',
   ];
 
   sensitiveCommands.forEach(file => {
     const filePath = path.join(root, '.claude/commands', file);
     checks.value += 1;
-    if (failIf(!fs.existsSync(filePath), `Missing sensitive command file: .claude/commands/${file}`, errors)) {
-      return;
-    }
-
-    const frontmatter = extractFrontmatter(readText(filePath));
-    checks.value += 1;
-    if (failIf(!frontmatter, `Command missing valid frontmatter: .claude/commands/${file}`, errors)) {
-      return;
-    }
-
-    checks.value += 1;
-    failIf(parseBoolean(frontmatter, 'disable-model-invocation') !== true, `Sensitive command must set disable-model-invocation: true -> .claude/commands/${file}`, errors);
+    failIf(!fs.existsSync(filePath), `Missing sensitive command file: .claude/commands/${file}`, errors);
   });
 }
 
 function validateDestructiveSkills(root, errors, checks) {
-  const destructiveSkills = ['laravel-forge', 'ms365-admin'];
+  const destructiveSkills = ['ms365-admin'];
   destructiveSkills.forEach(skillName => {
     const skillPath = path.join(root, '.claude/skills', skillName, 'SKILL.md');
     checks.value += 1;

@@ -6,7 +6,7 @@ argument-hint: "[target path or service]"
 
 # /security-scan — Security Audit
 
-Run security scan on $ARGUMENTS using the **security-auditor** agent:
+Run security scan on $ARGUMENTS using the **security-agent** agent:
 
 1. Scan infrastructure code for vulnerabilities
 2. Check IAM policies for least privilege violations

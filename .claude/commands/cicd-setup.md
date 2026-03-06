@@ -6,7 +6,7 @@ argument-hint: "[platform] [project type]"
 
 # /cicd-setup — CI/CD Pipeline Generation
 
-Set up CI/CD for $ARGUMENTS using the **cicd-architect** agent:
+Set up CI/CD for $ARGUMENTS using the **devops-engineer** agent:
 
 1. Analyze the project stack and structure
 2. Choose the appropriate CI platform

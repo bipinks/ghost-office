@@ -6,7 +6,7 @@ argument-hint: "[project or workload description]"
 
 # /infra-plan — Infrastructure Planning
 
-Plan infrastructure for $ARGUMENTS using the **infra-planner** agent:
+Plan infrastructure for $ARGUMENTS using the **architecture-agent** agent:
 
 1. Gather requirements (application type, traffic, compliance)
 2. Design multi-tier architecture (network → compute → data → security)

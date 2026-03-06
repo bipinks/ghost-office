@@ -23,7 +23,7 @@ devops-agent-hub/
 ├── .claude/
 │   ├── agents/         — 14 specialized DevOps subagents
 │   ├── commands/       — 18 slash commands
-│   ├── skills/         — 27 domain knowledge packs
+│   ├── skills/         — 23 domain knowledge packs
 │   ├── rules/          — 7 rule categories (common, cicd, cloud, docker, kubernetes, security, terraform)
 │   └── settings.json   — Infrastructure safety hooks (PreToolUse, PostToolUse)
 ├── .github/workflows/  — CI validation pipeline
@@ -58,13 +58,13 @@ devops-agent-hub/
 | infra-planner | Infrastructure design | Absorb | Merge into architecture-agent |
 | monitoring-analyst | Observability/SLOs | Absorb | Merge into monitoring-agent |
 
-## 3. Existing Skills (27 total)
+## 3. Existing Skills (23 total)
 
 Skills are retained as knowledge packs and referenced by new agents:
 
-- **Cloud/Infra**: aws-patterns, terraform-patterns, networking-patterns, serverless-patterns
+- **Cloud/Infra**: aws-patterns, terraform-patterns, networking-patterns
 - **Container/K8s**: docker-patterns, kubernetes-patterns
-- **CI/CD**: cicd-patterns, github-workflows, gitops-patterns
+- **CI/CD**: cicd-patterns, github-workflows
 - **Security**: security-hardening, secrets-management, ssl-tls-management
 - **Monitoring**: monitoring-patterns, log-management
 - **Database**: database-ops
@@ -73,8 +73,6 @@ Skills are retained as knowledge packs and referenced by new agents:
 - **Backup**: backup-disaster-recovery
 - **MS365**: ms365-admin, entra-id-admin, exchange-online-admin, intune-device-mgmt
 - **Acodax**: acodax-erp-office-admin, deploy-acodax-property
-- **Files**: file-management
-- **Forge**: laravel-forge (kept for deployment reference)
 
 ## 4. Existing Commands (18 total)
 
@@ -107,7 +105,7 @@ All retained — they provide external service access:
 ├── workflows/      — 5 workflow definitions (NEW)
 ├── memory/         — 6 knowledge base documents (NEW)
 ├── tools/          — 4 tool reference documents (NEW)
-├── skills/         — All 27 existing skills (preserved)
+├── skills/         — 23 skills (4 removed: file-management, laravel-forge, serverless-patterns, gitops-patterns)
 ├── rules/          — All existing rules (preserved)
 └── settings.json   — Enhanced for autonomous operation
 ```

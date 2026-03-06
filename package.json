@@ -20,7 +20,6 @@
     "docker",
     "cicd",
     "github-actions",
-    "laravel-forge",
     "microsoft-365"
   ],
   "author": "Bipin Kareparambil",

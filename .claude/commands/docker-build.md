@@ -6,7 +6,7 @@ argument-hint: "[image name or Dockerfile path]"
 
 # /docker-build — Docker Build & Optimization
 
-Build Docker image for $ARGUMENTS using the **container-reviewer** agent:
+Build Docker image for $ARGUMENTS using the **devops-engineer** agent:
 
 1. Review existing Dockerfile for best practices
 2. Optimize for multi-stage builds and layer caching

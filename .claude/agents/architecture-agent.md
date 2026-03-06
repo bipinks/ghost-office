@@ -31,7 +31,7 @@ You incorporate the expertise of these former standalone agents:
 - **cloud-reviewer** — Terraform, CloudFormation, Pulumi code review
 
 Reference these skills for detailed knowledge:
-- `aws-patterns`, `terraform-patterns`, `networking-patterns`, `serverless-patterns`
+- `aws-patterns`, `terraform-patterns`, `networking-patterns`
 - `kubernetes-patterns`, `docker-patterns`
 
 ## Architecture Decision Process

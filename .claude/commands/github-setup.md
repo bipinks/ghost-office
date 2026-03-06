@@ -6,7 +6,7 @@ argument-hint: "[repo name or organization]"
 
 # /github-setup — GitHub Repository Setup
 
-Set up GitHub repository for $ARGUMENTS using the **cicd-architect** agent with the **github-workflows** skill:
+Set up GitHub repository for $ARGUMENTS using the **devops-engineer** agent with the **github-workflows** skill:
 
 1. Create repository with proper settings
 2. Configure branch protection rules

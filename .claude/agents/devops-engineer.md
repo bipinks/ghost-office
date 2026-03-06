@@ -27,7 +27,7 @@ You incorporate the expertise of these former standalone agents:
 - **deployer** — SSH-based production/staging deployments
 
 Reference these skills for detailed knowledge:
-- `cicd-patterns`, `github-workflows`, `gitops-patterns`
+- `cicd-patterns`, `github-workflows`
 - `docker-patterns`, `kubernetes-patterns`
 - `nginx-patterns`, `ansible-patterns`
 - `terraform-patterns`, `aws-patterns`

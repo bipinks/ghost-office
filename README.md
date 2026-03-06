@@ -83,7 +83,6 @@ devops-agent-hub/
 │   │   ├── github-workflows/        # GitHub Actions CI/CD patterns
 │   │   ├── ansible-patterns/        # Ansible roles and playbooks
 │   │   ├── monitoring-patterns/     # Prometheus, Grafana, Datadog
-│   │   ├── laravel-forge/           # Forge site provisioning
 │   │   ├── ms365-admin/             # Microsoft 365 administration
 │   │   ├── nginx-patterns/          # Nginx configuration
 │   │   ├── ssl-tls-management/      # Certificate management
@@ -93,8 +92,6 @@ devops-agent-hub/
 │   │   ├── security-hardening/      # Server hardening, CIS benchmarks
 │   │   ├── log-management/          # ELK, CloudWatch, structured logs
 │   │   ├── database-ops/            # PostgreSQL, MySQL, Redis ops
-│   │   ├── serverless-patterns/     # Lambda, Cloud Functions
-│   │   ├── gitops-patterns/         # ArgoCD, Flux workflows
 │   │   ├── cicd-patterns/           # Pipeline design patterns
 │   │   └── cloud-cost-optimization/ # FinOps and cost analysis
 │   ├── rules/                       # Always-follow guidelines

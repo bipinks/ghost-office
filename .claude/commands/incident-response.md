@@ -6,7 +6,7 @@ argument-hint: "[incident description or service name]"
 
 # /incident-response — Incident Triage
 
-Respond to incident: $ARGUMENTS using the **incident-responder** agent:
+Respond to incident: $ARGUMENTS using the **monitoring-agent** agent:
 
 1. Assess severity (SEV1-SEV4)
 2. Check recent deployments and changes
