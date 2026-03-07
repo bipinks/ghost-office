@@ -6,6 +6,7 @@ node_modules/
 # Claude Code local settings and runtime logs
 .claude/settings.local.json
 .claude/logs/
+.claude/memory/domain.lock
 
 # Environment and secrets
 *.pem

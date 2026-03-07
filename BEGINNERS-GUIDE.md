@@ -25,7 +25,7 @@ The project has **6 main parts**:
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│              COMMANDS (21 shortcuts)                │
+│              COMMANDS (22 shortcuts)                │
 │   /cicd-setup, /deploy-staging, /fix-bug, etc.      │
 │   → These are quick shortcuts you type              │
 └──────────────────────┬──────────────────────────────┘
@@ -61,7 +61,7 @@ Open the project folder in your editor. You'll see:
 devops-agent-hub/
 ├── .claude/
 │   ├── agents/    ← 18 AI "expert" definitions
-│   ├── commands/  ← 21 shortcut commands
+│   ├── commands/  ← 22 shortcut commands
 │   ├── skills/    ← 54 knowledge guides with code examples
 │   ├── rules/     ← Safety and best practice rules
 │   └── settings.json ← Automatic safety hooks
@@ -92,7 +92,7 @@ cp devops-agent-hub/.mcp.json your-project/.mcp.json
 cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
 ```
 
-> **Tip:** After copying, edit `CLAUDE.md` to match your project's tech stack, architecture, and domain. The default includes ERP domain knowledge — replace `.claude/memory/domain-knowledge.md` with your own domain expertise.
+> **Tip:** After copying, run `/set-domain <name>` to activate your domain (erp, ecommerce, saas, healthcare, fintech, education, cms). Then edit `CLAUDE.md` to match your project's tech stack and architecture.
 
 ### Step 3: Start Using Commands
 

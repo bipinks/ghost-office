@@ -9,7 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Agents](https://img.shields.io/badge/agents-18-blue)](.claude/agents/)
 [![Skills](https://img.shields.io/badge/skills-54-green)](.claude/skills/)
-[![Commands](https://img.shields.io/badge/commands-21-orange)](.claude/commands/)
+[![Commands](https://img.shields.io/badge/commands-22-orange)](.claude/commands/)
+[![Domains](https://img.shields.io/badge/domains-7-purple)](.claude/memory/domains/)
 
 </div>
 
@@ -79,7 +80,7 @@ cp devops-agent-hub/package.json your-project/package.json
 cp -r devops-agent-hub/contexts/ your-project/contexts/
 ```
 
-> **Important:** After copying, edit `CLAUDE.md` to match your project — update the architecture, tech stack, domain knowledge, and conventions. The default includes ERP domain knowledge; replace `.claude/memory/domain-knowledge.md` with your own domain.
+> **Important:** After copying, run `/set-domain <name>` to activate the right domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms). Then edit `CLAUDE.md` to match your project's architecture, tech stack, and conventions.
 
 ### Then just ask:
 
@@ -196,7 +197,7 @@ The **master-orchestrator** coordinates everything — it plans work, assigns ag
 | `/cicd-setup "..."` | CI/CD pipeline generation for any platform |
 | `/cost-review` | Cloud spend analysis + optimization recommendations |
 
-[See all 21 commands →](.claude/commands/)
+[See all 22 commands →](.claude/commands/)
 
 ---
 
@@ -256,9 +257,9 @@ End-to-end processes that coordinate multiple agents:
 your-project/
 ├── .claude/                 Auto-discovered by Claude Code
 │   ├── agents/              18 autonomous agents (1 orchestrator + 17 specialists)
-│   ├── commands/            21 slash commands for task execution
+│   ├── commands/            22 slash commands for task execution
 │   ├── workflows/           6 end-to-end workflow definitions
-│   ├── memory/              6 knowledge base docs (architecture, standards, domain)
+│   ├── memory/              6 knowledge base docs + 7 domain templates
 │   ├── skills/              54 domain knowledge packs with real code examples
 │   ├── rules/               12 always-follow guidelines across 7 categories
 │   ├── hooks/               11 safety, audit, and lifecycle hook scripts
@@ -278,18 +279,21 @@ your-project/
 
 ---
 
-## ERP Specialty
+## 7 Domain Templates
 
-The workspace includes deep ERP domain knowledge out of the box:
+Switch domain knowledge instantly with `/set-domain <name>`:
 
-- **Accounting**: Double-entry bookkeeping, chart of accounts, bank reconciliation
-- **Inventory**: FIFO/LIFO/weighted average, stock movements, batch tracking
-- **Sales**: Quote → Order → Delivery → Invoice → Payment workflow
-- **Procurement**: Three-way matching, approval workflows, vendor management
-- **HR/Payroll**: Employee lifecycle, leave management, salary components
-- **Multi-tenancy**: `branch_id` isolation enforced at every layer
+| Domain | Command | What You Get |
+|--------|---------|-------------|
+| **ERP** | `/set-domain erp` | Accounting, inventory, sales, HR, procurement, manufacturing |
+| **E-Commerce** | `/set-domain ecommerce` | Catalog, cart, checkout, orders, payments, shipping |
+| **SaaS** | `/set-domain saas` | Subscriptions, billing, feature flags, onboarding |
+| **Healthcare** | `/set-domain healthcare` | EHR, HIPAA compliance, HL7 FHIR, clinical workflows |
+| **Fintech** | `/set-domain fintech` | Payments, ledger, KYC/AML, fraud detection, PCI DSS |
+| **Education** | `/set-domain education` | Courses, assessments, LMS, FERPA/COPPA compliance |
+| **CMS** | `/set-domain cms` | Content authoring, SEO, headless API, localization |
 
-Remove or replace `.claude/memory/domain-knowledge.md` to specialize for your domain.
+The active domain is cached in `domain.lock` — runs once, not every session. All agents automatically reference the active domain knowledge.
 
 ---
 

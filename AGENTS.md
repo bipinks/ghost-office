@@ -1,6 +1,6 @@
 # Autonomous AI Software Company — Agent Instructions
 
-A **fully autonomous AI-driven software company** with 18 specialized agents (7 departments), 54 skills, 21 commands, 6 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven software company** with 18 specialized agents (7 departments), 54 skills, 22 commands, 6 workflows, 11 hooks, 7 domain templates, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -83,7 +83,8 @@ All agents reference `.claude/memory/` before making decisions:
 |----------|----------|
 | `architecture.md` | System architecture, module structure, API design |
 | `coding-standards.md` | Laravel/PHP, Vue/TS conventions, git workflow |
-| `domain-knowledge.md` | Domain expertise, business rules, multi-branch operations (ERP specialty) |
+| `domain-knowledge.md` | Active domain expertise and business rules (set via `/set-domain`) |
+| `domains/*.md` | 7 switchable domain templates (erp, ecommerce, saas, healthcare, fintech, education, cms) |
 | `deployment-standards.md` | Environment setup, deployment checklists, rollback |
 | `devops-runbook.md` | Server management, backups, CI/CD, troubleshooting |
 | `performance-guidelines.md` | Performance targets, optimization rules, caching |
@@ -122,7 +123,7 @@ Every deliverable must meet:
 ```
 .claude/
   agents/         — 18 autonomous agents (7 departments)
-  commands/       — 21 slash commands
+  commands/       — 22 slash commands
   workflows/      — 6 workflow definitions
   memory/         — 6 knowledge base documents
   tools/          — 4 tool reference documents

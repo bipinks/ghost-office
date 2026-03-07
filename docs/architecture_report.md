@@ -22,7 +22,7 @@ Claude Code native DevOps toolkit — a collection of markdown-based agents, ski
 devops-agent-hub/
 ├── .claude/
 │   ├── agents/         — 18 specialized agents (7 departments)
-│   ├── commands/       — 21 slash commands
+│   ├── commands/       — 22 slash commands
 │   ├── skills/         — 54 domain knowledge packs
 │   ├── rules/          — 7 rule categories (common, cicd, cloud, docker, kubernetes, security, terraform)
 │   └── settings.json   — Infrastructure safety hooks (PreToolUse, PostToolUse)
@@ -119,7 +119,8 @@ All retained — they provide external service access:
 ├── agents/         — 18 autonomous agents (1 orchestrator + 17 departments)
 ├── commands/       — 21 slash commands
 ├── workflows/      — 6 workflow definitions
-├── memory/         — 6 knowledge base documents (NEW)
+├── memory/         — 6 knowledge base documents + 7 domain templates (NEW)
+│   └── domains/    — Switchable domain packs (erp, ecommerce, saas, healthcare, fintech, education, cms)
 ├── tools/          — 4 tool reference documents (NEW)
 ├── skills/         — 54 domain knowledge packs
 ├── rules/          — All existing rules (preserved)

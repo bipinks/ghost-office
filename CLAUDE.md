@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A **fully autonomous AI-driven software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 17 specialized agents across 7 departments: product, engineering, quality, operations, marketing, support, and IT. ERP development is a core specialty, with built-in domain knowledge for enterprise resource planning systems.
+A **fully autonomous AI-driven software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 17 specialized agents across 7 departments: product, engineering, quality, operations, marketing, support, and IT. Ships with 7 switchable domain knowledge packs (ERP, E-Commerce, SaaS, Healthcare, Fintech, Education, CMS) — use `/set-domain` to activate.
 
 ## Architecture
 
@@ -11,9 +11,9 @@ All components live under `.claude/` for native auto-discovery:
 ```
 .claude/
 ├── agents/         — 18 autonomous agents (1 orchestrator + 17 departments)
-├── commands/       — 21 slash commands for task execution
+├── commands/       — 22 slash commands for task execution
 ├── workflows/      — 6 end-to-end workflow definitions
-├── memory/         — 6 knowledge base documents (persistent context)
+├── memory/         — 6 knowledge base documents + 7 domain templates (persistent context)
 ├── tools/          — 4 tool reference documents
 ├── skills/         — 54 domain knowledge packs
 ├── rules/          — 12 always-follow guidelines (7 categories)
@@ -63,10 +63,24 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 Agents reference `.claude/memory/` for persistent context:
 - @.claude/memory/architecture.md — System architecture overview
 - @.claude/memory/coding-standards.md — Coding conventions (Laravel/PHP, Vue/TS)
-- @.claude/memory/domain-knowledge.md — Domain expertise and business rules (ERP specialty)
+- @.claude/memory/domain-knowledge.md — Active domain expertise and business rules
 - @.claude/memory/deployment-standards.md — Staging/production deployment procedures
 - @.claude/memory/devops-runbook.md — Server management, CI/CD, backups
 - @.claude/memory/performance-guidelines.md — Optimization targets and rules
+
+### Domain Templates (`.claude/memory/domains/`)
+Switchable domain knowledge packs — use `/set-domain <name>` to activate:
+| Domain | File | Specialty |
+|--------|------|-----------|
+| ERP | `erp.md` | Accounting, inventory, sales, HR, procurement, manufacturing |
+| E-Commerce | `ecommerce.md` | Catalog, cart, checkout, orders, payments, shipping |
+| SaaS | `saas.md` | Subscriptions, multi-tenancy, billing, feature flags |
+| Healthcare | `healthcare.md` | EHR, HIPAA compliance, clinical workflows, HL7 FHIR |
+| Fintech | `fintech.md` | Payments, ledger, KYC/AML, fraud detection, PCI DSS |
+| Education | `education.md` | Courses, assessments, LMS, FERPA/COPPA compliance |
+| CMS | `cms.md` | Content authoring, SEO, headless API, localization |
+
+The active domain is cached in `.claude/memory/domain.lock` — detection runs once, not every session.
 
 ## Key Commands
 
@@ -86,6 +100,7 @@ Agents reference `.claude/memory/` for persistent context:
 | `/social-media` | Social media campaigns |
 | `/design-ui` | UI/UX design and wireframes |
 | `/ai-prompt` | AI prompt engineering |
+| `/set-domain` | Switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms) |
 
 ## References
 
@@ -143,7 +158,7 @@ The workspace enables Claude Code to:
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `session-start.sh` | SessionStart | Injects project context on session start/resume/compact |
+| `session-start.sh` | SessionStart | Injects project context + active domain on session start/resume/compact |
 | `pre-compact.sh` | PreCompact | Preserves critical context before auto-compaction |
 | `infra-safety-check.sh` | PreToolUse (Bash) | Warns on destructive infrastructure commands |
 | `git-safety-check.sh` | PreToolUse (Bash) | Blocks force-push to protected branches |

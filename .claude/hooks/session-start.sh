@@ -1,6 +1,7 @@
 #!/bin/bash
 # Hook: SessionStart — Project Context Injection
 # Injects critical project context at session start, resume, and compact events.
+# Includes domain detection via domain.lock for lazy, cached domain knowledge loading.
 # Exit 0 = allow (context injection only)
 
 INPUT_JSON="$(cat)"
@@ -22,6 +23,18 @@ if command -v git >/dev/null 2>&1; then
   UNCOMMITTED="$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | head -10)"
 fi
 
+# --- Detect active domain (cached in domain.lock) ---
+DOMAIN_LOCK="$PROJECT_DIR/.claude/memory/domain.lock"
+ACTIVE_DOMAIN=""
+DOMAIN_STATUS=""
+
+if [ -f "$DOMAIN_LOCK" ]; then
+  ACTIVE_DOMAIN="$(cat "$DOMAIN_LOCK" 2>/dev/null | tr -d '[:space:]')"
+  DOMAIN_STATUS="$ACTIVE_DOMAIN (cached — use /set-domain to change)"
+else
+  DOMAIN_STATUS="not set — use /set-domain <domain> to activate"
+fi
+
 # --- Output context summary ---
 cat <<EOF
 
@@ -30,6 +43,7 @@ Project: Autonomous AI Software Company (Claude Code native)
 Type: AI-driven software company — multi-tenant, multi-branch capable
 Session Event: ${EVENT_TYPE:-startup}
 Branch: ${BRANCH:-unknown}
+Domain: ${DOMAIN_STATUS}
 
 Key References:
 - Architecture: .claude/memory/architecture.md
