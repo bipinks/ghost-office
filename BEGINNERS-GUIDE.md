@@ -9,7 +9,7 @@ Welcome! If you're new to DevOps and wondering what this project does and how to
 **DevOps Agent Hub** is a toolkit that makes Claude Code incredibly good at DevOps tasks. Think of it as a "brain upgrade" for your AI assistant — it teaches the AI about infrastructure, deployments, servers, and cloud services so it can actually help you do DevOps work.
 
 ### Simple Analogy
-Imagine you hired 14 expert engineers, each specializing in different areas — from DevOps and security to backend, frontend, and QA. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
+Imagine you hired 18 expert engineers across 7 departments — from product management and engineering to marketing, security, and IT. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
 
 ---
 
@@ -25,14 +25,14 @@ The project has **6 main parts**:
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│              COMMANDS (17 shortcuts)                │
+│              COMMANDS (21 shortcuts)                │
 │   /cicd-setup, /deploy-staging, /fix-bug, etc.      │
 │   → These are quick shortcuts you type              │
 └──────────────────────┬──────────────────────────────┘
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│               AGENTS (14 experts)                   │
+│               AGENTS (18 experts)                   │
 │   The AI "experts" that handle the actual work      │
 │   backend-engineer, devops-engineer, qa-agent, etc. │
 └──────────────────────┬──────────────────────────────┘
@@ -60,8 +60,8 @@ Open the project folder in your editor. You'll see:
 ```
 devops-agent-hub/
 ├── .claude/
-│   ├── agents/    ← 14 AI "expert" definitions
-│   ├── commands/  ← 17 shortcut commands
+│   ├── agents/    ← 18 AI "expert" definitions
+│   ├── commands/  ← 21 shortcut commands
 │   ├── skills/    ← 54 knowledge guides with code examples
 │   ├── rules/     ← Safety and best practice rules
 │   └── settings.json ← Automatic safety hooks

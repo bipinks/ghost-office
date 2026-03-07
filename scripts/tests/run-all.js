@@ -15,6 +15,8 @@
  *   9. Hook scripts (test-hooks.js)
  *  10. Settings & config (test-settings.js)
  *  11. Content integrity (test-content-integrity.js)
+ *  12. Agent skill-mapping validation (inline)
+ *  13. Frontmatter schema validation (inline)
  */
 
 const { execSync } = require('child_process');
@@ -129,6 +131,162 @@ function main() {
   moduleTest('Hook scripts', './test-hooks');
   moduleTest('Settings & MCP config', './test-settings');
   moduleTest('Content integrity', './test-content-integrity');
+
+  // ==========================================
+  // Test 12: Agent skill-mapping validation
+  // ==========================================
+  inlineTest('Agent skill-mapping validation', () => {
+    const fs = require('fs');
+    const agentsDir = path.join(root, '.claude', 'agents');
+    const skillsDir = path.join(root, '.claude', 'skills');
+    const agentFiles = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+    const skillDirs = fs.existsSync(skillsDir)
+      ? fs.readdirSync(skillsDir).filter(name => fs.statSync(path.join(skillsDir, name)).isDirectory())
+      : [];
+    const errors = [];
+    const referencedSkills = new Set();
+
+    // Extract skills from each agent's frontmatter and verify they exist
+    agentFiles.forEach(file => {
+      const content = fs.readFileSync(path.join(agentsDir, file), 'utf8');
+      // Extract frontmatter
+      if (!content.startsWith('---')) return;
+      const lines = content.split(/\r?\n/);
+      const endIdx = lines.indexOf('---', 1);
+      if (endIdx === -1) return;
+      const frontmatter = lines.slice(1, endIdx).join('\n');
+
+      // Parse skills array from frontmatter (YAML format: skills: ["a", "b"] or skills:\n  - a)
+      const inlineMatch = frontmatter.match(/^skills:\s*\[([^\]]*)\]/m);
+      let skills = [];
+      if (inlineMatch) {
+        skills = inlineMatch[1]
+          .split(',')
+          .map(s => s.trim().replace(/^["']|["']$/g, ''))
+          .filter(s => s.length > 0);
+      } else {
+        // Try YAML list format
+        const listMatch = frontmatter.match(/^skills:\s*\n((?:\s+-\s+.+\n?)+)/m);
+        if (listMatch) {
+          skills = listMatch[1]
+            .split('\n')
+            .map(line => line.replace(/^\s+-\s+/, '').replace(/["']/g, '').trim())
+            .filter(s => s.length > 0);
+        }
+      }
+
+      const agentName = file.replace('.md', '');
+      skills.forEach(skill => {
+        referencedSkills.add(skill);
+        const skillPath = path.join(skillsDir, skill, 'SKILL.md');
+        if (!fs.existsSync(skillPath)) {
+          errors.push(`Agent ${agentName} references skill '${skill}' which does not exist`);
+        }
+      });
+    });
+
+    // Check for orphaned skills (not referenced by any agent)
+    const orphanedSkills = skillDirs.filter(dir => !referencedSkills.has(dir));
+    if (orphanedSkills.length > 0) {
+      console.log(`  WARN: ${orphanedSkills.length} orphaned skill(s) not referenced by any agent: ${orphanedSkills.join(', ')}`);
+    }
+
+    if (errors.length > 0) {
+      throw new Error(errors.join('; '));
+    }
+  });
+
+  // ==========================================
+  // Test 13: Frontmatter schema validation
+  // ==========================================
+  inlineTest('Frontmatter schema validation', () => {
+    const fs = require('fs');
+    const errors = [];
+
+    function extractFm(content) {
+      if (!content.startsWith('---')) return null;
+      const lines = content.split(/\r?\n/);
+      const endIdx = lines.indexOf('---', 1);
+      if (endIdx === -1) return null;
+      return lines.slice(1, endIdx).join('\n');
+    }
+
+    function hasKey(fm, key) {
+      return new RegExp(`^${key}:`, 'm').test(fm);
+    }
+
+    function parseArrayField(fm, key) {
+      const inlineMatch = fm.match(new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, 'm'));
+      if (inlineMatch) {
+        return inlineMatch[1].split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(s => s.length > 0);
+      }
+      const listMatch = fm.match(new RegExp(`^${key}:\\s*\\n((?:\\s+-\\s+.+\\n?)+)`, 'm'));
+      if (listMatch) {
+        return listMatch[1].split('\n').map(l => l.replace(/^\s+-\s+/, '').replace(/["']/g, '').trim()).filter(s => s.length > 0);
+      }
+      return null;
+    }
+
+    // Validate agent frontmatter: name, description, tools (array), model
+    const agentsDir = path.join(root, '.claude', 'agents');
+    fs.readdirSync(agentsDir).filter(f => f.endsWith('.md')).forEach(file => {
+      const content = fs.readFileSync(path.join(agentsDir, file), 'utf8');
+      const fm = extractFm(content);
+      if (!fm) {
+        errors.push(`Agent ${file}: missing frontmatter`);
+        return;
+      }
+      ['name', 'description', 'model'].forEach(key => {
+        if (!hasKey(fm, key)) errors.push(`Agent ${file}: missing required field '${key}'`);
+      });
+      if (!hasKey(fm, 'tools')) {
+        errors.push(`Agent ${file}: missing required field 'tools'`);
+      } else {
+        const tools = parseArrayField(fm, 'tools');
+        if (!tools || tools.length === 0) {
+          errors.push(`Agent ${file}: 'tools' must be a non-empty array`);
+        }
+      }
+    });
+
+    // Validate skill frontmatter: name, description, user-invocable
+    const skillsDir = path.join(root, '.claude', 'skills');
+    if (fs.existsSync(skillsDir)) {
+      fs.readdirSync(skillsDir)
+        .filter(name => fs.statSync(path.join(skillsDir, name)).isDirectory())
+        .forEach(skillDir => {
+          const skillPath = path.join(skillsDir, skillDir, 'SKILL.md');
+          if (!fs.existsSync(skillPath)) return; // already caught by other tests
+          const content = fs.readFileSync(skillPath, 'utf8');
+          const fm = extractFm(content);
+          if (!fm) {
+            errors.push(`Skill ${skillDir}/SKILL.md: missing frontmatter`);
+            return;
+          }
+          ['name', 'description', 'user-invocable'].forEach(key => {
+            if (!hasKey(fm, key)) errors.push(`Skill ${skillDir}/SKILL.md: missing required field '${key}'`);
+          });
+        });
+    }
+
+    // Validate command frontmatter: name, description
+    const commandsDir = path.join(root, '.claude', 'commands');
+    fs.readdirSync(commandsDir).filter(f => f.endsWith('.md')).forEach(file => {
+      const content = fs.readFileSync(path.join(commandsDir, file), 'utf8');
+      const fm = extractFm(content);
+      if (!fm) {
+        errors.push(`Command ${file}: missing frontmatter`);
+        return;
+      }
+      ['name', 'description'].forEach(key => {
+        if (!hasKey(fm, key)) errors.push(`Command ${file}: missing required field '${key}'`);
+      });
+    });
+
+    if (errors.length > 0) {
+      throw new Error(errors.join('; '));
+    }
+  });
 
   // ==========================================
   // Summary

@@ -1,6 +1,6 @@
 # DevOps Agent Hub
 
-> Fully autonomous AI-driven software company powered by Claude Code — 14 specialized agents, 54 domain skills, 17 slash commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+> Fully autonomous AI-driven software company powered by Claude Code — 18 specialized agents (7 departments), 54 domain skills, 21 slash commands, 6 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -47,22 +47,26 @@ cp devops-agent-hub/.mcp.json your-project/.mcp.json
 ```
 devops-agent-hub/
 ├── .claude/
-│   ├── agents/                      # 14 autonomous agents
+│   ├── agents/                      # 18 autonomous agents (7 departments)
 │   │   ├── master-orchestrator.md   # Central coordinator of all agents
-│   │   ├── architecture-agent.md    # System design, tech decisions
 │   │   ├── product-manager.md       # Requirements, specs, priorities
+│   │   ├── ui-ux-designer.md        # Visual design, wireframes, accessibility
+│   │   ├── architecture-agent.md    # System design, tech decisions
 │   │   ├── backend-engineer.md      # Server-side code, APIs, logic
-│   │   ├── frontend-engineer.md     # UI/UX, client-side code
+│   │   ├── frontend-engineer.md     # UI/UX implementation, client-side code
 │   │   ├── database-engineer.md     # Schema, queries, migrations
+│   │   ├── prompt-engineer.md       # AI prompts, LLM integration
 │   │   ├── qa-agent.md              # Testing, quality assurance
 │   │   ├── security-agent.md        # Security audits, vulnerabilities
 │   │   ├── devops-engineer.md       # CI/CD, infrastructure, deployments
 │   │   ├── monitoring-agent.md      # Observability, alerting, incidents
 │   │   ├── performance-agent.md     # Optimization, profiling, cost
+│   │   ├── content-strategist.md    # Content, SEO, email marketing
+│   │   ├── social-media-manager.md  # Social media, ads, community
 │   │   ├── support-agent.md         # User issues, triage, client admin
 │   │   ├── documentation-agent.md   # Tech docs, API docs, guides
 │   │   └── ms-it-admin.md           # Microsoft 365 administration
-│   ├── commands/                    # 17 slash commands
+│   ├── commands/                    # 21 slash commands
 │   │   ├── implement-feature.md     # /implement-feature
 │   │   ├── fix-bug.md               # /fix-bug
 │   │   ├── deploy-staging.md        # /deploy-staging
@@ -79,7 +83,11 @@ devops-agent-hub/
 │   │   ├── github-setup.md          # /github-setup
 │   │   ├── monitor-setup.md         # /monitor-setup
 │   │   ├── cost-review.md           # /cost-review
-│   │   └── acodax-deploy.md         # /acodax-deploy
+│   │   ├── acodax-deploy.md         # /acodax-deploy
+│   │   ├── create-content.md        # /create-content
+│   │   ├── social-media.md          # /social-media
+│   │   ├── design-ui.md             # /design-ui
+│   │   └── ai-prompt.md             # /ai-prompt
 │   ├── skills/                      # 54 domain knowledge packs
 │   │   ├── terraform-patterns/      # Terraform IaC best practices
 │   │   ├── kubernetes-patterns/     # K8s deployment patterns
@@ -134,6 +142,10 @@ devops-agent-hub/
 | Set up monitoring | `/monitor-setup` | monitoring-agent |
 | Write tests | `/write-tests` | qa-agent |
 | Analyze project | `/analyze-project` | architecture-agent |
+| Create content | `/create-content` | content-strategist |
+| Social media campaign | `/social-media` | social-media-manager |
+| Design UI/UX | `/design-ui` | ui-ux-designer |
+| AI prompt engineering | `/ai-prompt` | prompt-engineer |
 
 ---
 

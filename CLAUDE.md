@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A **fully autonomous AI-driven software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 13 specialized agents across product management, engineering, QA, security, DevOps, and support. ERP development is a core specialty, with built-in domain knowledge for enterprise resource planning systems.
+A **fully autonomous AI-driven software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 17 specialized agents across 7 departments: product, engineering, quality, operations, marketing, support, and IT. ERP development is a core specialty, with built-in domain knowledge for enterprise resource planning systems.
 
 ## Architecture
 
@@ -10,9 +10,9 @@ All components live under `.claude/` for native auto-discovery:
 
 ```
 .claude/
-├── agents/         — 14 autonomous agents (1 orchestrator + 12 departments + 1 specialist)
-├── commands/       — 17 slash commands for task execution
-├── workflows/      — 5 end-to-end workflow definitions
+├── agents/         — 18 autonomous agents (1 orchestrator + 17 departments)
+├── commands/       — 21 slash commands for task execution
+├── workflows/      — 6 end-to-end workflow definitions
 ├── memory/         — 6 knowledge base documents (persistent context)
 ├── tools/          — 4 tool reference documents
 ├── skills/         — 54 domain knowledge packs
@@ -27,21 +27,25 @@ All components live under `.claude/` for native auto-discovery:
 The central coordinator — assigns tasks, manages workflows, tracks progress, and ensures quality standards.
 
 ### Department Agents
-| Agent | Role |
-|-------|------|
-| architecture-agent | System design, tech decisions, infrastructure planning |
-| product-manager | Requirements, user stories, feature specs, prioritization |
-| backend-engineer | Server-side code, APIs, business logic (Laravel/Django) |
-| frontend-engineer | UI/UX, components, responsive design (Vue/React) |
-| database-engineer | Schema design, migrations, query optimization, backups |
-| qa-agent | Test strategy, test writing, bug verification, quality gates |
-| security-agent | Security audits, OWASP, CIS benchmarks, compliance |
-| devops-engineer | CI/CD, Docker, Kubernetes, infrastructure automation, SSH deployments |
-| monitoring-agent | Observability, alerting, incident response, post-mortems |
-| performance-agent | Optimization, load testing, cost analysis, caching |
-| support-agent | User issue triage, client operations, Acodax administration |
-| documentation-agent | API docs, user guides, ADRs, changelog |
-| ms-it-admin | Microsoft 365 & Entra ID administration |
+| Agent | Department | Role |
+|-------|------------|------|
+| product-manager | Product | Requirements, user stories, feature specs, prioritization |
+| ui-ux-designer | Product | Visual design, wireframes, design systems, accessibility |
+| architecture-agent | Engineering | System design, tech decisions, infrastructure planning |
+| backend-engineer | Engineering | Server-side code, APIs, business logic (Laravel/Django) |
+| frontend-engineer | Engineering | UI/UX implementation, components, responsive design (Vue/React) |
+| database-engineer | Engineering | Schema design, migrations, query optimization, backups |
+| prompt-engineer | Engineering | AI prompt design, LLM integration, conversational AI |
+| qa-agent | Quality | Test strategy, test writing, bug verification, quality gates |
+| security-agent | Quality | Security audits, OWASP, CIS benchmarks, compliance |
+| devops-engineer | Operations | CI/CD, Docker, Kubernetes, infrastructure automation, SSH deployments |
+| monitoring-agent | Operations | Observability, alerting, incident response, post-mortems |
+| performance-agent | Operations | Optimization, load testing, cost analysis, caching |
+| content-strategist | Marketing | Content planning, copywriting, SEO, email marketing |
+| social-media-manager | Marketing | Social media strategy, community, paid advertising |
+| support-agent | Support | User issue triage, client operations, Acodax administration |
+| documentation-agent | Support | API docs, user guides, ADRs, changelog |
+| ms-it-admin | IT | Microsoft 365 & Entra ID administration |
 
 ## Workflows
 
@@ -52,6 +56,7 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 | release-process | `/deploy-production` | QA → Security → DevOps |
 | production-incident | `/investigate-incident` | Monitoring → DevOps → Engineers |
 | client-deployment | New client setup | Support → Backend → DevOps |
+| content-campaign | `/create-content` | Content-strategist → SEO → Social |
 
 ## Knowledge Base
 
@@ -77,6 +82,10 @@ Agents reference `.claude/memory/` for persistent context:
 | `/monitor-system` | System health check |
 | `/investigate-incident` | Incident response |
 | `/security-scan` | Security audit |
+| `/create-content` | Content strategy and creation |
+| `/social-media` | Social media campaigns |
+| `/design-ui` | UI/UX design and wireframes |
+| `/ai-prompt` | AI prompt engineering |
 
 ## References
 

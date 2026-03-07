@@ -21,8 +21,8 @@ Claude Code native DevOps toolkit — a collection of markdown-based agents, ski
 ```
 devops-agent-hub/
 ├── .claude/
-│   ├── agents/         — 14 specialized DevOps subagents
-│   ├── commands/       — 18 slash commands
+│   ├── agents/         — 18 specialized agents (7 departments)
+│   ├── commands/       — 21 slash commands
 │   ├── skills/         — 54 domain knowledge packs
 │   ├── rules/          — 7 rule categories (common, cicd, cloud, docker, kubernetes, security, terraform)
 │   └── settings.json   — Infrastructure safety hooks (PreToolUse, PostToolUse)
@@ -39,7 +39,7 @@ devops-agent-hub/
 └── README.md           — Public documentation
 ```
 
-## 2. Existing Agents (14 total)
+## 2. Existing Agents (18 total)
 
 | Agent | Domain | Preserve? | Disposition |
 |-------|--------|-----------|-------------|
@@ -81,7 +81,7 @@ Skills are retained as knowledge packs and referenced by new agents:
 - **MS365**: ms365-admin, entra-id-admin, exchange-online-admin, intune-device-mgmt
 - **Acodax**: acodax-erp-office-admin, deploy-acodax-property
 
-## 4. Existing Commands (18 total)
+## 4. Existing Commands (21 total)
 
 Commands retained where relevant, new ERP-focused commands added.
 
@@ -91,7 +91,7 @@ All rules retained — they provide safety guardrails:
 - `common/`: coding-style, git-workflow, performance, security, testing
 - `cicd/`, `cloud/`, `docker/`, `kubernetes/`, `security/`, `terraform/`
 
-## 6. Hooks & Safety (7 hooks)
+## 6. Hooks & Safety (11 hooks)
 
 All hooks externalized to `.claude/hooks/` scripts:
 - **SessionStart (startup|resume|compact)**: `session-start.sh` — Injects ERP project context (branch, recent changes, critical rules)
@@ -116,9 +116,9 @@ All retained — they provide external service access:
 ### New Structure
 ```
 .claude/
-├── agents/         — 12 department agents + master orchestrator + ms-it-admin specialist
-├── commands/       — 9 new ERP commands + preserved essential commands
-├── workflows/      — 5 workflow definitions (NEW)
+├── agents/         — 18 autonomous agents (1 orchestrator + 17 departments)
+├── commands/       — 21 slash commands
+├── workflows/      — 6 workflow definitions
 ├── memory/         — 6 knowledge base documents (NEW)
 ├── tools/          — 4 tool reference documents (NEW)
 ├── skills/         — 54 domain knowledge packs

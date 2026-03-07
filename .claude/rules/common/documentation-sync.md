@@ -35,9 +35,9 @@ When adding, removing, or renaming any agent, skill, command, workflow, hook, or
 ## How to Find Counts
 
 Search for the current count number in each file. Counts appear in:
-- Inline text (e.g., "14 specialized agents, 38 skills")
-- Structure tree comments (e.g., `├── skills/ — 38 domain knowledge packs`)
-- Diagram labels (e.g., `│ SKILLS (38 knowledge packs) │`)
+- Inline text (e.g., "18 specialized agents, 54 skills")
+- Structure tree comments (e.g., `├── skills/ — 54 domain knowledge packs`)
+- Diagram labels (e.g., `│ SKILLS (54 knowledge packs) │`)
 
 ## Commit Convention
 

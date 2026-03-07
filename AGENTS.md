@@ -1,6 +1,6 @@
 # Autonomous AI Software Company — Agent Instructions
 
-A **fully autonomous AI-driven software company** with 14 specialized agents, 54 skills, 17 commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven software company** with 18 specialized agents (7 departments), 54 skills, 21 commands, 6 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -19,31 +19,39 @@ A **fully autonomous AI-driven software company** with 14 specialized agents, 54
 | master-orchestrator | Central coordinator of all agents | Every task — plans, assigns, tracks, delivers |
 
 ### Department Agents
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| architecture-agent | System design, tech decisions | New features, refactors, architecture reviews |
-| product-manager | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
-| backend-engineer | Server-side code, APIs, logic | Backend features, API endpoints, integrations |
-| frontend-engineer | UI/UX, client-side code | Frontend features, UI bugs, responsive design |
-| database-engineer | Schema, queries, migrations | DB changes, migrations, query optimization |
-| qa-agent | Testing, quality assurance | Test writing, bug verification, regression testing |
-| security-agent | Security audits, vulnerabilities | Security reviews, pen testing, compliance |
-| devops-engineer | CI/CD, infrastructure, SSH deployments | Pipeline setup, server config, deployments, SSH deploys |
-| monitoring-agent | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
-| performance-agent | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
-| support-agent | User issues, triage, client admin | Bug reports, client setup, Acodax user/role management |
-| documentation-agent | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
-| ms-it-admin | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
+| Agent | Department | Purpose | When to Use |
+|-------|------------|---------|-------------|
+| product-manager | Product | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
+| ui-ux-designer | Product | Visual design, wireframes, accessibility | UI design, design systems, user research |
+| architecture-agent | Engineering | System design, tech decisions | New features, refactors, architecture reviews |
+| backend-engineer | Engineering | Server-side code, APIs, logic | Backend features, API endpoints, integrations |
+| frontend-engineer | Engineering | UI/UX implementation, client-side code | Frontend features, UI bugs, responsive design |
+| database-engineer | Engineering | Schema, queries, migrations | DB changes, migrations, query optimization |
+| prompt-engineer | Engineering | AI prompts, LLM integration | Prompt design, chatbots, AI features |
+| qa-agent | Quality | Testing, quality assurance | Test writing, bug verification, regression testing |
+| security-agent | Quality | Security audits, vulnerabilities | Security reviews, pen testing, compliance |
+| devops-engineer | Operations | CI/CD, infrastructure, SSH deployments | Pipeline setup, server config, deployments |
+| monitoring-agent | Operations | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
+| performance-agent | Operations | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
+| content-strategist | Marketing | Content, SEO, email marketing | Content planning, copywriting, SEO audits |
+| social-media-manager | Marketing | Social media, ads, community | Social campaigns, community management |
+| support-agent | Support | User issues, triage, client admin | Bug reports, client setup, Acodax admin |
+| documentation-agent | Support | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
+| ms-it-admin | IT | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
 
 ## Agent Orchestration
 
 ### Automatic Assignment
 The master-orchestrator automatically routes tasks:
 - Feature requests → product-manager → architecture-agent → engineers → qa-agent
+- UI/UX design → ui-ux-designer → frontend-engineer
 - Bug reports → support-agent → relevant engineer → qa-agent
 - Deployments → devops-engineer → monitoring-agent
 - Security concerns → security-agent (immediate priority)
 - Incidents → monitoring-agent → devops-engineer → engineers
+- AI/LLM features → prompt-engineer → backend-engineer → qa-agent
+- Content/SEO → content-strategist
+- Social media/ads → social-media-manager
 - Documentation → documentation-agent
 - Performance issues → performance-agent
 - Microsoft 365 tasks → ms-it-admin
@@ -66,6 +74,7 @@ Launch multiple agents simultaneously for independent tasks:
 | Release Process | `.claude/workflows/release-process.md` | Freeze → QA → Security → Staging → Approval → Production |
 | Production Incident | `.claude/workflows/production-incident.md` | Detect → Triage → Investigate → Mitigate → Resolve → Post-mortem |
 | Client Deployment | `.claude/workflows/client-deployment.md` | Requirements → Tenant → Config → Data → Deploy → Verify |
+| Content Campaign | `.claude/workflows/content-campaign.md` | Strategy → Create → Optimize → Publish → Analyze |
 
 ## Knowledge Base
 
@@ -112,9 +121,9 @@ Every deliverable must meet:
 ## Project Structure
 ```
 .claude/
-  agents/         — 14 autonomous agents
-  commands/       — 17 slash commands
-  workflows/      — 5 workflow definitions
+  agents/         — 18 autonomous agents (7 departments)
+  commands/       — 21 slash commands
+  workflows/      — 6 workflow definitions
   memory/         — 6 knowledge base documents
   tools/          — 4 tool reference documents
   skills/         — 54 domain knowledge packs
