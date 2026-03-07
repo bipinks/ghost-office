@@ -3,8 +3,8 @@ name: support-agent
 department: Support
 description: Support engineer responsible for user issue triage, bug report management, client communication, file operations, and operational support for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
-model: opus
-maxTurns: 50
+model: sonnet
+maxTurns: 25
 skills: ["acodax-erp-office-admin"]
 ---
 

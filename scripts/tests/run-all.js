@@ -21,6 +21,7 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 function main() {
   const root = path.resolve(__dirname, '..', '..');
@@ -71,7 +72,6 @@ function main() {
 
   // Test 1: JSON validation
   inlineTest('JSON file validation', () => {
-    const fs = require('fs');
     const files = ['.claude/settings.json', '.mcp.json', 'package.json'];
     files.forEach(f => JSON.parse(fs.readFileSync(path.join(root, f), 'utf8')));
   });
@@ -83,7 +83,6 @@ function main() {
 
   // Test 3: Frontmatter presence
   inlineTest('YAML frontmatter in all agents/commands', () => {
-    const fs = require('fs');
     ['.claude/agents', '.claude/commands'].forEach(dir => {
       const fullDir = path.join(root, dir);
       fs.readdirSync(fullDir).filter(f => f.endsWith('.md')).forEach(f => {
@@ -95,7 +94,6 @@ function main() {
 
   // Test 4: Required files
   inlineTest('Required root files', () => {
-    const fs = require('fs');
     ['README.md', 'CLAUDE.md', 'AGENTS.md', 'LICENSE', 'CONTRIBUTING.md', 'BEGINNERS-GUIDE.md', '.gitignore'].forEach(f => {
       if (!fs.existsSync(path.join(root, f))) throw new Error(`Missing: ${f}`);
     });
@@ -103,7 +101,6 @@ function main() {
 
   // Test 5: MCP config placeholder hygiene
   inlineTest('MCP config placeholder hygiene', () => {
-    const fs = require('fs');
     const text = fs.readFileSync(path.join(root, '.mcp.json'), 'utf8');
     const banned = [/<your-/i, /\/path\/to\/project/i, /your-org/i];
     const found = banned.find(r => r.test(text));
@@ -112,7 +109,6 @@ function main() {
 
   // Test 6: .claude directory structure
   inlineTest('.claude directory structure', () => {
-    const fs = require('fs');
     const dirs = ['.claude/agents', '.claude/commands', '.claude/skills', '.claude/rules'];
     dirs.forEach(d => {
       const fullDir = path.join(root, d);
@@ -133,13 +129,21 @@ function main() {
   moduleTest('Content integrity', './test-content-integrity');
 
   // ==========================================
+  // Shared: pre-read agent files for Tests 12 & 13
+  // ==========================================
+  const agentsDir = path.join(root, '.claude', 'agents');
+  const skillsDir = path.join(root, '.claude', 'skills');
+  const commandsDir = path.join(root, '.claude', 'commands');
+  const agentFileCache = new Map();
+  fs.readdirSync(agentsDir).filter(f => f.endsWith('.md')).forEach(file => {
+    agentFileCache.set(file, fs.readFileSync(path.join(agentsDir, file), 'utf8'));
+  });
+
+  // ==========================================
   // Test 12: Agent skill-mapping validation
   // ==========================================
   inlineTest('Agent skill-mapping validation', () => {
-    const fs = require('fs');
-    const agentsDir = path.join(root, '.claude', 'agents');
-    const skillsDir = path.join(root, '.claude', 'skills');
-    const agentFiles = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+    const agentFiles = Array.from(agentFileCache.keys());
     const skillDirs = fs.existsSync(skillsDir)
       ? fs.readdirSync(skillsDir).filter(name => fs.statSync(path.join(skillsDir, name)).isDirectory())
       : [];
@@ -148,8 +152,7 @@ function main() {
 
     // Extract skills from each agent's frontmatter and verify they exist
     agentFiles.forEach(file => {
-      const content = fs.readFileSync(path.join(agentsDir, file), 'utf8');
-      // Extract frontmatter
+      const content = agentFileCache.get(file);
       if (!content.startsWith('---')) return;
       const lines = content.split(/\r?\n/);
       const endIdx = lines.indexOf('---', 1);
@@ -200,27 +203,42 @@ function main() {
   // Test 13: Frontmatter schema validation
   // ==========================================
   inlineTest('Frontmatter schema validation', () => {
-    const fs = require('fs');
     const errors = [];
+    const lineSplitRe = /\r?\n/;
+    const quoteStripRe = /^["']|["']$/g;
 
     function extractFm(content) {
       if (!content.startsWith('---')) return null;
-      const lines = content.split(/\r?\n/);
+      const lines = content.split(lineSplitRe);
       const endIdx = lines.indexOf('---', 1);
       if (endIdx === -1) return null;
       return lines.slice(1, endIdx).join('\n');
     }
 
+    // Pre-compiled regex cache for hasKey and parseArrayField
+    const regexCache = {};
+    function getKeyRegexes(key) {
+      if (!regexCache[key]) {
+        regexCache[key] = {
+          has: new RegExp(`^${key}:`, 'm'),
+          inline: new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, 'm'),
+          list: new RegExp(`^${key}:\\s*\\n((?:\\s+-\\s+.+\\n?)+)`, 'm'),
+        };
+      }
+      return regexCache[key];
+    }
+
     function hasKey(fm, key) {
-      return new RegExp(`^${key}:`, 'm').test(fm);
+      return getKeyRegexes(key).has.test(fm);
     }
 
     function parseArrayField(fm, key) {
-      const inlineMatch = fm.match(new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, 'm'));
+      const re = getKeyRegexes(key);
+      const inlineMatch = fm.match(re.inline);
       if (inlineMatch) {
-        return inlineMatch[1].split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(s => s.length > 0);
+        return inlineMatch[1].split(',').map(s => s.trim().replace(quoteStripRe, '')).filter(s => s.length > 0);
       }
-      const listMatch = fm.match(new RegExp(`^${key}:\\s*\\n((?:\\s+-\\s+.+\\n?)+)`, 'm'));
+      const listMatch = fm.match(re.list);
       if (listMatch) {
         return listMatch[1].split('\n').map(l => l.replace(/^\s+-\s+/, '').replace(/["']/g, '').trim()).filter(s => s.length > 0);
       }
@@ -228,9 +246,8 @@ function main() {
     }
 
     // Validate agent frontmatter: name, description, tools (array), model
-    const agentsDir = path.join(root, '.claude', 'agents');
-    fs.readdirSync(agentsDir).filter(f => f.endsWith('.md')).forEach(file => {
-      const content = fs.readFileSync(path.join(agentsDir, file), 'utf8');
+    Array.from(agentFileCache.keys()).forEach(file => {
+      const content = agentFileCache.get(file);
       const fm = extractFm(content);
       if (!fm) {
         errors.push(`Agent ${file}: missing frontmatter`);
@@ -250,7 +267,6 @@ function main() {
     });
 
     // Validate skill frontmatter: name, description, user-invocable
-    const skillsDir = path.join(root, '.claude', 'skills');
     if (fs.existsSync(skillsDir)) {
       fs.readdirSync(skillsDir)
         .filter(name => fs.statSync(path.join(skillsDir, name)).isDirectory())
@@ -270,7 +286,6 @@ function main() {
     }
 
     // Validate command frontmatter: name, description
-    const commandsDir = path.join(root, '.claude', 'commands');
     fs.readdirSync(commandsDir).filter(f => f.endsWith('.md')).forEach(file => {
       const content = fs.readFileSync(path.join(commandsDir, file), 'utf8');
       const fm = extractFm(content);

@@ -3,8 +3,8 @@ name: content-strategist
 department: Marketing
 description: Content strategist responsible for content planning, copywriting, SEO optimization, email marketing campaigns, and content performance analysis
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
-model: opus
-maxTurns: 50
+model: sonnet
+maxTurns: 30
 skills: ["seo-optimization", "copywriting-patterns", "email-marketing", "content-strategy"]
 ---
 

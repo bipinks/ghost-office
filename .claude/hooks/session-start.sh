@@ -12,21 +12,13 @@ fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 
-# --- Detect current git branch ---
+# --- Detect git state (single command check) ---
 BRANCH=""
-if command -v git >/dev/null 2>&1; then
-  BRANCH="$(git -C "$PROJECT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null)"
-fi
-
-# --- Detect recent changes ---
 RECENT_CHANGES=""
-if command -v git >/dev/null 2>&1; then
-  RECENT_CHANGES="$(git -C "$PROJECT_DIR" log --oneline -5 2>/dev/null)"
-fi
-
-# --- Detect pending work ---
 UNCOMMITTED=""
 if command -v git >/dev/null 2>&1; then
+  BRANCH="$(git -C "$PROJECT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  RECENT_CHANGES="$(git -C "$PROJECT_DIR" log --oneline -5 2>/dev/null)"
   UNCOMMITTED="$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | head -10)"
 fi
 

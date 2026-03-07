@@ -3,8 +3,8 @@ name: social-media-manager
 department: Marketing
 description: Social media manager responsible for social media strategy, content creation, community management, paid advertising, and analytics across all platforms
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
-model: opus
-maxTurns: 50
+model: sonnet
+maxTurns: 30
 skills: ["social-media-strategy", "community-management", "paid-advertising", "analytics-reporting"]
 ---
 

@@ -3,8 +3,8 @@ name: ms-it-admin
 department: IT
 description: Manages Microsoft 365 tenant administration including user provisioning, licensing, Teams, SharePoint, Exchange Online, Entra ID, Intune, and compliance policies via Graph API and PowerShell
 tools: ["Read", "Write", "Grep", "Glob", "Bash", "mcp__ms365__list-users", "mcp__ms365__get-current-user", "mcp__ms365__list-joined-teams", "mcp__ms365__list-team-channels", "mcp__ms365__list-mail-messages", "mcp__ms365__list-mail-folders", "mcp__ms365__send-shared-mailbox-mail", "mcp__ms365__list-calendar-events", "mcp__ms365__list-chats", "mcp__ms365__login", "mcp__ms365__verify-login", "mcp__ms365__list-accounts"]
-model: opus
-maxTurns: 30
+model: sonnet
+maxTurns: 10
 skills: ["ms365-admin", "entra-id-admin", "exchange-online-admin", "intune-device-mgmt"]
 ---
 

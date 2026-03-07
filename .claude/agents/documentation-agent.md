@@ -4,8 +4,8 @@ department: Support
 description: Technical writer responsible for API documentation, user guides, architecture docs, changelogs, and knowledge base maintenance for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 disallowedTools: ["mcp__ms365__send-shared-mailbox-mail", "mcp__ms365__send-chat-message"]
-model: opus
-maxTurns: 50
+model: sonnet
+maxTurns: 30
 skills: ["documentation-standards"]
 ---
 

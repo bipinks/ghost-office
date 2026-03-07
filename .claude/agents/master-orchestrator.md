@@ -4,7 +4,7 @@ department: Leadership
 description: Central coordinator of all autonomous agents — assigns tasks, manages workflows, escalates issues, maintains audit logs, and ensures coding standards and quality
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Agent", "TodoWrite"]
 model: opus
-maxTurns: 100
+maxTurns: 30
 permissionMode: default
 ---
 

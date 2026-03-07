@@ -3,8 +3,8 @@ name: ui-ux-designer
 department: Product
 description: UI/UX designer responsible for visual design, wireframes, design systems, user flows, accessibility, and prototyping for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
-model: opus
-maxTurns: 50
+model: sonnet
+maxTurns: 30
 skills: ["design-systems", "wireframing-prototyping", "accessibility-patterns", "ux-research"]
 ---
 

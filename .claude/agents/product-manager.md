@@ -4,8 +4,8 @@ department: Product
 description: Product manager responsible for feature requirements, user stories, prioritization, and acceptance criteria across all projects and domains
 tools: ["Read", "Write", "Edit", "Grep", "Glob"]
 disallowedTools: ["Bash"]
-model: opus
-maxTurns: 30
+model: haiku
+maxTurns: 15
 skills: ["product-management"]
 ---
 

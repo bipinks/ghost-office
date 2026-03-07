@@ -12,10 +12,12 @@ fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 
-# --- Capture current state ---
+# --- Capture current state (single git check) ---
 BRANCH=""
 UNCOMMITTED_COUNT=0
+HAS_GIT=false
 if command -v git >/dev/null 2>&1; then
+  HAS_GIT=true
   BRANCH="$(git -C "$PROJECT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null)"
   UNCOMMITTED_COUNT="$(git -C "$PROJECT_DIR" status --porcelain 2>/dev/null | wc -l)"
 fi
@@ -47,8 +49,10 @@ if [ "$UNCOMMITTED_COUNT" -gt 0 ]; then
 fi
 
 # --- Recent commits for continuity ---
-echo "Recent Work (last 3 commits):"
-git -C "$PROJECT_DIR" log --oneline -3 2>/dev/null
-echo ""
+if $HAS_GIT; then
+  echo "Recent Work (last 3 commits):"
+  git -C "$PROJECT_DIR" log --oneline -3 2>/dev/null
+  echo ""
+fi
 
 exit 0
