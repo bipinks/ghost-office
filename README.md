@@ -98,6 +98,38 @@ Agents, skills, commands, rules, and hooks all auto-discover from `.claude/`.
 
 ## The Team
 
+```
+                         ┌─────────────────────┐
+                         │ master-orchestrator  │
+                         │  Plans · Assigns ·   │
+                         │  Tracks · Delivers   │
+                         └─────────┬───────────┘
+                                   │
+        ┌──────────┬───────────┬───┴───┬───────────┬──────────┬────────┐
+        │          │           │       │           │          │        │
+   ┌────┴───┐ ┌───┴────┐ ┌───┴──┐ ┌──┴───┐ ┌────┴───┐ ┌───┴───┐ ┌──┴──┐
+   │Product │ │Engineer│ │Quality│ │  Ops │ │Market- │ │Support│ │ IT  │
+   │        │ │  -ing  │ │      │ │      │ │  ing   │ │       │ │     │
+   └───┬────┘ └───┬────┘ └──┬───┘ └──┬───┘ └───┬────┘ └──┬────┘ └──┬──┘
+       │          │          │        │          │         │         │
+  ┌────┴────┐  ┌──┴───┐  ┌──┴──┐  ┌──┴───┐  ┌──┴──┐  ┌──┴──┐  ┌──┴──┐
+  │product- │  │archi-│  │ qa- │  │devops│  │cont-│  │supp-│  │ms-it│
+  │manager  │  │tect  │  │agent│  │engnr │  │ent  │  │ort  │  │admin│
+  │         │  │      │  │     │  │      │  │strat│  │agent│  └─────┘
+  │ui-ux-   │  │back- │  │sec- │  │moni- │  │     │  │     │
+  │designer │  │end   │  │urity│  │toring│  │soc- │  │docs │
+  └─────────┘  │      │  └─────┘  │      │  │ial  │  │agent│
+               │front-│           │perf- │  └─────┘  └─────┘
+               │end   │           │orm.  │
+               │      │           └──────┘
+               │data- │
+               │base  │
+               │      │
+               │prompt│
+               │engnr │
+               └──────┘
+```
+
 <table>
 <tr>
 <td align="center"><b>Department</b></td>
@@ -105,43 +137,43 @@ Agents, skills, commands, rules, and hooks all auto-discover from `.claude/`.
 <td align="center"><b>What They Do</b></td>
 </tr>
 <tr>
-<td>Product</td>
+<td><b>Product</b></td>
 <td>product-manager, ui-ux-designer</td>
 <td>Requirements, user stories, wireframes, design systems</td>
 </tr>
 <tr>
-<td>Engineering</td>
+<td><b>Engineering</b></td>
 <td>architecture, backend, frontend, database, prompt-engineer</td>
 <td>System design, APIs, UI, schemas, AI integration</td>
 </tr>
 <tr>
-<td>Quality</td>
+<td><b>Quality</b></td>
 <td>qa-agent, security-agent</td>
 <td>Tests, security audits, OWASP, compliance</td>
 </tr>
 <tr>
-<td>Operations</td>
+<td><b>Operations</b></td>
 <td>devops-engineer, monitoring-agent, performance-agent</td>
 <td>CI/CD, deployments, observability, optimization</td>
 </tr>
 <tr>
-<td>Marketing</td>
+<td><b>Marketing</b></td>
 <td>content-strategist, social-media-manager</td>
 <td>Content strategy, SEO, campaigns, community</td>
 </tr>
 <tr>
-<td>Support</td>
+<td><b>Support</b></td>
 <td>support-agent, documentation-agent</td>
 <td>Issue triage, API docs, user guides, changelogs</td>
 </tr>
 <tr>
-<td>IT</td>
+<td><b>IT</b></td>
 <td>ms-it-admin</td>
 <td>Microsoft 365, Entra ID, Teams, Exchange</td>
 </tr>
 </table>
 
-All coordinated by the **master-orchestrator** — it plans work, assigns agents, runs parallel streams, and enforces quality gates.
+The **master-orchestrator** coordinates everything — it plans work, assigns agents, runs parallel streams, and enforces quality gates before delivery.
 
 ---
 
