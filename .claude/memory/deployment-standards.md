@@ -1,4 +1,4 @@
-# Deployment Standards — ERP Platform
+# Deployment Standards — Platform Deployment
 
 ## Environments
 

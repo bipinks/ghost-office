@@ -1,4 +1,4 @@
-# Architecture Report — DevOps Agent Hub → Autonomous ERP Workspace
+# Architecture Report — DevOps Agent Hub → Autonomous AI Software Company
 
 **Generated**: 2026-03-06
 **Status**: Pre-transformation analysis
@@ -44,7 +44,7 @@ devops-agent-hub/
 | Agent | Domain | Preserve? | Disposition |
 |-------|--------|-----------|-------------|
 | ms-it-admin | Microsoft 365 administration | **Yes** | Keep as-is, integrate with IT/admin functions |
-| acodax-erp-office-admin | Acodax ERP user/role management | **Yes** | Keep as-is, core ERP admin agent |
+| acodax-erp-office-admin | Acodax ERP user/role management | **Yes** | Keep as-is, domain-specific admin agent |
 | deployer | SSH-based project deployment | **Yes** | Keep, absorb into devops-engineer scope |
 | security-auditor | CIS/OWASP security audits | Absorb | Merge into security-agent |
 | cicd-architect | CI/CD pipeline design | Absorb | Merge into devops-engineer |

@@ -1,4 +1,4 @@
-# Performance Guidelines — ERP Platform
+# Performance Guidelines — Platform Performance
 
 ## Performance Targets
 

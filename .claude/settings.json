@@ -1,5 +1,5 @@
 {
-  "project_type": "enterprise_erp",
+  "project_type": "ai_software_company",
   "default_agent": "master-orchestrator",
   "autonomy_enabled": true,
   "parallel_task_execution": true,
@@ -51,7 +51,7 @@
           {
             "type": "command",
             "command": ".claude/hooks/session-start.sh",
-            "statusMessage": "Loading ERP workspace context..."
+            "statusMessage": "Loading workspace context..."
           }
         ]
       }

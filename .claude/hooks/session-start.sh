@@ -1,5 +1,5 @@
 #!/bin/bash
-# Hook: SessionStart — ERP Project Context Injection
+# Hook: SessionStart — Project Context Injection
 # Injects critical project context at session start, resume, and compact events.
 # Exit 0 = allow (context injection only)
 
@@ -33,16 +33,16 @@ fi
 # --- Output context summary ---
 cat <<EOF
 
-=== ERP Workspace Context ===
-Project: Autonomous ERP Workspace (Claude Code native)
-Type: Enterprise ERP — multi-tenant, multi-branch
+=== AI Software Company — Workspace Context ===
+Project: Autonomous AI Software Company (Claude Code native)
+Type: AI-driven software company — multi-tenant, multi-branch capable
 Session Event: ${EVENT_TYPE:-startup}
 Branch: ${BRANCH:-unknown}
 
 Key References:
 - Architecture: .claude/memory/architecture.md
 - Coding Standards: .claude/memory/coding-standards.md
-- ERP Domain: .claude/memory/erp-domain.md
+- Domain Knowledge: .claude/memory/domain-knowledge.md
 - Deployment: .claude/memory/deployment-standards.md
 
 Active Hooks: infra-safety, git-safety, file-write-check, migration-check, ms365-audit

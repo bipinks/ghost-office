@@ -1,8 +1,8 @@
-# System Architecture — ERP Platform
+# System Architecture — Platform Reference
 
 ## Overview
 
-The ERP platform is a multi-tenant, modular enterprise resource planning system designed to manage accounting, inventory, sales, HR, procurement, and manufacturing operations across multiple branches.
+The platform is a multi-tenant, modular system. For ERP projects, it manages accounting, inventory, sales, HR, procurement, and manufacturing operations across multiple branches. The architecture patterns apply to any multi-tenant application.
 
 ## Architecture Style
 
@@ -60,7 +60,7 @@ companies (1) ──→ branches (many) ──→ users (many)
 
 ## Module Architecture
 
-Each ERP module follows this internal structure:
+Each module follows this internal structure:
 
 ```
 module/

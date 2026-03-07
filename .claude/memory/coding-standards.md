@@ -1,4 +1,4 @@
-# Coding Standards — ERP Platform
+# Coding Standards — Platform Development
 
 ## General Principles
 

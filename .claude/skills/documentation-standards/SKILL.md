@@ -1,6 +1,6 @@
 ---
 name: documentation-standards
-description: Use when writing or updating technical documentation for the ERP platform. Covers API docs, Architecture Decision Records, user guides, changelogs, README patterns, and knowledge base maintenance.
+description: Use when writing or updating technical documentation for the platform. Covers API docs, Architecture Decision Records, user guides, changelogs, README patterns, and knowledge base maintenance.
 user-invocable: false
 allowed-tools: ["Read", "Write", "Grep", "Glob"]
 ---
@@ -209,7 +209,7 @@ Every ERP module should have a README:
 
 | Event | Update |
 |-------|--------|
-| New module added | `architecture.md`, `erp-domain.md` |
+| New module added | `architecture.md`, `domain-knowledge.md` |
 | API change | `architecture.md` |
 | New coding pattern | `coding-standards.md` |
 | Deployment change | `deployment-standards.md` |

@@ -1,7 +1,7 @@
 # Feature Development Workflow
 
 ## Overview
-End-to-end workflow for developing new ERP features, from requirements to deployment.
+End-to-end workflow for developing new features, from requirements to deployment.
 
 ## Trigger
 - User requests a new feature
@@ -19,7 +19,7 @@ End-to-end workflow for developing new ERP features, from requirements to deploy
 ## Phases
 
 ### Phase 1: Requirements (Sequential)
-**Agent**: erp-product-manager
+**Agent**: product-manager
 **Actions**:
 1. Analyze the feature request
 2. Write user stories with acceptance criteria

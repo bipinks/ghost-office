@@ -1,6 +1,6 @@
 ---
 name: refactor-module
-description: Refactor an ERP module for improved code quality, performance, or architecture
+description: Refactor a module for improved code quality, performance, or architecture
 argument-hint: "<module name and refactoring goal>"
 ---
 

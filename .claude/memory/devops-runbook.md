@@ -1,4 +1,4 @@
-# DevOps Runbook — ERP Platform Operations
+# DevOps Runbook — Platform Operations
 
 ## Server Management
 

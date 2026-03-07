@@ -1,8 +1,8 @@
-# CLAUDE.md — Autonomous ERP Workspace
+# CLAUDE.md — Autonomous AI Software Company
 
 ## Project Overview
 
-A **fully autonomous AI-driven ERP software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 13 specialized agents across product management, engineering, QA, security, DevOps, and support.
+A **fully autonomous AI-driven software company** powered by Claude Code. The system operates as an entire engineering and operations department with a master orchestrator coordinating 13 specialized agents across product management, engineering, QA, security, DevOps, and support. ERP development is a core specialty, with built-in domain knowledge for enterprise resource planning systems.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 | Agent | Role |
 |-------|------|
 | architecture-agent | System design, tech decisions, infrastructure planning |
-| erp-product-manager | Requirements, user stories, feature specs, prioritization |
+| product-manager | Requirements, user stories, feature specs, prioritization |
 | backend-engineer | Server-side code, APIs, business logic (Laravel/Django) |
 | frontend-engineer | UI/UX, components, responsive design (Vue/React) |
 | database-engineer | Schema design, migrations, query optimization, backups |
@@ -39,7 +39,7 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 | devops-engineer | CI/CD, Docker, Kubernetes, infrastructure automation, SSH deployments |
 | monitoring-agent | Observability, alerting, incident response, post-mortems |
 | performance-agent | Optimization, load testing, cost analysis, caching |
-| support-agent | User issue triage, client operations, Acodax ERP administration |
+| support-agent | User issue triage, client operations, Acodax administration |
 | documentation-agent | API docs, user guides, ADRs, changelog |
 | ms-it-admin | Microsoft 365 & Entra ID administration |
 
@@ -57,8 +57,8 @@ The central coordinator — assigns tasks, manages workflows, tracks progress, a
 
 Agents reference `.claude/memory/` for persistent context:
 - @.claude/memory/architecture.md — System architecture overview
-- @.claude/memory/coding-standards.md — ERP coding conventions (Laravel/PHP, Vue/TS)
-- @.claude/memory/erp-domain.md — Business rules, modules, multi-branch operations
+- @.claude/memory/coding-standards.md — Coding conventions (Laravel/PHP, Vue/TS)
+- @.claude/memory/domain-knowledge.md — Domain expertise and business rules (ERP specialty)
 - @.claude/memory/deployment-standards.md — Staging/production deployment procedures
 - @.claude/memory/devops-runbook.md — Server management, CI/CD, backups
 - @.claude/memory/performance-guidelines.md — Optimization targets and rules
@@ -108,7 +108,7 @@ The workspace enables Claude Code to:
 - Break down tasks and assign to specialized agents
 - Execute parallel work streams for independent subtasks (with worktree isolation)
 - Run quality gates (tests, security review) before deployment
-- Manage full ERP feature lifecycle (requirements → deploy)
+- Manage full feature lifecycle across any domain (requirements → deploy)
 - Handle incidents with structured triage and resolution
 - Maintain audit trails for all operations (MS365 audit logging)
 - Reference the knowledge base for consistent decision-making
@@ -133,7 +133,7 @@ The workspace enables Claude Code to:
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `session-start.sh` | SessionStart | Injects ERP context on session start/resume/compact |
+| `session-start.sh` | SessionStart | Injects project context on session start/resume/compact |
 | `pre-compact.sh` | PreCompact | Preserves critical context before auto-compaction |
 | `infra-safety-check.sh` | PreToolUse (Bash) | Warns on destructive infrastructure commands |
 | `git-safety-check.sh` | PreToolUse (Bash) | Blocks force-push to protected branches |

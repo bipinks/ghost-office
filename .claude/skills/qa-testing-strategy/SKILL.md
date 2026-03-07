@@ -1,6 +1,6 @@
 ---
 name: qa-testing-strategy
-description: Use when writing tests, designing test plans, or verifying bug fixes for the ERP platform. Covers PHPUnit, Pest, Cypress/Playwright, test data factories, multi-tenant isolation testing, and quality gate criteria.
+description: Use when writing tests, designing test plans, or verifying bug fixes for the platform. Covers PHPUnit, Pest, Cypress/Playwright, test data factories, multi-tenant isolation testing, and quality gate criteria.
 user-invocable: false
 allowed-tools: ["Read", "Write", "Bash", "Grep", "Glob"]
 ---

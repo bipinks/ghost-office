@@ -1,4 +1,6 @@
-# ERP Domain Knowledge — Business Rules & Modules
+# Domain Knowledge — Business Rules & Modules
+
+> **Current Specialty**: Enterprise Resource Planning (ERP). This document serves as the domain knowledge base for ERP projects. For other project types, extend or replace with relevant domain knowledge.
 
 ## Core Business Concepts
 
@@ -23,7 +25,7 @@
 
 ---
 
-## ERP Modules
+## ERP Modules (Built-in Specialty)
 
 ### 1. Accounting & Finance
 **Entities**: Account, Journal Entry, Ledger, Bank Account, Bank Transaction

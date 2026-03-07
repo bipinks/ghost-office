@@ -31,7 +31,7 @@ Uncommitted Files: ${UNCOMMITTED_COUNT}
 IMPORTANT — Preserve These After Compaction:
 1. Current working branch: ${BRANCH:-unknown}
 2. Uncommitted changes count: ${UNCOMMITTED_COUNT}
-3. Project type: Enterprise ERP (multi-tenant, multi-branch)
+3. Project type: AI Software Company (multi-tenant, multi-branch capable)
 4. All database tables require branch_id column
 5. Protected branches: main, master, develop, production, staging
 6. Hooks active: infra-safety, git-safety, file-write-check, migration-check, ms365-audit

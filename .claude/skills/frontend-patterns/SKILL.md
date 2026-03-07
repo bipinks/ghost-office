@@ -1,11 +1,11 @@
 ---
 name: frontend-patterns
-description: Use when building ERP frontend components, pages, or client-side logic. Covers Vue 3 Composition API, TypeScript patterns, component design, state management, form handling, data tables, and responsive layouts for enterprise applications.
+description: Use when building frontend components, pages, or client-side logic. Covers Vue 3 Composition API, TypeScript patterns, component design, state management, form handling, data tables, and responsive layouts for enterprise applications.
 user-invocable: false
 allowed-tools: ["Read", "Write", "Bash", "Grep", "Glob"]
 ---
 
-# Frontend Patterns — ERP Platform
+# Frontend Patterns — Platform Development
 
 ## Vue 3 Component Pattern (Composition API)
 

@@ -1,6 +1,6 @@
 ---
 name: implement-feature
-description: Implement a new ERP feature end-to-end with autonomous agent coordination
+description: Implement a new feature end-to-end with autonomous agent coordination
 argument-hint: "<feature description>"
 ---
 
@@ -10,7 +10,7 @@ Implement the following feature using the full autonomous agent team: $ARGUMENTS
 
 ### Agents Involved
 - **master-orchestrator** — Coordinates the entire workflow
-- **erp-product-manager** — Writes feature spec and acceptance criteria
+- **product-manager** — Writes feature spec and acceptance criteria
 - **architecture-agent** — Reviews technical approach
 - **backend-engineer** — Implements server-side code
 - **frontend-engineer** — Implements UI components
@@ -22,7 +22,7 @@ Implement the following feature using the full autonomous agent team: $ARGUMENTS
 ### Workflow
 
 #### Phase 1: Planning (Sequential)
-1. **erp-product-manager**: Write feature specification
+1. **product-manager**: Write feature specification
    - User stories with acceptance criteria
    - Data model requirements
    - API endpoint definitions

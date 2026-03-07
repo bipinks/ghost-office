@@ -1,6 +1,6 @@
-# Autonomous ERP Workspace — Agent Instructions
+# Autonomous AI Software Company — Agent Instructions
 
-A **fully autonomous AI-driven ERP software company** with 14 specialized agents, 26 skills, 17 commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven software company** with 14 specialized agents, 26 skills, 17 commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -22,7 +22,7 @@ A **fully autonomous AI-driven ERP software company** with 14 specialized agents
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|
 | architecture-agent | System design, tech decisions | New features, refactors, architecture reviews |
-| erp-product-manager | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
+| product-manager | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
 | backend-engineer | Server-side code, APIs, logic | Backend features, API endpoints, integrations |
 | frontend-engineer | UI/UX, client-side code | Frontend features, UI bugs, responsive design |
 | database-engineer | Schema, queries, migrations | DB changes, migrations, query optimization |
@@ -31,7 +31,7 @@ A **fully autonomous AI-driven ERP software company** with 14 specialized agents
 | devops-engineer | CI/CD, infrastructure, SSH deployments | Pipeline setup, server config, deployments, SSH deploys |
 | monitoring-agent | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
 | performance-agent | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
-| support-agent | User issues, triage, ERP admin | Bug reports, client setup, Acodax ERP user/role management |
+| support-agent | User issues, triage, client admin | Bug reports, client setup, Acodax user/role management |
 | documentation-agent | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
 | ms-it-admin | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
 
@@ -39,7 +39,7 @@ A **fully autonomous AI-driven ERP software company** with 14 specialized agents
 
 ### Automatic Assignment
 The master-orchestrator automatically routes tasks:
-- Feature requests → erp-product-manager → architecture-agent → engineers → qa-agent
+- Feature requests → product-manager → architecture-agent → engineers → qa-agent
 - Bug reports → support-agent → relevant engineer → qa-agent
 - Deployments → devops-engineer → monitoring-agent
 - Security concerns → security-agent (immediate priority)
@@ -47,7 +47,7 @@ The master-orchestrator automatically routes tasks:
 - Documentation → documentation-agent
 - Performance issues → performance-agent
 - Microsoft 365 tasks → ms-it-admin
-- Acodax ERP admin → support-agent
+- Acodax admin → support-agent
 - SSH deployments → devops-engineer
 
 ### Parallel Execution
@@ -74,7 +74,7 @@ All agents reference `.claude/memory/` before making decisions:
 |----------|----------|
 | `architecture.md` | System architecture, module structure, API design |
 | `coding-standards.md` | Laravel/PHP, Vue/TS conventions, git workflow |
-| `erp-domain.md` | ERP modules, business rules, multi-branch operations |
+| `domain-knowledge.md` | Domain expertise, business rules, multi-branch operations (ERP specialty) |
 | `deployment-standards.md` | Environment setup, deployment checklists, rollback |
 | `devops-runbook.md` | Server management, backups, CI/CD, troubleshooting |
 | `performance-guidelines.md` | Performance targets, optimization rules, caching |
@@ -95,7 +95,7 @@ All agents reference `.claude/memory/` before making decisions:
 Reference `.claude/memory/coding-standards.md` for full details:
 - **PHP/Laravel**: PSR-12, thin controllers, service layer for business logic
 - **TypeScript/Vue**: Composition API, type-safe props, component-based architecture
-- **Database**: snake_case, branch_id on every table, soft deletes, audit columns
+- **Database**: snake_case, branch_id for multi-tenant tables, soft deletes, audit columns
 - **API**: RESTful, versioned, consistent response envelope
 - **Git**: Conventional commits, feature branches, squash merge
 
@@ -133,7 +133,7 @@ docs/             — Architecture reports and documentation
 - No security vulnerabilities in deployed code
 - Zero secrets exposed in code or logs
 - Tests passing with 80%+ coverage
-- Multi-tenant data isolation verified for every feature
+- Multi-tenant data isolation verified for multi-tenant features
 - Deployment rollback available within 5 minutes
 - Mean Time To Recovery (MTTR) under 30 minutes for SEV1
 - Every feature has documentation and changelog entry

@@ -1,7 +1,7 @@
 # Client Deployment Workflow
 
 ## Overview
-Workflow for deploying the ERP platform to a new client tenant or updating an existing client's deployment.
+Workflow for deploying the platform to a new client tenant or updating an existing client's deployment.
 
 ## Trigger
 - New client onboarding
@@ -20,11 +20,11 @@ Workflow for deploying the ERP platform to a new client tenant or updating an ex
 ## Phases
 
 ### Phase 1: Client Requirements
-**Agent**: support-agent + erp-product-manager
+**Agent**: support-agent + product-manager
 **Actions**:
 1. Gather client requirements:
    - Company name and branches
-   - Required ERP modules
+   - Required modules
    - User count and roles
    - Data migration needs (from existing system)
    - Integration requirements
@@ -42,7 +42,7 @@ Workflow for deploying the ERP platform to a new client tenant or updating an ex
    - Currency and locale settings
    - Financial year configuration
    - Invoice/document numbering sequences
-4. Enable required ERP modules
+4. Enable required modules
 **Output**: Tenant created and configured
 
 ### Phase 3: User & Role Setup
