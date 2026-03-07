@@ -17,7 +17,7 @@
 
 ## What This Does
 
-You copy `.claude/` into your project. Claude Code instantly becomes an **autonomous AI software company** — a master orchestrator breaks down your task, assigns it to specialized agents, runs quality gates, and delivers production-ready results.
+You copy `.claude/` and `CLAUDE.md` into your project. Claude Code instantly becomes an **autonomous AI software company** — a master orchestrator breaks down your task, assigns it to specialized agents, runs quality gates, and delivers production-ready results.
 
 ```
 You: /implement-feature "Add invoice PDF generation with email delivery"
@@ -40,28 +40,59 @@ Result: Complete feature — code, tests, docs, ready to deploy.
 
 ---
 
-## 30-Second Setup
+## Setup
+
+### Option A: Use this repo directly
 
 ```bash
-# Option A: Use directly
 git clone https://github.com/bipinks/devops-agent-hub.git
 cd devops-agent-hub && claude
-
-# Option B: Add to your existing project
-cp -r devops-agent-hub/.claude/ your-project/.claude/
-cd your-project && claude
 ```
 
-Then just ask:
+### Option B: Add to your existing project
+
+**Minimum (required):**
+```bash
+cp -r devops-agent-hub/.claude/ your-project/.claude/
+cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
+```
+
+**Full setup (recommended):**
+```bash
+# Core — agents, skills, commands, rules, hooks, settings
+cp -r devops-agent-hub/.claude/ your-project/.claude/
+
+# Project instructions — Claude Code reads this on every session
+cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
+
+# MCP integrations — GitHub, AWS, MS365, Docker, K8s, etc.
+cp devops-agent-hub/.mcp.json your-project/.mcp.json
+
+# Agent reference — full roster and orchestration details
+cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
+
+# Validation scripts — structure checks and test suite
+cp -r devops-agent-hub/scripts/ your-project/scripts/
+cp devops-agent-hub/package.json your-project/package.json
+
+# Context modes — switch between dev, deploy, incident, review
+cp -r devops-agent-hub/contexts/ your-project/contexts/
+```
+
+> **Important:** After copying, edit `CLAUDE.md` to match your project — update the architecture, tech stack, domain knowledge, and conventions. The default includes ERP domain knowledge; replace `.claude/memory/domain-knowledge.md` with your own domain.
+
+### Then just ask:
 
 ```bash
+cd your-project && claude
+
 /implement-feature "Add user authentication with OAuth"
 /fix-bug "Invoice totals wrong when tax-exempt"
 /deploy-production
 /security-scan
 ```
 
-That's it. Agents, skills, commands, rules, and hooks all auto-discover.
+Agents, skills, commands, rules, and hooks all auto-discover from `.claude/`.
 
 ---
 
@@ -189,21 +220,29 @@ End-to-end processes that coordinate multiple agents:
 
 ## Architecture
 
-Everything lives in `.claude/` for native auto-discovery:
-
 ```
-.claude/
-├── agents/         18 autonomous agents (1 orchestrator + 17 specialists)
-├── commands/       21 slash commands for task execution
-├── workflows/      6 end-to-end workflow definitions
-├── memory/         6 knowledge base docs (architecture, standards, domain)
-├── skills/         54 domain knowledge packs with real code examples
-├── rules/          12 always-follow guidelines across 7 categories
-├── hooks/          11 safety, audit, and lifecycle hook scripts
-└── settings.json   Permissions, hooks, and autonomous operation config
+your-project/
+├── .claude/                 Auto-discovered by Claude Code
+│   ├── agents/              18 autonomous agents (1 orchestrator + 17 specialists)
+│   ├── commands/            21 slash commands for task execution
+│   ├── workflows/           6 end-to-end workflow definitions
+│   ├── memory/              6 knowledge base docs (architecture, standards, domain)
+│   ├── skills/              54 domain knowledge packs with real code examples
+│   ├── rules/               12 always-follow guidelines across 7 categories
+│   ├── hooks/               11 safety, audit, and lifecycle hook scripts
+│   └── settings.json        Permissions, hooks, and autonomous operation config
+│
+├── CLAUDE.md                Project instructions — Claude reads this every session
+├── AGENTS.md                Agent roster and orchestration reference
+├── .mcp.json                MCP server connections (GitHub, AWS, MS365, etc.)
+├── scripts/                 Validation utilities and test suite
+├── contexts/                Dynamic context modes (dev, deploy, incident, review)
+└── ... your project files
 ```
 
-**No plugins. No dependencies. No build step.** Pure markdown, JSON, and shell scripts. Claude Code auto-discovers everything.
+**What must be copied:** `.claude/` + `CLAUDE.md` (minimum). See [Setup](#setup) for the full list.
+
+**No plugins. No dependencies. No build step.** Pure markdown, JSON, and shell scripts. Claude Code auto-discovers everything from `.claude/`.
 
 ---
 

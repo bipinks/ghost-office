@@ -80,11 +80,19 @@ cd devops-agent-hub
 claude
 ```
 
-To use in your own project, copy `.claude/` into your project root:
+To use in your own project, copy the core files into your project root:
 
 ```bash
+# Required — agents, skills, commands, rules, hooks, and project instructions
 cp -r devops-agent-hub/.claude/ your-project/.claude/
+cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
+
+# Recommended — MCP integrations and agent reference
+cp devops-agent-hub/.mcp.json your-project/.mcp.json
+cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
 ```
+
+> **Tip:** After copying, edit `CLAUDE.md` to match your project's tech stack, architecture, and domain. The default includes ERP domain knowledge — replace `.claude/memory/domain-knowledge.md` with your own domain expertise.
 
 ### Step 3: Start Using Commands
 
