@@ -19,7 +19,7 @@ fi
 
 # --- Determine log directory ---
 LOG_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/logs"
-mkdir -p "$LOG_DIR" 2>/dev/null
+mkdir -p -m 0700 "$LOG_DIR" 2>/dev/null
 
 LOG_FILE="$LOG_DIR/subagent-lifecycle.log"
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"

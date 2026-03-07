@@ -18,7 +18,7 @@ fi
 
 # --- Log the failure ---
 LOG_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/logs"
-mkdir -p "$LOG_DIR" 2>/dev/null
+mkdir -p -m 0700 "$LOG_DIR" 2>/dev/null
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 echo "[$TIMESTAMP] tool=$TOOL_NAME error=$ERROR_MSG" >> "$LOG_DIR/tool-failures.log" 2>/dev/null
 

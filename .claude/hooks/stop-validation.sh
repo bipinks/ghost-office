@@ -26,7 +26,7 @@ fi
 
 # --- Log completion ---
 LOG_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/logs"
-mkdir -p "$LOG_DIR" 2>/dev/null
+mkdir -p -m 0700 "$LOG_DIR" 2>/dev/null
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 echo "[$TIMESTAMP] session=$SESSION_ID event=response_complete" >> "$LOG_DIR/session-activity.log" 2>/dev/null
 

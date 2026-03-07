@@ -36,13 +36,19 @@ case "$NOTIFICATION_TYPE" in
     ;;
 esac
 
+# Sanitize variables before use in command strings (prevent injection)
+SAFE_MESSAGE="${MESSAGE//\"/\\\"}"
+SAFE_MESSAGE_PS="${MESSAGE//\'/\'\'}"
+SAFE_TITLE="${TITLE//\"/\\\"}"
+SAFE_TITLE_PS="${TITLE//\'/\'\'}"
+
 # Try multiple notification methods (cross-platform)
 if command -v notify-send >/dev/null 2>&1; then
   notify-send "$TITLE" "$MESSAGE" --urgency=normal 2>/dev/null
 elif command -v osascript >/dev/null 2>&1; then
-  osascript -e "display notification \"$MESSAGE\" with title \"$TITLE\"" 2>/dev/null
+  osascript -e "display notification \"$SAFE_MESSAGE\" with title \"$SAFE_TITLE\"" 2>/dev/null
 elif command -v powershell.exe >/dev/null 2>&1; then
-  powershell.exe -Command "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('$MESSAGE','$TITLE')" 2>/dev/null
+  powershell.exe -Command "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('$SAFE_MESSAGE_PS','$SAFE_TITLE_PS')" 2>/dev/null
 fi
 
 exit 0
