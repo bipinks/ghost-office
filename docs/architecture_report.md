@@ -23,7 +23,7 @@ devops-agent-hub/
 ├── .claude/
 │   ├── agents/         — 14 specialized DevOps subagents
 │   ├── commands/       — 18 slash commands
-│   ├── skills/         — 38 domain knowledge packs
+│   ├── skills/         — 54 domain knowledge packs
 │   ├── rules/          — 7 rule categories (common, cicd, cloud, docker, kubernetes, security, terraform)
 │   └── settings.json   — Infrastructure safety hooks (PreToolUse, PostToolUse)
 ├── .github/workflows/  — CI validation pipeline
@@ -58,7 +58,7 @@ devops-agent-hub/
 | infra-planner | Infrastructure design | Absorb | Merge into architecture-agent |
 | monitoring-analyst | Observability/SLOs | Absorb | Merge into monitoring-agent |
 
-## 3. Skills (38 total)
+## 3. Skills (54 total)
 
 Skills are retained as knowledge packs and referenced by new agents:
 
@@ -121,7 +121,7 @@ All retained — they provide external service access:
 ├── workflows/      — 5 workflow definitions (NEW)
 ├── memory/         — 6 knowledge base documents (NEW)
 ├── tools/          — 4 tool reference documents (NEW)
-├── skills/         — 38 domain knowledge packs (original 23 + 15 new software engineering skills)
+├── skills/         — 54 domain knowledge packs
 ├── rules/          — All existing rules (preserved)
 ├── hooks/          — 11 hook scripts (session-start, pre-compact, infra-safety, git-safety, file-write, migration, ms365-audit, subagent-lifecycle, notification, stop-validation, tool-failure)
 └── settings.json   — Enhanced with hooks, permissions (allowedTools/deny), and autonomous operation

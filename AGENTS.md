@@ -1,6 +1,6 @@
 # Autonomous AI Software Company — Agent Instructions
 
-A **fully autonomous AI-driven software company** with 14 specialized agents, 38 skills, 17 commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+A **fully autonomous AI-driven software company** with 14 specialized agents, 54 skills, 17 commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 ## Core Principles
 1. **Agent-First** — Delegate to specialized agents for domain tasks
@@ -117,7 +117,7 @@ Every deliverable must meet:
   workflows/      — 5 workflow definitions
   memory/         — 6 knowledge base documents
   tools/          — 4 tool reference documents
-  skills/         — 38 domain knowledge packs
+  skills/         — 54 domain knowledge packs
   rules/          — 12 guidelines (7 categories)
   hooks/          — 11 safety, audit, and lifecycle hook scripts
   settings.json   — Hooks, permissions, and autonomous settings

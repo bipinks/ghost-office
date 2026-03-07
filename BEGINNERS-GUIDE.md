@@ -39,7 +39,7 @@ The project has **6 main parts**:
                        │ uses knowledge from
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│           SKILLS (38 knowledge packs)               │
+│           SKILLS (54 knowledge packs)               │
 │   Step-by-step guides with real code examples       │
 │   Terraform, Docker, AWS, Laravel, Vue, MS365, etc. │
 └─────────────────────────────────────────────────────┘
@@ -62,7 +62,7 @@ devops-agent-hub/
 ├── .claude/
 │   ├── agents/    ← 14 AI "expert" definitions
 │   ├── commands/  ← 17 shortcut commands
-│   ├── skills/    ← 38 knowledge guides with code examples
+│   ├── skills/    ← 54 knowledge guides with code examples
 │   ├── rules/     ← Safety and best practice rules
 │   └── settings.json ← Automatic safety hooks
 ├── .mcp.json      ← External service connections

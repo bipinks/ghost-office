@@ -1,6 +1,6 @@
 # DevOps Agent Hub
 
-> Fully autonomous AI-driven software company powered by Claude Code — 14 specialized agents, 38 domain skills, 17 slash commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+> Fully autonomous AI-driven software company powered by Claude Code — 14 specialized agents, 54 domain skills, 17 slash commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -80,7 +80,7 @@ devops-agent-hub/
 │   │   ├── monitor-setup.md         # /monitor-setup
 │   │   ├── cost-review.md           # /cost-review
 │   │   └── acodax-deploy.md         # /acodax-deploy
-│   ├── skills/                      # 38 domain knowledge packs
+│   ├── skills/                      # 54 domain knowledge packs
 │   │   ├── terraform-patterns/      # Terraform IaC best practices
 │   │   ├── kubernetes-patterns/     # K8s deployment patterns
 │   │   ├── docker-patterns/         # Dockerfile and Compose patterns
@@ -96,7 +96,7 @@ devops-agent-hub/
 │   │   ├── performance-optimization/# Profiling and optimization
 │   │   ├── multi-tenancy-patterns/  # Multi-tenant isolation
 │   │   ├── authentication-patterns/ # Auth and RBAC
-│   │   └── ... (38 total)           # See .claude/skills/ for full list
+│   │   └── ... (54 total)           # See .claude/skills/ for full list
 │   ├── rules/                       # Always-follow guidelines
 │   │   ├── common/                  # Universal DevOps principles
 │   │   ├── terraform/               # Terraform-specific rules
