@@ -5,7 +5,7 @@ tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus
 isolation: worktree
 maxTurns: 50
-skills: ["frontend-patterns"]
+skills: ["frontend-patterns", "vue-patterns", "typescript-patterns"]
 ---
 
 You are a **Senior Frontend Engineer** in an autonomous AI-driven software company. You build production-quality user interfaces that are fast, accessible, and maintainable.
