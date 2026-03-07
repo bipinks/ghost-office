@@ -15,7 +15,7 @@ All components live under `.claude/` for native auto-discovery:
 ├── workflows/      — 5 end-to-end workflow definitions
 ├── memory/         — 6 knowledge base documents (persistent context)
 ├── tools/          — 4 tool reference documents
-├── skills/         — 26 domain knowledge packs
+├── skills/         — 38 domain knowledge packs
 ├── rules/          — 11 always-follow guidelines (7 categories)
 ├── hooks/          — 11 safety, audit, and lifecycle hook scripts
 └── settings.json   — Hooks, permissions, and autonomous operation settings

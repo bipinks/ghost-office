@@ -9,7 +9,7 @@ Welcome! If you're new to DevOps and wondering what this project does and how to
 **DevOps Agent Hub** is a toolkit that makes Claude Code incredibly good at DevOps tasks. Think of it as a "brain upgrade" for your AI assistant — it teaches the AI about infrastructure, deployments, servers, and cloud services so it can actually help you do DevOps work.
 
 ### Simple Analogy
-Imagine you hired 10 expert DevOps engineers, each specializing in different areas. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
+Imagine you hired 14 expert engineers, each specializing in different areas — from DevOps and security to backend, frontend, and QA. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
 
 ---
 
@@ -25,23 +25,23 @@ The project has **6 main parts**:
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│              COMMANDS (16 shortcuts)                │
-│   /cicd-setup, /deploy, /forge-deploy, etc.         │
+│              COMMANDS (17 shortcuts)                │
+│   /cicd-setup, /deploy-staging, /fix-bug, etc.      │
 │   → These are quick shortcuts you type              │
 └──────────────────────┬──────────────────────────────┘
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│               AGENTS (10 experts)                   │
+│               AGENTS (14 experts)                   │
 │   The AI "experts" that handle the actual work      │
-│   cicd-architect, infra-planner, security-auditor   │
+│   backend-engineer, devops-engineer, qa-agent, etc. │
 └──────────────────────┬──────────────────────────────┘
                        │ uses knowledge from
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│           SKILLS (21 knowledge packs)               │
+│           SKILLS (38 knowledge packs)               │
 │   Step-by-step guides with real code examples       │
-│   Terraform, Docker, AWS, Laravel Forge, MS365      │
+│   Terraform, Docker, AWS, Laravel, Vue, MS365, etc. │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -60,9 +60,9 @@ Open the project folder in your editor. You'll see:
 ```
 devops-agent-hub/
 ├── .claude/
-│   ├── agents/    ← 10 AI "expert" definitions
-│   ├── commands/  ← 16 shortcut commands
-│   ├── skills/    ← 21 knowledge guides with code examples
+│   ├── agents/    ← 14 AI "expert" definitions
+│   ├── commands/  ← 17 shortcut commands
+│   ├── skills/    ← 38 knowledge guides with code examples
 │   ├── rules/     ← Safety and best practice rules
 │   └── settings.json ← Automatic safety hooks
 ├── .mcp.json      ← External service connections

@@ -23,7 +23,7 @@ devops-agent-hub/
 ├── .claude/
 │   ├── agents/         — 14 specialized DevOps subagents
 │   ├── commands/       — 18 slash commands
-│   ├── skills/         — 23 domain knowledge packs
+│   ├── skills/         — 38 domain knowledge packs
 │   ├── rules/          — 7 rule categories (common, cicd, cloud, docker, kubernetes, security, terraform)
 │   └── settings.json   — Infrastructure safety hooks (PreToolUse, PostToolUse)
 ├── .github/workflows/  — CI validation pipeline
@@ -58,7 +58,7 @@ devops-agent-hub/
 | infra-planner | Infrastructure design | Absorb | Merge into architecture-agent |
 | monitoring-analyst | Observability/SLOs | Absorb | Merge into monitoring-agent |
 
-## 3. Existing Skills (23 total)
+## 3. Skills (38 total)
 
 Skills are retained as knowledge packs and referenced by new agents:
 
@@ -67,9 +67,16 @@ Skills are retained as knowledge packs and referenced by new agents:
 - **CI/CD**: cicd-patterns, github-workflows
 - **Security**: security-hardening, secrets-management, ssl-tls-management
 - **Monitoring**: monitoring-patterns, log-management
-- **Database**: database-ops
+- **Database**: database-ops, postgresql-patterns, redis-patterns
 - **Web/Server**: nginx-patterns, ansible-patterns
 - **Cost**: cloud-cost-optimization
+- **Backend**: laravel-patterns, api-design, authentication-patterns, multi-tenancy-patterns
+- **Frontend**: vue-patterns, typescript-patterns, frontend-patterns
+- **Testing/QA**: testing-patterns, qa-testing-strategy
+- **Performance**: performance-optimization
+- **Product**: product-management
+- **Incident**: incident-management
+- **Documentation**: documentation-standards
 - **Backup**: backup-disaster-recovery
 - **MS365**: ms365-admin, entra-id-admin, exchange-online-admin, intune-device-mgmt
 - **Acodax**: acodax-erp-office-admin, deploy-acodax-property
@@ -114,9 +121,9 @@ All retained — they provide external service access:
 ├── workflows/      — 5 workflow definitions (NEW)
 ├── memory/         — 6 knowledge base documents (NEW)
 ├── tools/          — 4 tool reference documents (NEW)
-├── skills/         — 23 skills (4 removed: file-management, laravel-forge, serverless-patterns, gitops-patterns)
+├── skills/         — 38 domain knowledge packs (original 23 + 15 new software engineering skills)
 ├── rules/          — All existing rules (preserved)
-├── hooks/          — 7 hook scripts (NEW: session-start, pre-compact, infra-safety, git-safety, file-write, migration, ms365-audit)
+├── hooks/          — 11 hook scripts (session-start, pre-compact, infra-safety, git-safety, file-write, migration, ms365-audit, subagent-lifecycle, notification, stop-validation, tool-failure)
 └── settings.json   — Enhanced with hooks, permissions (allowedTools/deny), and autonomous operation
 ```
 

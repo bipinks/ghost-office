@@ -1,6 +1,6 @@
 # DevOps Agent Hub
 
-> Claude Code native DevOps toolkit with 10 specialized agents, 21 domain skills, 16 slash commands, path-scoped rules, and infrastructure safety hooks for cloud operations, CI/CD, and reliable deployments.
+> Fully autonomous AI-driven software company powered by Claude Code — 14 specialized agents, 38 domain skills, 17 slash commands, 5 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -47,53 +47,56 @@ cp devops-agent-hub/.mcp.json your-project/.mcp.json
 ```
 devops-agent-hub/
 ├── .claude/
-│   ├── agents/                      # Specialized DevOps subagents
-│   │   ├── infra-planner.md         # Infrastructure planning and design
-│   │   ├── cicd-architect.md        # CI/CD pipeline architecture
-│   │   ├── cloud-reviewer.md        # Cloud infrastructure code review
-│   │   ├── security-auditor.md      # CIS benchmarks, OWASP for infra
-│   │   ├── incident-responder.md    # Incident triage and resolution
-│   │   ├── cost-optimizer.md        # Cloud cost analysis
-│   │   ├── deployment-manager.md    # Blue/green, canary deployments
-│   │   ├── monitoring-analyst.md    # Observability and alerting
-│   │   ├── database-ops.md          # Database operations
-│   │   └── container-reviewer.md    # Docker/K8s review
-│   ├── commands/                    # Slash commands
-│   │   ├── deploy.md                # /deploy
-│   │   ├── infra-plan.md            # /infra-plan
+│   ├── agents/                      # 14 autonomous agents
+│   │   ├── master-orchestrator.md   # Central coordinator of all agents
+│   │   ├── architecture-agent.md    # System design, tech decisions
+│   │   ├── product-manager.md       # Requirements, specs, priorities
+│   │   ├── backend-engineer.md      # Server-side code, APIs, logic
+│   │   ├── frontend-engineer.md     # UI/UX, client-side code
+│   │   ├── database-engineer.md     # Schema, queries, migrations
+│   │   ├── qa-agent.md              # Testing, quality assurance
+│   │   ├── security-agent.md        # Security audits, vulnerabilities
+│   │   ├── devops-engineer.md       # CI/CD, infrastructure, deployments
+│   │   ├── monitoring-agent.md      # Observability, alerting, incidents
+│   │   ├── performance-agent.md     # Optimization, profiling, cost
+│   │   ├── support-agent.md         # User issues, triage, client admin
+│   │   ├── documentation-agent.md   # Tech docs, API docs, guides
+│   │   └── ms-it-admin.md           # Microsoft 365 administration
+│   ├── commands/                    # 17 slash commands
+│   │   ├── implement-feature.md     # /implement-feature
+│   │   ├── fix-bug.md               # /fix-bug
+│   │   ├── deploy-staging.md        # /deploy-staging
+│   │   ├── deploy-production.md     # /deploy-production
+│   │   ├── analyze-project.md       # /analyze-project
+│   │   ├── write-tests.md           # /write-tests
+│   │   ├── refactor-module.md       # /refactor-module
 │   │   ├── security-scan.md         # /security-scan
-│   │   ├── cost-review.md           # /cost-review
+│   │   ├── monitor-system.md        # /monitor-system
+│   │   ├── investigate-incident.md  # /investigate-incident
+│   │   ├── infra-plan.md            # /infra-plan
 │   │   ├── cicd-setup.md            # /cicd-setup
 │   │   ├── docker-build.md          # /docker-build
-│   │   ├── k8s-deploy.md            # /k8s-deploy
-│   │   ├── server-provision.md      # /server-provision
-│   │   ├── forge-deploy.md          # /forge-deploy
-│   │   ├── ms365-provision.md       # /ms365-provision
-│   │   ├── investigate-incident.md   # /investigate-incident
-│   │   ├── backup.md                # /backup
+│   │   ├── github-setup.md          # /github-setup
 │   │   ├── monitor-setup.md         # /monitor-setup
-│   │   ├── db-migrate.md            # /db-migrate
-│   │   ├── ssl-setup.md             # /ssl-setup
-│   │   └── github-setup.md          # /github-setup
-│   ├── skills/                      # Domain knowledge packs
+│   │   ├── cost-review.md           # /cost-review
+│   │   └── acodax-deploy.md         # /acodax-deploy
+│   ├── skills/                      # 38 domain knowledge packs
 │   │   ├── terraform-patterns/      # Terraform IaC best practices
 │   │   ├── kubernetes-patterns/     # K8s deployment patterns
 │   │   ├── docker-patterns/         # Dockerfile and Compose patterns
 │   │   ├── aws-patterns/            # AWS service patterns
 │   │   ├── github-workflows/        # GitHub Actions CI/CD patterns
-│   │   ├── ansible-patterns/        # Ansible roles and playbooks
-│   │   ├── monitoring-patterns/     # Prometheus, Grafana, Datadog
-│   │   ├── ms365-admin/             # Microsoft 365 administration
-│   │   ├── nginx-patterns/          # Nginx configuration
-│   │   ├── ssl-tls-management/      # Certificate management
-│   │   ├── secrets-management/      # Vault, Secrets Manager
-│   │   ├── backup-disaster-recovery/# Backup and DR strategies
-│   │   ├── networking-patterns/     # VPC, DNS, CDN, load balancing
-│   │   ├── security-hardening/      # Server hardening, CIS benchmarks
-│   │   ├── log-management/          # ELK, CloudWatch, structured logs
-│   │   ├── database-ops/            # PostgreSQL, MySQL, Redis ops
-│   │   ├── cicd-patterns/           # Pipeline design patterns
-│   │   └── cloud-cost-optimization/ # FinOps and cost analysis
+│   │   ├── laravel-patterns/        # Laravel application patterns
+│   │   ├── vue-patterns/            # Vue 3 frontend patterns
+│   │   ├── typescript-patterns/     # TypeScript patterns
+│   │   ├── postgresql-patterns/     # PostgreSQL optimization
+│   │   ├── redis-patterns/          # Redis caching and queues
+│   │   ├── api-design/              # REST API design patterns
+│   │   ├── testing-patterns/        # Test architecture
+│   │   ├── performance-optimization/# Profiling and optimization
+│   │   ├── multi-tenancy-patterns/  # Multi-tenant isolation
+│   │   ├── authentication-patterns/ # Auth and RBAC
+│   │   └── ... (38 total)           # See .claude/skills/ for full list
 │   ├── rules/                       # Always-follow guidelines
 │   │   ├── common/                  # Universal DevOps principles
 │   │   ├── terraform/               # Terraform-specific rules
@@ -119,23 +122,31 @@ devops-agent-hub/
 
 | Task | Command | Agent |
 |------|---------|-------|
-| Design infrastructure | `/infra-plan` | infra-planner |
-| Build CI/CD pipeline | `/cicd-setup` | cicd-architect |
-| Review Terraform code | *(use cloud-reviewer agent)* | cloud-reviewer |
-| Security audit | `/security-scan` | security-auditor |
+| Implement a feature | `/implement-feature` | master-orchestrator → all agents |
+| Fix a bug | `/fix-bug` | support-agent → engineer → qa-agent |
+| Design infrastructure | `/infra-plan` | architecture-agent |
+| Build CI/CD pipeline | `/cicd-setup` | devops-engineer |
+| Security audit | `/security-scan` | security-agent |
 | Handle incident | `/investigate-incident` | monitoring-agent |
-| Optimize cloud costs | `/cost-review` | cost-optimizer |
-| Deploy application | `/deploy` | deployment-manager |
-| Set up monitoring | `/monitor-setup` | monitoring-analyst |
-| Database migration | `/db-migrate` | database-ops |
-| Review Dockerfiles | `/docker-build` | container-reviewer |
+| Optimize costs | `/cost-review` | performance-agent |
+| Deploy to staging | `/deploy-staging` | devops-engineer |
+| Deploy to production | `/deploy-production` | devops-engineer (approval gate) |
+| Set up monitoring | `/monitor-setup` | monitoring-agent |
+| Write tests | `/write-tests` | qa-agent |
+| Analyze project | `/analyze-project` | architecture-agent |
 
 ---
 
 ## Common Workflows
 
+**Implement a new feature:**
+```bash
+/implement-feature "Add invoice PDF generation with email delivery"
+```
+
 **Setting up a new project:**
 ```bash
+/analyze-project
 /infra-plan "Three-tier web app on AWS"
 /cicd-setup "GitHub Actions with Docker and ECS"
 /monitor-setup "Prometheus + Grafana for ECS services"
@@ -144,8 +155,8 @@ devops-agent-hub/
 **Deploying to production:**
 ```bash
 /security-scan
-/cost-review
-/deploy
+/deploy-staging
+/deploy-production
 ```
 
 **Incident response:**
