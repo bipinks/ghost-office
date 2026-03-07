@@ -1,186 +1,230 @@
-# DevOps Agent Hub
+<div align="center">
 
-> Fully autonomous AI-driven software company powered by Claude Code — 18 specialized agents (7 departments), 54 domain skills, 21 slash commands, 6 workflows, 11 hooks, and a persistent knowledge base for end-to-end product development, operations, and support.
+# Autonomous AI Software Company
+
+### Drop a folder into any project. Get an entire engineering department.
+
+**18 AI agents** across **7 departments** — from product and engineering to security, marketing, and IT — all coordinated by a master orchestrator. Powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Agents](https://img.shields.io/badge/agents-18-blue)](.claude/agents/)
+[![Skills](https://img.shields.io/badge/skills-54-green)](.claude/skills/)
+[![Commands](https://img.shields.io/badge/commands-21-orange)](.claude/commands/)
+
+</div>
 
 ---
 
-## Quick Start
+## What This Does
 
-### Option 1: Clone and Use Directly
+You copy `.claude/` into your project. Claude Code instantly becomes an **autonomous AI software company** — a master orchestrator breaks down your task, assigns it to specialized agents, runs quality gates, and delivers production-ready results.
+
+```
+You: /implement-feature "Add invoice PDF generation with email delivery"
+
+Orchestrator assigns:
+  → product-manager     writes requirements + acceptance criteria
+  → architecture-agent  designs the solution
+  → backend-engineer    implements API + PDF service
+  → frontend-engineer   builds the UI
+  → database-engineer   creates migrations (with branch_id)
+  → qa-agent            writes tests (80%+ coverage)
+  → security-agent      reviews for vulnerabilities
+  → devops-engineer     updates CI/CD pipeline
+  → documentation-agent writes API docs + changelog
+
+Result: Complete feature — code, tests, docs, ready to deploy.
+```
+
+**No plugins. No install. Just markdown, JSON, and shell scripts.**
+
+---
+
+## 30-Second Setup
 
 ```bash
-# Clone the repo
+# Option A: Use directly
 git clone https://github.com/bipinks/devops-agent-hub.git
-cd devops-agent-hub
+cd devops-agent-hub && claude
 
-# Start Claude Code — agents, commands, skills, rules, and hooks auto-discover
-claude
-```
-
-### Option 2: Copy into Your Project
-
-```bash
-# Copy .claude/ directory into your project
+# Option B: Add to your existing project
 cp -r devops-agent-hub/.claude/ your-project/.claude/
-
-# Copy MCP config (optional — only servers you need)
-cp devops-agent-hub/.mcp.json your-project/.mcp.json
+cd your-project && claude
 ```
 
-### Start Using
+Then just ask:
 
 ```bash
-/infra-plan "Design a VPC with public and private subnets"
-/cicd-setup "Create GitHub Actions for a Node.js app with Docker deploy"
-/forge-deploy "Provision a new site on Forge with SSL"
-/security-scan
-/cost-review
-/deploy
-```
-
----
-
-## Project Structure
-
-```
-devops-agent-hub/
-├── .claude/
-│   ├── agents/                      # 18 autonomous agents (7 departments)
-│   │   ├── master-orchestrator.md   # Central coordinator of all agents
-│   │   ├── product-manager.md       # Requirements, specs, priorities
-│   │   ├── ui-ux-designer.md        # Visual design, wireframes, accessibility
-│   │   ├── architecture-agent.md    # System design, tech decisions
-│   │   ├── backend-engineer.md      # Server-side code, APIs, logic
-│   │   ├── frontend-engineer.md     # UI/UX implementation, client-side code
-│   │   ├── database-engineer.md     # Schema, queries, migrations
-│   │   ├── prompt-engineer.md       # AI prompts, LLM integration
-│   │   ├── qa-agent.md              # Testing, quality assurance
-│   │   ├── security-agent.md        # Security audits, vulnerabilities
-│   │   ├── devops-engineer.md       # CI/CD, infrastructure, deployments
-│   │   ├── monitoring-agent.md      # Observability, alerting, incidents
-│   │   ├── performance-agent.md     # Optimization, profiling, cost
-│   │   ├── content-strategist.md    # Content, SEO, email marketing
-│   │   ├── social-media-manager.md  # Social media, ads, community
-│   │   ├── support-agent.md         # User issues, triage, client admin
-│   │   ├── documentation-agent.md   # Tech docs, API docs, guides
-│   │   └── ms-it-admin.md           # Microsoft 365 administration
-│   ├── commands/                    # 21 slash commands
-│   │   ├── implement-feature.md     # /implement-feature
-│   │   ├── fix-bug.md               # /fix-bug
-│   │   ├── deploy-staging.md        # /deploy-staging
-│   │   ├── deploy-production.md     # /deploy-production
-│   │   ├── analyze-project.md       # /analyze-project
-│   │   ├── write-tests.md           # /write-tests
-│   │   ├── refactor-module.md       # /refactor-module
-│   │   ├── security-scan.md         # /security-scan
-│   │   ├── monitor-system.md        # /monitor-system
-│   │   ├── investigate-incident.md  # /investigate-incident
-│   │   ├── infra-plan.md            # /infra-plan
-│   │   ├── cicd-setup.md            # /cicd-setup
-│   │   ├── docker-build.md          # /docker-build
-│   │   ├── github-setup.md          # /github-setup
-│   │   ├── monitor-setup.md         # /monitor-setup
-│   │   ├── cost-review.md           # /cost-review
-│   │   ├── acodax-deploy.md         # /acodax-deploy
-│   │   ├── create-content.md        # /create-content
-│   │   ├── social-media.md          # /social-media
-│   │   ├── design-ui.md             # /design-ui
-│   │   └── ai-prompt.md             # /ai-prompt
-│   ├── skills/                      # 54 domain knowledge packs
-│   │   ├── terraform-patterns/      # Terraform IaC best practices
-│   │   ├── kubernetes-patterns/     # K8s deployment patterns
-│   │   ├── docker-patterns/         # Dockerfile and Compose patterns
-│   │   ├── aws-patterns/            # AWS service patterns
-│   │   ├── github-workflows/        # GitHub Actions CI/CD patterns
-│   │   ├── laravel-patterns/        # Laravel application patterns
-│   │   ├── vue-patterns/            # Vue 3 frontend patterns
-│   │   ├── typescript-patterns/     # TypeScript patterns
-│   │   ├── postgresql-patterns/     # PostgreSQL optimization
-│   │   ├── redis-patterns/          # Redis caching and queues
-│   │   ├── api-design/              # REST API design patterns
-│   │   ├── testing-patterns/        # Test architecture
-│   │   ├── performance-optimization/# Profiling and optimization
-│   │   ├── multi-tenancy-patterns/  # Multi-tenant isolation
-│   │   ├── authentication-patterns/ # Auth and RBAC
-│   │   └── ... (54 total)           # See .claude/skills/ for full list
-│   ├── rules/                       # Always-follow guidelines
-│   │   ├── common/                  # Universal DevOps principles
-│   │   ├── terraform/               # Terraform-specific rules
-│   │   ├── kubernetes/              # K8s-specific rules
-│   │   ├── docker/                  # Docker-specific rules
-│   │   ├── cicd/                    # CI/CD-specific rules
-│   │   ├── cloud/                   # Cloud-specific rules
-│   │   └── security/                # Security-specific rules
-│   ├── settings.json                # Infrastructure safety hooks
-│   └── settings.local.json          # Personal overrides (gitignored)
-├── .mcp.json                        # MCP servers (GitHub, AWS, Cloudflare, etc.)
-├── CLAUDE.md                        # Project instructions
-├── AGENTS.md                        # Agent reference and orchestration guide
-├── contexts/                        # Dynamic context modes
-├── examples/                        # Example CLAUDE.md configs
-├── scripts/                         # Utility scripts
-└── README.md
-```
-
----
-
-## Which Agent Should I Use?
-
-| Task | Command | Agent |
-|------|---------|-------|
-| Implement a feature | `/implement-feature` | master-orchestrator → all agents |
-| Fix a bug | `/fix-bug` | support-agent → engineer → qa-agent |
-| Design infrastructure | `/infra-plan` | architecture-agent |
-| Build CI/CD pipeline | `/cicd-setup` | devops-engineer |
-| Security audit | `/security-scan` | security-agent |
-| Handle incident | `/investigate-incident` | monitoring-agent |
-| Optimize costs | `/cost-review` | performance-agent |
-| Deploy to staging | `/deploy-staging` | devops-engineer |
-| Deploy to production | `/deploy-production` | devops-engineer (approval gate) |
-| Set up monitoring | `/monitor-setup` | monitoring-agent |
-| Write tests | `/write-tests` | qa-agent |
-| Analyze project | `/analyze-project` | architecture-agent |
-| Create content | `/create-content` | content-strategist |
-| Social media campaign | `/social-media` | social-media-manager |
-| Design UI/UX | `/design-ui` | ui-ux-designer |
-| AI prompt engineering | `/ai-prompt` | prompt-engineer |
-
----
-
-## Common Workflows
-
-**Implement a new feature:**
-```bash
-/implement-feature "Add invoice PDF generation with email delivery"
-```
-
-**Setting up a new project:**
-```bash
-/analyze-project
-/infra-plan "Three-tier web app on AWS"
-/cicd-setup "GitHub Actions with Docker and ECS"
-/monitor-setup "Prometheus + Grafana for ECS services"
-```
-
-**Deploying to production:**
-```bash
-/security-scan
-/deploy-staging
+/implement-feature "Add user authentication with OAuth"
+/fix-bug "Invoice totals wrong when tax-exempt"
 /deploy-production
+/security-scan
 ```
 
-**Incident response:**
-```bash
-/investigate-incident "High CPU on production web servers"
-```
+That's it. Agents, skills, commands, rules, and hooks all auto-discover.
 
 ---
 
-## MCP Servers
+## The Team
 
-Configured in `.mcp.json` — enable only what you need:
+<table>
+<tr>
+<td align="center"><b>Department</b></td>
+<td align="center"><b>Agents</b></td>
+<td align="center"><b>What They Do</b></td>
+</tr>
+<tr>
+<td>Product</td>
+<td>product-manager, ui-ux-designer</td>
+<td>Requirements, user stories, wireframes, design systems</td>
+</tr>
+<tr>
+<td>Engineering</td>
+<td>architecture, backend, frontend, database, prompt-engineer</td>
+<td>System design, APIs, UI, schemas, AI integration</td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>qa-agent, security-agent</td>
+<td>Tests, security audits, OWASP, compliance</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>devops-engineer, monitoring-agent, performance-agent</td>
+<td>CI/CD, deployments, observability, optimization</td>
+</tr>
+<tr>
+<td>Marketing</td>
+<td>content-strategist, social-media-manager</td>
+<td>Content strategy, SEO, campaigns, community</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>support-agent, documentation-agent</td>
+<td>Issue triage, API docs, user guides, changelogs</td>
+</tr>
+<tr>
+<td>IT</td>
+<td>ms-it-admin</td>
+<td>Microsoft 365, Entra ID, Teams, Exchange</td>
+</tr>
+</table>
+
+All coordinated by the **master-orchestrator** — it plans work, assigns agents, runs parallel streams, and enforces quality gates.
+
+---
+
+## What You Can Do
+
+| Command | What Happens |
+|---------|-------------|
+| `/implement-feature "..."` | Full feature lifecycle: requirements → design → code → test → docs |
+| `/fix-bug "..."` | Triage → investigate → fix → regression test → deploy |
+| `/deploy-production` | Security scan → staging → approval gate → production deploy |
+| `/investigate-incident "..."` | Structured triage → root cause → mitigation → post-mortem |
+| `/security-scan` | OWASP + CIS audit, secret detection, dependency scan |
+| `/analyze-project` | Architecture review, tech debt analysis, recommendations |
+| `/write-tests` | Comprehensive test suite with 80%+ coverage target |
+| `/refactor-module "..."` | Code quality improvements with safety net |
+| `/create-content "..."` | Content strategy → copywriting → SEO optimization |
+| `/design-ui "..."` | Wireframes → components → accessibility audit |
+| `/ai-prompt "..."` | Prompt engineering → evaluation → integration |
+| `/infra-plan "..."` | Cloud architecture design with Terraform |
+| `/cicd-setup "..."` | CI/CD pipeline generation for any platform |
+| `/cost-review` | Cloud spend analysis + optimization recommendations |
+
+[See all 21 commands →](.claude/commands/)
+
+---
+
+## Built-In Safety
+
+This isn't a toy — it has production-grade guardrails:
+
+| Hook | What It Prevents |
+|------|-----------------|
+| **git-safety-check** | Blocks force-push to main/master/develop/production |
+| **infra-safety-check** | Warns before `terraform destroy`, `kubectl delete`, `rm -rf` |
+| **file-write-check** | Scans every file write for hardcoded secrets and API keys |
+| **migration-check** | Enforces `branch_id` in all migrations (multi-tenant isolation) |
+| **ms365-audit-log** | Logs all Microsoft 365 operations for compliance |
+| **session-start** | Auto-injects project context on every session |
+| **pre-compact** | Preserves critical context before auto-compaction |
+
+Plus deny rules that block `DROP DATABASE`, `rm -rf /`, and force-push to protected branches.
+
+---
+
+## 54 Domain Skills
+
+Agents don't just guess — they reference deep knowledge packs:
+
+**Infrastructure**: AWS, Terraform, Kubernetes, Docker, Ansible, Nginx, Networking
+**Backend**: Laravel, API Design, Authentication, Multi-tenancy, PostgreSQL, Redis
+**Frontend**: Vue 3, TypeScript, Component Patterns, Accessibility
+**Quality**: Testing Patterns, Security Hardening, Secrets Management, SSL/TLS
+**Operations**: CI/CD, GitHub Actions, Monitoring, Log Management, Backup/DR
+**AI/ML**: Prompt Design, LLM Integration, Conversational AI, AI Evaluation
+**Marketing**: SEO, Content Strategy, Copywriting, Email Marketing, Paid Ads, Social Media
+**Product**: Product Management, UX Research, Wireframing, Design Systems
+
+Each skill contains real-world patterns, code examples, and decision frameworks.
+
+---
+
+## 6 Workflows
+
+End-to-end processes that coordinate multiple agents:
+
+| Workflow | Flow |
+|----------|------|
+| **Feature Development** | Requirements → Design → Implement (parallel) → Test → Review → Deploy |
+| **Bug Fix** | Triage → Investigate → Fix → Regression Test → Deploy |
+| **Release Process** | Code Freeze → QA → Security → Staging → Approval → Production |
+| **Production Incident** | Detect → Triage → Investigate → Mitigate → Resolve → Post-mortem |
+| **Client Deployment** | Requirements → Tenant Setup → Config → Data → Deploy → Verify |
+| **Content Campaign** | Strategy → Create → SEO Optimize → Publish → Analyze |
+
+---
+
+## Architecture
+
+Everything lives in `.claude/` for native auto-discovery:
+
+```
+.claude/
+├── agents/         18 autonomous agents (1 orchestrator + 17 specialists)
+├── commands/       21 slash commands for task execution
+├── workflows/      6 end-to-end workflow definitions
+├── memory/         6 knowledge base docs (architecture, standards, domain)
+├── skills/         54 domain knowledge packs with real code examples
+├── rules/          12 always-follow guidelines across 7 categories
+├── hooks/          11 safety, audit, and lifecycle hook scripts
+└── settings.json   Permissions, hooks, and autonomous operation config
+```
+
+**No plugins. No dependencies. No build step.** Pure markdown, JSON, and shell scripts. Claude Code auto-discovers everything.
+
+---
+
+## ERP Specialty
+
+The workspace includes deep ERP domain knowledge out of the box:
+
+- **Accounting**: Double-entry bookkeeping, chart of accounts, bank reconciliation
+- **Inventory**: FIFO/LIFO/weighted average, stock movements, batch tracking
+- **Sales**: Quote → Order → Delivery → Invoice → Payment workflow
+- **Procurement**: Three-way matching, approval workflows, vendor management
+- **HR/Payroll**: Employee lifecycle, leave management, salary components
+- **Multi-tenancy**: `branch_id` isolation enforced at every layer
+
+Remove or replace `.claude/memory/domain-knowledge.md` to specialize for your domain.
+
+---
+
+## MCP Integrations
+
+Pre-configured connections to external services (enable what you need):
 
 | Server | Purpose |
 |--------|---------|
@@ -191,35 +235,30 @@ Configured in `.mcp.json` — enable only what you need:
 | Supabase | Database, auth, storage |
 | Docker | Containers, images, volumes |
 | Kubernetes | Pods, services, deployments |
-
-Set required environment variables for each server (API tokens, etc.).
-
----
-
-## Safety
-
-- Infrastructure safety hooks run automatically via `.claude/settings.json`
-- Destructive operations (`terraform apply/destroy`, `kubectl delete`) trigger warnings
-- Secret detection runs on every file write/edit
-- Dockerfile best practices checked automatically
-- All rules auto-load from `.claude/rules/` based on file patterns
+| Microsoft 365 | Users, Teams, Exchange, SharePoint |
+| Filesystem | Local file operations |
 
 ---
 
 ## Requirements
 
-- Claude Code CLI
-- Node.js 18+ (for scripts)
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+- Node.js 18+ (for validation scripts)
 - Relevant CLI tools as needed: `terraform`, `kubectl`, `docker`, `aws`, `gh`
 
 ---
 
-## Contributing
+## Learn More
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- **[Beginner's Guide](BEGINNERS-GUIDE.md)** — New to DevOps? Start here
+- **[Agent Reference](AGENTS.md)** — Full agent roster and orchestration details
+- **[Architecture Report](docs/architecture_report.md)** — System design and transformation plan
+- **[Contributing](CONTRIBUTING.md)** — How to add agents, skills, commands, and rules
 
 ---
 
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+Built by [Bipin Kareparambil](https://github.com/bipinks).
