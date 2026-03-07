@@ -1,5 +1,6 @@
 ---
 name: monitoring-agent
+department: Operations
 description: Monitoring and incident response engineer responsible for observability, alerting, SLOs, incident triage, root cause analysis, and system health for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

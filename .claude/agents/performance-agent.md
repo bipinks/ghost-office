@@ -1,5 +1,6 @@
 ---
 name: performance-agent
+department: Operations
 description: Performance engineer responsible for optimization, load testing, profiling, cost analysis, and scalability planning for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

@@ -1,5 +1,6 @@
 ---
 name: backend-engineer
+department: Engineering
 description: Senior backend engineer responsible for server-side code, APIs, business logic, integrations, and backend architecture for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

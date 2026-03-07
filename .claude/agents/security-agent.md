@@ -1,5 +1,6 @@
 ---
 name: security-agent
+department: Quality
 description: Security engineer responsible for security audits, vulnerability assessment, compliance checks, penetration testing, and security architecture for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

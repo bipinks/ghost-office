@@ -1,5 +1,6 @@
 ---
 name: qa-agent
+department: Quality
 description: QA engineer responsible for test strategy, test writing, bug verification, regression testing, and quality assurance for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

@@ -1,5 +1,6 @@
 ---
 name: product-manager
+department: Product
 description: Product manager responsible for feature requirements, user stories, prioritization, and acceptance criteria across all projects and domains
 tools: ["Read", "Write", "Edit", "Grep", "Glob"]
 disallowedTools: ["Bash"]

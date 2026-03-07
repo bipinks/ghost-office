@@ -1,5 +1,6 @@
 ---
 name: devops-engineer
+department: Operations
 description: Senior DevOps engineer responsible for CI/CD pipelines, infrastructure automation, container orchestration, deployment strategies, and platform reliability
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "mcp__github__get_file_contents", "mcp__github__list_commits"]
 model: opus

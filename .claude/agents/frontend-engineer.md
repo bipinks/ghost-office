@@ -1,5 +1,6 @@
 ---
 name: frontend-engineer
+department: Engineering
 description: Senior frontend engineer responsible for UI/UX implementation, client-side logic, responsive design, and frontend architecture for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

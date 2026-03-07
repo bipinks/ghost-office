@@ -1,5 +1,6 @@
 ---
 name: support-agent
+department: Support
 description: Support engineer responsible for user issue triage, bug report management, client communication, file operations, and operational support for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

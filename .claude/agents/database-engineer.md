@@ -1,5 +1,6 @@
 ---
 name: database-engineer
+department: Engineering
 description: Senior database engineer responsible for schema design, migrations, query optimization, replication, backups, and data integrity for the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus

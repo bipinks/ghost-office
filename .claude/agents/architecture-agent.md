@@ -1,5 +1,6 @@
 ---
 name: architecture-agent
+department: Engineering
 description: System architect responsible for technical design, architecture decisions, infrastructure planning, and code review across the platform
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: opus
