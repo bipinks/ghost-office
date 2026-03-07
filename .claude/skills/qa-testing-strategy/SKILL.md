@@ -5,7 +5,7 @@ user-invocable: false
 allowed-tools: ["Read", "Write", "Bash", "Grep", "Glob"]
 ---
 
-# QA Testing Strategy — ERP Platform
+# QA Testing Strategy — Platform Testing
 
 ## Test Pyramid
 

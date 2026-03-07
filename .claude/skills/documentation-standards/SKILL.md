@@ -5,7 +5,7 @@ user-invocable: false
 allowed-tools: ["Read", "Write", "Grep", "Glob"]
 ---
 
-# Documentation Standards — ERP Platform
+# Documentation Standards — Platform Documentation
 
 ## API Documentation Pattern
 
