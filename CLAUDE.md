@@ -16,7 +16,7 @@ All components live under `.claude/` for native auto-discovery:
 ├── memory/         — 6 knowledge base documents (persistent context)
 ├── tools/          — 4 tool reference documents
 ├── skills/         — 38 domain knowledge packs
-├── rules/          — 11 always-follow guidelines (7 categories)
+├── rules/          — 12 always-follow guidelines (7 categories)
 ├── hooks/          — 11 safety, audit, and lifecycle hook scripts
 └── settings.json   — Hooks, permissions, and autonomous operation settings
 ```
@@ -101,6 +101,7 @@ IMPORTANT: The following rules are enforced by hooks and MUST be followed:
 - All database tables MUST include `branch_id` for multi-tenant data isolation
 - All migrations MUST include rollback/down methods
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`
+- When adding/removing agents, skills, commands, workflows, or hooks, ALWAYS update documentation counts in `CLAUDE.md`, `AGENTS.md`, `README.md`, `BEGINNERS-GUIDE.md`, and `docs/architecture_report.md` (see `.claude/rules/common/documentation-sync.md`)
 
 ## Autonomous Operation
 

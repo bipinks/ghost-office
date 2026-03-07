@@ -118,7 +118,7 @@ Every deliverable must meet:
   memory/         — 6 knowledge base documents
   tools/          — 4 tool reference documents
   skills/         — 38 domain knowledge packs
-  rules/          — 11 guidelines (7 categories)
+  rules/          — 12 guidelines (7 categories)
   hooks/          — 11 safety, audit, and lifecycle hook scripts
   settings.json   — Hooks, permissions, and autonomous settings
 .mcp.json         — MCP server configurations (GitHub, AWS, MS365, etc.)
