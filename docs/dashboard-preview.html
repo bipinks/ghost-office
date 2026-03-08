@@ -385,6 +385,75 @@
   }
   .error-item .tool { color: #f85149; font-weight: 600; }
   .error-item .time { color: #8b949e; font-size: 10px; }
+
+  /* ── Responsive — Tablet ── */
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; }
+    .header-left { flex-wrap: wrap; gap: 8px; }
+    .header h1 { font-size: 15px; }
+    .header-right { width: 100%; display: flex; gap: 8px; flex-wrap: wrap; }
+    .session-selector { flex: 1; min-width: 0; }
+    .stats-bar { gap: 8px; flex-wrap: wrap; }
+    .stat-card { min-width: 70px; padding: 8px 10px; }
+    .stat-card .value { font-size: 1.3em; }
+    .stat-card .label { font-size: 0.65em; }
+    .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 4px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 8px 12px; font-size: 0.8em; white-space: nowrap; flex-shrink: 0; }
+    .workflow-bar { padding: 8px; }
+    .workflow-step { min-width: 60px; }
+    .workflow-step .step-label { font-size: 0.6em; }
+    .agent-row { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+    .agent-row .name { flex-basis: calc(100% - 30px); font-size: 0.9em; }
+    .detail-panel { padding: 12px; }
+    .msg-input-bar { flex-wrap: wrap; }
+    .msg-input-bar select { width: 100%; min-height: 36px; }
+    .msg-input-bar input { min-height: 36px; }
+    .msg-input-bar button { min-height: 36px; }
+    .msg-bubble { max-width: 95%; }
+    .error-item { font-size: 10px; }
+  }
+
+  /* ── Responsive — Phone ── */
+  @media (max-width: 480px) {
+    body { padding: 6px; }
+    .header { border-radius: 6px; padding: 10px 12px; }
+    .header h1 { font-size: 14px; }
+    .session-badge { font-size: 10px; padding: 3px 8px; }
+    .session-selector { font-size: 11px; padding: 4px 6px; }
+    .stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .stat-card { min-width: unset; padding: 8px; }
+    .tab { padding: 6px 10px; font-size: 0.75em; border-radius: 4px; }
+    .workflow-bar { padding: 6px; gap: 0; }
+    .workflow-step { min-width: 50px; }
+    .workflow-step .step-dot { width: 14px; height: 14px; }
+    .workflow-step .step-label { font-size: 0.55em; }
+    .agent-row { padding: 8px 10px; border-radius: 6px; }
+    .agent-row .name { font-size: 0.85em; }
+    .agent-row .status { font-size: 0.7em; padding: 2px 6px; }
+    .agent-row .duration { font-size: 0.7em; }
+    .agent-row .progress-bar { width: 50px; height: 4px; }
+    .dept-header { font-size: 0.8em; padding: 6px 10px; }
+    .detail-panel { padding: 10px; border-radius: 6px; }
+    .msg-bubble { max-width: 100%; font-size: 12px; }
+    .msg-meta { font-size: 9px; }
+    .msg-input-bar { gap: 6px; }
+    .msg-input-bar select { font-size: 11px; min-height: 40px; }
+    .msg-input-bar input { font-size: 12px; min-height: 40px; }
+    .msg-input-bar button { font-size: 11px; min-height: 40px; }
+    .msg-toast { bottom: 10px; right: 10px; left: 10px; text-align: center; }
+    .error-item { font-size: 10px; padding: 6px 8px; }
+  }
+
+  /* ── Touch targets ── */
+  @media (pointer: coarse) {
+    .agent-row { min-height: 48px; }
+    .tab { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .msg-input-bar button { min-height: 44px; }
+    .msg-input-bar select { min-height: 44px; }
+    .msg-input-bar input { min-height: 44px; }
+  }
 </style>
 </head>
 <body>
