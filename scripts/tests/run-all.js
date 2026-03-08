@@ -15,8 +15,9 @@
  *   9. Hook scripts (test-hooks.js)
  *  10. Settings & config (test-settings.js)
  *  11. Content integrity (test-content-integrity.js)
- *  12. Agent skill-mapping validation (inline)
- *  13. Frontmatter schema validation (inline)
+ *  12. Dashboard & analytics (test-dashboard.js)
+ *  13. Agent skill-mapping validation (inline)
+ *  14. Frontmatter schema validation (inline)
  */
 
 const { execSync } = require('child_process');
@@ -127,6 +128,7 @@ function main() {
   moduleTest('Hook scripts', './test-hooks');
   moduleTest('Settings & MCP config', './test-settings');
   moduleTest('Content integrity', './test-content-integrity');
+  moduleTest('Dashboard & analytics', './test-dashboard');
 
   // ==========================================
   // Shared: pre-read agent files for Tests 12 & 13
