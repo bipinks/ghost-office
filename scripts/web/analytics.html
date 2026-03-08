@@ -113,6 +113,59 @@
     text-align: center; font-size: 11px; color: #484f58; margin-top: 16px;
   }
 
+  /* Auto-refresh controls */
+  .refresh-controls {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .refresh-controls .label { font-size: 11px; color: #8b949e; }
+  .refresh-toggle {
+    display: flex; gap: 2px; background: #0d1117;
+    border: 1px solid #30363d; border-radius: 6px; overflow: hidden;
+  }
+  .refresh-toggle button {
+    background: transparent; color: #8b949e; border: none;
+    padding: 4px 10px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .refresh-toggle button:hover { color: #c9d1d9; }
+  .refresh-toggle button.active {
+    background: #238636; color: #fff;
+  }
+  .last-updated { font-size: 11px; color: #484f58; }
+
+  /* Date range controls */
+  .date-controls {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 12px 24px; background: #161b22;
+    border: 1px solid #30363d; border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .date-controls .label { font-size: 11px; color: #8b949e; white-space: nowrap; }
+  .date-presets {
+    display: flex; gap: 2px; background: #0d1117;
+    border: 1px solid #30363d; border-radius: 6px; overflow: hidden;
+  }
+  .date-presets button {
+    background: transparent; color: #8b949e; border: none;
+    padding: 5px 12px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .date-presets button:hover { color: #c9d1d9; }
+  .date-presets button.active {
+    background: #388bfd30; color: #58a6ff;
+  }
+  .date-custom {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .date-custom input[type="date"] {
+    background: #0d1117; color: #c9d1d9; border: 1px solid #30363d;
+    border-radius: 4px; padding: 4px 8px; font-size: 11px;
+    font-family: inherit;
+  }
+  .date-custom input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     body { padding: 10px; }
@@ -147,8 +200,36 @@
     <span class="subtitle">Cross-session performance insights</span>
   </div>
   <div class="header-actions">
+    <div class="refresh-controls">
+      <span class="label">Auto:</span>
+      <div class="refresh-toggle" id="refresh-toggle">
+        <button data-interval="0" class="active">Off</button>
+        <button data-interval="10">10s</button>
+        <button data-interval="30">30s</button>
+        <button data-interval="60">60s</button>
+      </div>
+      <span class="last-updated" id="last-updated"></span>
+    </div>
     <a href="/" class="btn">&larr; Dashboard</a>
     <button class="btn btn-primary" onclick="loadAll()">Refresh</button>
+  </div>
+</div>
+
+<!-- Date Range Filter -->
+<div class="date-controls">
+  <span class="label">Date Range:</span>
+  <div class="date-presets" id="date-presets">
+    <button data-range="all" class="active">All Time</button>
+    <button data-range="today">Today</button>
+    <button data-range="7d">Last 7 Days</button>
+    <button data-range="30d">Last 30 Days</button>
+    <button data-range="custom">Custom</button>
+  </div>
+  <div class="date-custom" id="date-custom" style="display:none">
+    <input type="date" id="date-from">
+    <span class="label">to</span>
+    <input type="date" id="date-to">
+    <button class="btn" onclick="applyCustomDate()">Apply</button>
   </div>
 </div>
 
@@ -234,7 +315,7 @@
   </table>
 </div>
 
-<div class="refresh-note">Data refreshes on page load. Click Refresh to update.</div>
+<div class="refresh-note">Data refreshes on page load. Use auto-refresh or click Refresh to update.</div>
 
 <script>
   // Chart.js global config for dark theme
@@ -253,6 +334,15 @@
   let agentData = [];
   let sortCol = 'run_count';
   let sortDir = -1;
+
+  // ── Auto-refresh state ──
+  let refreshInterval = 0;
+  let refreshTimer = null;
+  let lastLoadTime = null;
+
+  // ── Date range state ──
+  let dateFrom = null;
+  let dateTo = null;
 
   function fmtDuration(s) {
     s = Math.round(s);
@@ -276,16 +366,41 @@
     return sid ? sid.substring(0, 6) : '-';
   }
 
+  function dateParams() {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set('from', dateFrom);
+    if (dateTo) params.set('to', dateTo);
+    const qs = params.toString();
+    return qs ? '?' + qs : '';
+  }
+
   async function fetchApi(path) {
     try {
-      const r = await fetch('/api/analytics/' + path);
+      const r = await fetch('/api/analytics/' + path + dateParams());
       if (!r.ok) return null;
       return await r.json();
     } catch { return null; }
   }
 
-  function makeChart(id, type, data, options = {}) {
-    if (charts[id]) charts[id].destroy();
+  function updateChart(id, type, data, options = {}) {
+    const existing = charts[id];
+    if (existing && existing.config.type === type) {
+      // Update in place for smooth transitions
+      existing.data.labels = data.labels;
+      data.datasets.forEach((ds, i) => {
+        if (existing.data.datasets[i]) {
+          Object.assign(existing.data.datasets[i], ds);
+        } else {
+          existing.data.datasets.push(ds);
+        }
+      });
+      // Remove extra datasets
+      existing.data.datasets.length = data.datasets.length;
+      existing.update('none');
+      return;
+    }
+    // Create new chart
+    if (existing) existing.destroy();
     const ctx = document.getElementById(id);
     if (!ctx) return;
     charts[id] = new Chart(ctx, {
@@ -315,7 +430,7 @@
   async function loadSessionTrend() {
     const d = await fetchApi('session-trends');
     if (!d || !d.length) return;
-    makeChart('chart-session-trend', 'line', {
+    updateChart('chart-session-trend', 'line', {
       labels: d.map(s => shortSession(s.session_id)),
       datasets: [{
         label: 'Duration (s)',
@@ -340,9 +455,8 @@
     const d = await fetchApi('agent-performance');
     if (!d || !d.length) return;
     agentData = d;
-    // Chart
     const sorted = [...d].sort((a, b) => b.avg_duration - a.avg_duration).slice(0, 15);
-    makeChart('chart-agent-perf', 'bar', {
+    updateChart('chart-agent-perf', 'bar', {
       labels: sorted.map(a => a.agent_name),
       datasets: [{
         label: 'Avg Duration (s)',
@@ -381,7 +495,7 @@
   async function loadDeptChart() {
     const d = await fetchApi('department-performance');
     if (!d || !d.length) return;
-    makeChart('chart-dept', 'doughnut', {
+    updateChart('chart-dept', 'doughnut', {
       labels: d.map(dp => dp.department),
       datasets: [{
         data: d.map(dp => dp.total_runs),
@@ -394,9 +508,8 @@
   async function loadErrorCharts() {
     const d = await fetchApi('error-breakdown');
     if (!d) return;
-    // By tool
     if (d.by_tool && d.by_tool.length) {
-      makeChart('chart-errors-tool', 'bar', {
+      updateChart('chart-errors-tool', 'bar', {
         labels: d.by_tool.map(e => e.tool || 'unknown'),
         datasets: [{
           label: 'Errors',
@@ -413,9 +526,8 @@
         },
       });
     }
-    // By agent
     if (d.by_agent && d.by_agent.length) {
-      makeChart('chart-errors-agent', 'bar', {
+      updateChart('chart-errors-agent', 'bar', {
         labels: d.by_agent.map(e => e.agent_name),
         datasets: [{
           label: 'Errors',
@@ -432,7 +544,6 @@
         },
       });
     }
-    // Recent errors table
     if (d.recent && d.recent.length) {
       const tbody = document.querySelector('#error-table tbody');
       tbody.innerHTML = d.recent.slice(0, 20).map(e => `<tr>
@@ -448,7 +559,7 @@
     const d = await fetchApi('token-usage');
     if (!d || !d.per_session) return;
     const ps = d.per_session;
-    makeChart('chart-tokens', 'bar', {
+    updateChart('chart-tokens', 'bar', {
       labels: ps.map(s => shortSession(s.session_id)),
       datasets: [{
         label: 'Input',
@@ -470,7 +581,7 @@
   async function loadBottlenecks() {
     const d = await fetchApi('workflow-bottlenecks');
     if (!d || !d.length) return;
-    makeChart('chart-bottlenecks', 'bar', {
+    updateChart('chart-bottlenecks', 'bar', {
       labels: d.map(b => b.department),
       datasets: [{
         label: 'Avg Duration (s)',
@@ -490,7 +601,7 @@
     const d = await fetchApi('message-stats');
     if (!d || !d.by_type) return;
     if (d.by_type.length) {
-      makeChart('chart-msg-types', 'doughnut', {
+      updateChart('chart-msg-types', 'doughnut', {
         labels: d.by_type.map(m => m.msg_type),
         datasets: [{
           data: d.by_type.map(m => m.count),
@@ -501,7 +612,7 @@
     }
   }
 
-  // Sortable table headers
+  // ── Sortable table headers ──
   document.querySelectorAll('#agent-table th[data-sort]').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.sort;
@@ -511,6 +622,102 @@
     });
   });
 
+  // ── Auto-refresh ──
+  function setRefreshInterval(seconds) {
+    refreshInterval = seconds;
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = null;
+    if (seconds > 0) {
+      refreshTimer = setInterval(loadAll, seconds * 1000);
+    }
+    // Update button states
+    document.querySelectorAll('#refresh-toggle button').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.interval) === seconds);
+    });
+    // Persist preference
+    try { localStorage.setItem('analytics-refresh', seconds); } catch {}
+  }
+
+  function updateLastUpdated() {
+    lastLoadTime = Date.now();
+    const el = document.getElementById('last-updated');
+    el.textContent = 'Updated just now';
+    // Update "Xs ago" display
+    if (window._lastUpdatedTimer) clearInterval(window._lastUpdatedTimer);
+    window._lastUpdatedTimer = setInterval(() => {
+      if (!lastLoadTime) return;
+      const ago = Math.round((Date.now() - lastLoadTime) / 1000);
+      if (ago < 5) el.textContent = 'Updated just now';
+      else if (ago < 60) el.textContent = `Updated ${ago}s ago`;
+      else el.textContent = `Updated ${Math.floor(ago/60)}m ago`;
+    }, 5000);
+  }
+
+  document.querySelectorAll('#refresh-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => setRefreshInterval(parseInt(btn.dataset.interval)));
+  });
+
+  // Restore saved preference
+  try {
+    const saved = parseInt(localStorage.getItem('analytics-refresh'));
+    if (saved > 0) setRefreshInterval(saved);
+  } catch {}
+
+  // ── Date range ──
+  function setDateRange(from, to, preset) {
+    dateFrom = from;
+    dateTo = to;
+    document.querySelectorAll('#date-presets button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.range === preset);
+    });
+    document.getElementById('date-custom').style.display =
+      preset === 'custom' ? 'flex' : 'none';
+    if (preset !== 'custom') loadAll();
+  }
+
+  function toISODate(d) {
+    return d.toISOString().split('T')[0];
+  }
+
+  document.querySelectorAll('#date-presets button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const range = btn.dataset.range;
+      const now = new Date();
+      switch (range) {
+        case 'all':
+          setDateRange(null, null, 'all');
+          break;
+        case 'today':
+          setDateRange(toISODate(now), toISODate(now), 'today');
+          break;
+        case '7d': {
+          const d = new Date(now); d.setDate(d.getDate() - 7);
+          setDateRange(toISODate(d), toISODate(now), '7d');
+          break;
+        }
+        case '30d': {
+          const d = new Date(now); d.setDate(d.getDate() - 30);
+          setDateRange(toISODate(d), toISODate(now), '30d');
+          break;
+        }
+        case 'custom':
+          document.getElementById('date-custom').style.display = 'flex';
+          document.querySelectorAll('#date-presets button').forEach(b =>
+            b.classList.toggle('active', b.dataset.range === 'custom'));
+          break;
+      }
+    });
+  });
+
+  function applyCustomDate() {
+    const from = document.getElementById('date-from').value;
+    const to = document.getElementById('date-to').value;
+    dateFrom = from || null;
+    dateTo = to || null;
+    loadAll();
+  }
+
+  // ── Load all data ──
   async function loadAll() {
     await Promise.all([
       loadSummary(),
@@ -522,6 +729,7 @@
       loadBottlenecks(),
       loadMsgChart(),
     ]);
+    updateLastUpdated();
   }
 
   loadAll();

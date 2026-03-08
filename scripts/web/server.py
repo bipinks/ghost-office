@@ -26,6 +26,7 @@ import sqlite3
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8686
 
@@ -373,33 +374,91 @@ def query_db(sql, params=()):
 
 # ── Analytics endpoints ───────────────────────────────────────────────────────
 
-def analytics_summary():
+def _date_filter(date_from=None, date_to=None):
+    """Build SQL WHERE clause and params for date range filtering on sessions."""
+    clauses = []
+    params = []
+    if date_from:
+        clauses.append("started_at >= ?")
+        params.append(date_from)
+    if date_to:
+        # Include the full end day
+        clauses.append("started_at <= ?")
+        params.append(date_to + "T23:59:59Z" if "T" not in date_to else date_to)
+    return clauses, params
+
+
+def _session_ids_for_range(date_from=None, date_to=None):
+    """Get session IDs within a date range, or None for all."""
+    if not date_from and not date_to:
+        return None
+    clauses, params = _date_filter(date_from, date_to)
+    where = " AND ".join(clauses)
+    rows = query_db(f"SELECT session_id FROM sessions WHERE {where}", tuple(params))
+    return [r["session_id"] for r in rows]
+
+
+def analytics_summary(date_from=None, date_to=None):
     """Aggregate stats across all sessions."""
-    rows = query_db("""
+    clauses, params = _date_filter(date_from, date_to)
+    where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+    rows = query_db(f"""
         SELECT
             COUNT(*) as total_sessions,
             COALESCE(SUM(agent_count), 0) as total_agents,
             COALESCE(SUM(total_tokens), 0) as total_tokens,
             COALESCE(AVG(total_duration), 0) as avg_duration,
             COALESCE(MAX(updated_at), '') as last_activity
-        FROM sessions
-    """)
+        FROM sessions {where}
+    """, tuple(params))
     summary = rows[0] if rows else {}
-    # Add error count
-    err_rows = query_db("SELECT COUNT(*) as total_errors FROM errors")
+    # Add error count (filtered by session range)
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None:
+        placeholders = ",".join("?" * len(sids))
+        err_rows = query_db(
+            f"SELECT COUNT(*) as total_errors FROM errors WHERE session_id IN ({placeholders})",
+            tuple(sids)
+        ) if sids else [{"total_errors": 0}]
+    else:
+        err_rows = query_db("SELECT COUNT(*) as total_errors FROM errors")
     summary["total_errors"] = err_rows[0]["total_errors"] if err_rows else 0
     # Add message count
-    msg_rows = query_db("SELECT COUNT(*) as total_messages FROM messages")
+    if sids is not None:
+        placeholders = ",".join("?" * len(sids))
+        msg_rows = query_db(
+            f"SELECT COUNT(*) as total_messages FROM messages WHERE session_id IN ({placeholders})",
+            tuple(sids)
+        ) if sids else [{"total_messages": 0}]
+    else:
+        msg_rows = query_db("SELECT COUNT(*) as total_messages FROM messages")
     summary["total_messages"] = msg_rows[0]["total_messages"] if msg_rows else 0
     return summary
 
 
-def analytics_agent_performance():
+def analytics_agent_performance(date_from=None, date_to=None):
     """Per-agent aggregate stats."""
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None:
+        if not sids:
+            return []
+        placeholders = ",".join("?" * len(sids))
+        return query_db(f"""
+            SELECT
+                agent_name, department,
+                COUNT(*) as run_count,
+                COALESCE(AVG(duration_seconds), 0) as avg_duration,
+                COALESCE(SUM(error_count), 0) as total_errors,
+                COALESCE(SUM(tokens_total), 0) as total_tokens,
+                COALESCE(AVG(tokens_total), 0) as avg_tokens,
+                COALESCE(SUM(todo_completed), 0) as total_tasks_completed,
+                COALESCE(SUM(tool_uses), 0) as total_tool_uses
+            FROM agent_runs WHERE session_id IN ({placeholders})
+            GROUP BY agent_name ORDER BY run_count DESC
+        """, tuple(sids))
     return query_db("""
         SELECT
-            agent_name,
-            department,
+            agent_name, department,
             COUNT(*) as run_count,
             COALESCE(AVG(duration_seconds), 0) as avg_duration,
             COALESCE(SUM(error_count), 0) as total_errors,
@@ -407,149 +466,180 @@ def analytics_agent_performance():
             COALESCE(AVG(tokens_total), 0) as avg_tokens,
             COALESCE(SUM(todo_completed), 0) as total_tasks_completed,
             COALESCE(SUM(tool_uses), 0) as total_tool_uses
-        FROM agent_runs
-        GROUP BY agent_name
-        ORDER BY run_count DESC
+        FROM agent_runs GROUP BY agent_name ORDER BY run_count DESC
     """)
 
 
-def analytics_department_performance():
+def analytics_department_performance(date_from=None, date_to=None):
     """Per-department aggregate stats."""
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None:
+        if not sids:
+            return []
+        placeholders = ",".join("?" * len(sids))
+        return query_db(f"""
+            SELECT department, COUNT(DISTINCT agent_name) as agent_count,
+                COUNT(*) as total_runs,
+                COALESCE(AVG(duration_seconds), 0) as avg_duration,
+                COALESCE(SUM(error_count), 0) as total_errors,
+                COALESCE(SUM(tokens_total), 0) as total_tokens
+            FROM agent_runs WHERE department != '' AND session_id IN ({placeholders})
+            GROUP BY department ORDER BY total_runs DESC
+        """, tuple(sids))
     return query_db("""
-        SELECT
-            department,
-            COUNT(DISTINCT agent_name) as agent_count,
+        SELECT department, COUNT(DISTINCT agent_name) as agent_count,
             COUNT(*) as total_runs,
             COALESCE(AVG(duration_seconds), 0) as avg_duration,
             COALESCE(SUM(error_count), 0) as total_errors,
             COALESCE(SUM(tokens_total), 0) as total_tokens
-        FROM agent_runs
-        WHERE department != ''
-        GROUP BY department
-        ORDER BY total_runs DESC
+        FROM agent_runs WHERE department != ''
+        GROUP BY department ORDER BY total_runs DESC
     """)
 
 
-def analytics_session_trends():
+def analytics_session_trends(date_from=None, date_to=None):
     """Session-over-session trends (last 50)."""
-    sessions = query_db("""
+    clauses, params = _date_filter(date_from, date_to)
+    where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+    sessions = query_db(f"""
         SELECT session_id, started_at, total_duration, total_tokens, agent_count
-        FROM sessions
-        ORDER BY started_at DESC
-        LIMIT 50
-    """)
-    # Add error count per session
+        FROM sessions {where}
+        ORDER BY started_at DESC LIMIT 50
+    """, tuple(params))
     for s in sessions:
         err = query_db(
             "SELECT COUNT(*) as cnt FROM errors WHERE session_id = ?",
             (s["session_id"],)
         )
         s["error_count"] = err[0]["cnt"] if err else 0
-    return list(reversed(sessions))  # chronological order
+    return list(reversed(sessions))
 
 
-def analytics_workflow_bottlenecks():
+def analytics_workflow_bottlenecks(date_from=None, date_to=None):
     """Average time per department (proxy for workflow phases)."""
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None:
+        if not sids:
+            return []
+        placeholders = ",".join("?" * len(sids))
+        return query_db(f"""
+            SELECT department,
+                COALESCE(AVG(duration_seconds), 0) as avg_duration,
+                COUNT(*) as sample_count
+            FROM agent_runs
+            WHERE department != '' AND duration_seconds > 0
+                AND session_id IN ({placeholders})
+            GROUP BY department ORDER BY avg_duration DESC
+        """, tuple(sids))
     return query_db("""
-        SELECT
-            department,
+        SELECT department,
             COALESCE(AVG(duration_seconds), 0) as avg_duration,
             COUNT(*) as sample_count
         FROM agent_runs
         WHERE department != '' AND duration_seconds > 0
-        GROUP BY department
-        ORDER BY avg_duration DESC
+        GROUP BY department ORDER BY avg_duration DESC
     """)
 
 
-def analytics_error_breakdown():
+def analytics_error_breakdown(date_from=None, date_to=None):
     """Errors by tool and agent."""
-    by_tool = query_db("""
-        SELECT tool, COUNT(*) as count
-        FROM errors
-        GROUP BY tool
-        ORDER BY count DESC
-        LIMIT 20
-    """)
-    by_agent = query_db("""
-        SELECT agent_name, COUNT(*) as count
-        FROM errors
-        GROUP BY agent_name
-        ORDER BY count DESC
-        LIMIT 20
-    """)
-    recent = query_db("""
-        SELECT agent_name, tool, message, timestamp
-        FROM errors
-        ORDER BY timestamp DESC
-        LIMIT 50
-    """)
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None and not sids:
+        return {"by_tool": [], "by_agent": [], "recent": []}
+    sid_filter = ""
+    sid_params = ()
+    if sids is not None:
+        placeholders = ",".join("?" * len(sids))
+        sid_filter = f"WHERE session_id IN ({placeholders})"
+        sid_params = tuple(sids)
+    by_tool = query_db(f"""
+        SELECT tool, COUNT(*) as count FROM errors {sid_filter}
+        GROUP BY tool ORDER BY count DESC LIMIT 20
+    """, sid_params)
+    by_agent = query_db(f"""
+        SELECT agent_name, COUNT(*) as count FROM errors {sid_filter}
+        GROUP BY agent_name ORDER BY count DESC LIMIT 20
+    """, sid_params)
+    recent = query_db(f"""
+        SELECT agent_name, tool, message, timestamp FROM errors {sid_filter}
+        ORDER BY timestamp DESC LIMIT 50
+    """, sid_params)
     return {"by_tool": by_tool, "by_agent": by_agent, "recent": recent}
 
 
-def analytics_token_usage():
+def analytics_token_usage(date_from=None, date_to=None):
     """Token usage trends per session."""
-    per_session = query_db("""
-        SELECT
-            s.session_id,
-            s.started_at,
-            s.total_tokens,
+    clauses, params = _date_filter(date_from, date_to)
+    where = ("WHERE " + " AND ".join(["s." + c for c in clauses])) if clauses else ""
+    per_session = query_db(f"""
+        SELECT s.session_id, s.started_at, s.total_tokens,
             COALESCE(SUM(ar.tokens_input), 0) as input_tokens,
             COALESCE(SUM(ar.tokens_output), 0) as output_tokens
         FROM sessions s
         LEFT JOIN agent_runs ar ON s.session_id = ar.session_id
-        GROUP BY s.session_id
-        ORDER BY s.started_at DESC
-        LIMIT 50
-    """)
-    per_agent = query_db("""
-        SELECT
-            agent_name,
-            COALESCE(SUM(tokens_total), 0) as total,
-            COALESCE(SUM(tokens_input), 0) as input_tokens,
-            COALESCE(SUM(tokens_output), 0) as output_tokens
-        FROM agent_runs
-        GROUP BY agent_name
-        ORDER BY total DESC
-    """)
-    return {
-        "per_session": list(reversed(per_session)),
-        "per_agent": per_agent,
-    }
+        {where}
+        GROUP BY s.session_id ORDER BY s.started_at DESC LIMIT 50
+    """, tuple(params))
+    # Per-agent filtered by session range
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None:
+        if not sids:
+            per_agent = []
+        else:
+            placeholders = ",".join("?" * len(sids))
+            per_agent = query_db(f"""
+                SELECT agent_name,
+                    COALESCE(SUM(tokens_total), 0) as total,
+                    COALESCE(SUM(tokens_input), 0) as input_tokens,
+                    COALESCE(SUM(tokens_output), 0) as output_tokens
+                FROM agent_runs WHERE session_id IN ({placeholders})
+                GROUP BY agent_name ORDER BY total DESC
+            """, tuple(sids))
+    else:
+        per_agent = query_db("""
+            SELECT agent_name,
+                COALESCE(SUM(tokens_total), 0) as total,
+                COALESCE(SUM(tokens_input), 0) as input_tokens,
+                COALESCE(SUM(tokens_output), 0) as output_tokens
+            FROM agent_runs GROUP BY agent_name ORDER BY total DESC
+        """)
+    return {"per_session": list(reversed(per_session)), "per_agent": per_agent}
 
 
-def analytics_message_stats():
+def analytics_message_stats(date_from=None, date_to=None):
     """Message volume and response times."""
-    by_type = query_db("""
-        SELECT msg_type, COUNT(*) as count
-        FROM messages
-        GROUP BY msg_type
-        ORDER BY count DESC
-    """)
-    by_status = query_db("""
-        SELECT status, COUNT(*) as count
-        FROM messages
-        GROUP BY status
-        ORDER BY count DESC
-    """)
-    avg_response = query_db("""
+    sids = _session_ids_for_range(date_from, date_to)
+    if sids is not None and not sids:
+        return {"by_type": [], "by_status": [], "response_times": {}, "per_agent": []}
+    sid_filter = ""
+    sid_params = ()
+    if sids is not None:
+        placeholders = ",".join("?" * len(sids))
+        sid_filter = f"WHERE session_id IN ({placeholders})"
+        sid_params = tuple(sids)
+    by_type = query_db(f"""
+        SELECT msg_type, COUNT(*) as count FROM messages {sid_filter}
+        GROUP BY msg_type ORDER BY count DESC
+    """, sid_params)
+    by_status = query_db(f"""
+        SELECT status, COUNT(*) as count FROM messages {sid_filter}
+        GROUP BY status ORDER BY count DESC
+    """, sid_params)
+    resp_filter = sid_filter.replace("WHERE", "WHERE response_time_seconds IS NOT NULL AND response_time_seconds > 0 AND") if sid_filter else "WHERE response_time_seconds IS NOT NULL AND response_time_seconds > 0"
+    avg_response = query_db(f"""
         SELECT
             COALESCE(AVG(response_time_seconds), 0) as avg_response_time,
             COALESCE(MIN(response_time_seconds), 0) as min_response_time,
             COALESCE(MAX(response_time_seconds), 0) as max_response_time,
             COUNT(*) as acknowledged_count
-        FROM messages
-        WHERE response_time_seconds IS NOT NULL AND response_time_seconds > 0
-    """)
-    per_agent = query_db("""
-        SELECT
-            agent_name,
-            COUNT(*) as total_messages,
+        FROM messages {resp_filter}
+    """, sid_params)
+    per_agent = query_db(f"""
+        SELECT agent_name, COUNT(*) as total_messages,
             COALESCE(AVG(response_time_seconds), 0) as avg_response_time
-        FROM messages
-        GROUP BY agent_name
-        ORDER BY total_messages DESC
-    """)
+        FROM messages {sid_filter}
+        GROUP BY agent_name ORDER BY total_messages DESC
+    """, sid_params)
     return {
         "by_type": by_type,
         "by_status": by_status,
@@ -588,14 +678,19 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         # API: analytics endpoints
-        m = re.match(r"^/api/analytics/([\w-]+)$", self.path)
+        parsed = urlparse(self.path)
+        m = re.match(r"^/api/analytics/([\w-]+)$", parsed.path)
         if m:
             route = m.group(1)
             handler = ANALYTICS_ROUTES.get(route)
             if handler:
+                # Parse date range query params
+                qs = parse_qs(parsed.query)
+                date_from = qs.get("from", [None])[0]
+                date_to = qs.get("to", [None])[0]
                 # Sync before analytics query
                 sync_json_to_sqlite()
-                self._json_response(200, handler())
+                self._json_response(200, handler(date_from=date_from, date_to=date_to))
             else:
                 self._json_response(404, {"error": f"Unknown analytics route: {route}"})
             return

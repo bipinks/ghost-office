@@ -98,6 +98,28 @@ function run() {
   // Responsive design
   assert(analyticsHtml.includes('@media'), 'analytics.html: has media queries for responsive design');
 
+  // Auto-refresh controls
+  assert(analyticsHtml.includes('refresh-toggle'), 'analytics.html: has refresh toggle controls');
+  assert(analyticsHtml.includes('refreshInterval'), 'analytics.html: has refresh interval state');
+  assert(analyticsHtml.includes('setRefreshInterval'), 'analytics.html: has setRefreshInterval function');
+  assert(analyticsHtml.includes('last-updated'), 'analytics.html: has last updated indicator');
+  assert(analyticsHtml.includes('localStorage'), 'analytics.html: persists refresh preference');
+  assert(analyticsHtml.includes('clearInterval'), 'analytics.html: clears refresh timer');
+
+  // Date range filtering
+  assert(analyticsHtml.includes('date-presets'), 'analytics.html: has date preset buttons');
+  assert(analyticsHtml.includes('date-from'), 'analytics.html: has date-from input');
+  assert(analyticsHtml.includes('date-to'), 'analytics.html: has date-to input');
+  assert(analyticsHtml.includes('dateParams'), 'analytics.html: has dateParams function');
+  assert(analyticsHtml.includes('setDateRange'), 'analytics.html: has setDateRange function');
+  assert(analyticsHtml.includes('applyCustomDate'), 'analytics.html: has applyCustomDate function');
+  assert(analyticsHtml.includes("'all'") && analyticsHtml.includes("'today'"), 'analytics.html: has All Time and Today presets');
+  assert(analyticsHtml.includes("'7d'") && analyticsHtml.includes("'30d'"), 'analytics.html: has 7d and 30d presets');
+
+  // In-place chart updates
+  assert(analyticsHtml.includes('updateChart'), 'analytics.html: has updateChart function for in-place updates');
+  assert(analyticsHtml.includes('.update('), 'analytics.html: calls chart.update() for smooth transitions');
+
   // Tables
   assert(analyticsHtml.includes('agent-table'), 'analytics.html: has agent performance table');
   assert(analyticsHtml.includes('error-table'), 'analytics.html: has errors table');
@@ -183,6 +205,18 @@ function run() {
   // API route patterns
   assert(serverPy.includes('/api/analytics/'), 'server.py: has analytics route pattern');
   assert(serverPy.includes('/api/messages/'), 'server.py: has messages route pattern');
+
+  // Date range filtering support
+  assert(serverPy.includes('from urllib.parse import'), 'server.py: imports URL parsing');
+  assert(serverPy.includes('parse_qs'), 'server.py: uses parse_qs for query params');
+  assert(serverPy.includes('date_from'), 'server.py: accepts date_from parameter');
+  assert(serverPy.includes('date_to'), 'server.py: accepts date_to parameter');
+  assert(serverPy.includes('def _date_filter('), 'server.py: has _date_filter helper');
+  assert(serverPy.includes('def _session_ids_for_range('), 'server.py: has _session_ids_for_range helper');
+  // All analytics functions accept date params
+  assert(serverPy.includes('def analytics_summary(date_from='), 'server.py: summary accepts date params');
+  assert(serverPy.includes('def analytics_session_trends(date_from='), 'server.py: session_trends accepts date params');
+  assert(serverPy.includes('def analytics_error_breakdown(date_from='), 'server.py: error_breakdown accepts date params');
 
   // Content length validation for POST
   assert(serverPy.includes('Content-Length'), 'server.py: validates content length');
