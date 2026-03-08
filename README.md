@@ -155,8 +155,44 @@ When you run `/implement-feature`, up to 9 agents work in parallel. The dashboar
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Active: 2  │  Completed: 2  │  Idle: 3  │  Uptime: 6m 18s    ║
 ╚══════════════════════════════════════════════════════════════════╝
-  [1-4] detail  │  [a] all agents  │  [h] history  │  [q] quit
+  [1-4] detail  [l] sessions  [h] history  [s] stats  [e] errors
+  [w] workflow  [m] messages  [c] command  [q] quit
 ```
+
+---
+
+### Session list — `[l]` or `--sessions`
+
+Switch between active and historical sessions:
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  SESSION LIST                                    12:34:56 UTC    ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  [1] ● a3f9b2c8d1e4f5a7  ████████░░  2/4  (ACTIVE)            ║
+║        Started 6m ago · 2 running                                ║
+║                                                                  ║
+║  [2] ○ 7c2d1e9a3b5f8c0d  ██████████  done                     ║
+║        Mar 08 09:14 · 8 agents · 12m 44s                        ║
+║                                                                  ║
+║  [3] ○ f81a3c7e2b9d4f6a  ██████████  done                     ║
+║        Mar 07 16:52 · 6 agents · 8m 30s                         ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+  [1-3] select session  [h] history  [s] stats  [q] quit
+```
+
+When viewing a historical session, the header turns red with a **HISTORY** badge:
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  AGENT DASHBOARD (HISTORY)                       12:34:56 UTC    ║
+║  Session: 7c2d1e9a                                [l] live       ║
+╠══════════════════════════════════════════════════════════════════╣
+```
+
+Press `[b]` to return to the session list, or `[l]` to switch sessions.
 
 ---
 
@@ -199,8 +235,10 @@ Press a number key to see that agent's task list in real-time:
 ║  f81a3c   ║  Mar 07  16:52   ║  8m 30s  ║    6    ║  completed  ║
 ║  b4e29a   ║  Mar 07  11:07   ║  15m 02s ║    9    ║  completed  ║
 ╚═══════════╩══════════════════╩══════════╩═════════╩═════════════╝
-  [enter] view session  │  [b] back  │  [q] quit
+  [b] back  │  [q] quit
 ```
+
+Tip: Use `[l]` from the overview to open the interactive session list, or `--session <id>` to jump directly.
 
 ---
 
@@ -213,7 +251,8 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 │  ◉ ○ ○   Agent Dashboard                    http://localhost:8686       │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│   Agent Dashboard · Session a3f9b2 · 12:34:56 UTC                       │
+│   Agent Dashboard                          [Current Session ▾]          │
+│   Session: a3f9b2 · 12:34:56 UTC                                        │
 │                                                                          │
 │   ┌────────────┐   ┌────────────┐   ┌──────────────────┐   ┌─────────┐ │
 │   │Requirements│──▶│   Design   │──▶│ ■ Implementation │──▶│ Testing │ │
@@ -265,7 +304,14 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 ```html
 <!-- http://localhost:8686  —  auto-refresh every 2s, dark theme -->
 <div class="dashboard dark">
-  <header>Agent Dashboard · Session a3f9b2 · 12:34:56 UTC</header>
+  <header>
+    Agent Dashboard
+    <select id="session-selector">
+      <option value="current">Current Session</option>
+      <option>7c2d1e (8 agents, 12m 44s)</option>
+    </select>
+  </header>
+  <div class="meta">Session: a3f9b2 · 12:34:56 UTC</div>
 
   <div class="workflow-bar">
     <span class="done">Requirements</span> ▶
