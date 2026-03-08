@@ -68,6 +68,71 @@
   .analytics-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
   .refresh-note { text-align: center; color: var(--text-dim); font-size: 0.75em; margin-top: 20px; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes task-pulse { 0%,100% { background: rgba(210,153,34,0.1); } 50% { background: rgba(210,153,34,0.25); } }
+
+  /* --- Workflow Progress Bar --- */
+  .workflow-bar { display: flex; align-items: center; gap: 0; margin-bottom: 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; }
+  .workflow-step { flex: 1; text-align: center; position: relative; min-width: 100px; }
+  .workflow-step .step-label { font-size: 0.7em; color: var(--text-dim); margin-top: 6px; white-space: nowrap; }
+  .workflow-step .step-dot { width: 18px; height: 18px; border-radius: 50%; margin: 0 auto; border: 2px solid var(--border); background: var(--bg); transition: all 0.3s; position: relative; z-index: 1; }
+  .workflow-step.done .step-dot { background: var(--green); border-color: var(--green); }
+  .workflow-step.active .step-dot { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 10px var(--yellow); animation: pulse 1.5s infinite; }
+  .workflow-step.pending .step-dot { background: var(--bg); border-color: var(--border); }
+  .workflow-step.done .step-label { color: var(--green); }
+  .workflow-step.active .step-label { color: var(--yellow); font-weight: 600; }
+  .workflow-step::after { content: ''; position: absolute; top: 9px; left: 50%; right: -50%; height: 2px; background: var(--border); z-index: 0; }
+  .workflow-step:last-child::after { display: none; }
+  .workflow-step.done::after { background: var(--green); }
+  .workflow-step.active::after { background: linear-gradient(to right, var(--yellow), var(--border)); }
+
+  /* --- Active task highlight --- */
+  .todo-item.in_progress { animation: task-pulse 2s ease-in-out infinite; border-radius: 4px; padding: 6px 4px; }
+  .todo-item.in_progress .icon { font-size: 1.1em; }
+
+  /* --- Error timeline tab --- */
+  .errors-section { display: none; }
+  .errors-section.active { display: block; }
+  .error-timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85em; align-items: flex-start; }
+  .error-timeline-item .et-time { color: var(--text-dim); min-width: 60px; flex-shrink: 0; }
+  .error-timeline-item .et-agent { color: var(--purple); min-width: 140px; flex-shrink: 0; font-weight: 600; }
+  .error-timeline-item .et-tool { color: var(--yellow); min-width: 80px; flex-shrink: 0; }
+  .error-timeline-item .et-msg { color: var(--text); flex: 1; word-break: break-word; }
+
+  /* --- Keyboard shortcut help overlay --- */
+  .kb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .kb-overlay.active { display: flex; }
+  .kb-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; width: 90%; }
+  .kb-panel h3 { color: var(--text-bright); margin-bottom: 16px; }
+  .kb-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85em; }
+  .kb-row kbd { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; color: var(--cyan); font-family: inherit; }
+
+  /* --- Notification toggle --- */
+  .notif-toggle { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-family: inherit; font-size: 0.75em; cursor: pointer; transition: all 0.15s; }
+  .notif-toggle:hover { border-color: var(--blue); color: var(--blue); }
+  .notif-toggle.active { border-color: var(--green); color: var(--green); background: rgba(63,185,80,0.1); }
+
+  /* --- Responsive layout --- */
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .stats-bar { gap: 8px; }
+    .stat-card { min-width: 70px; padding: 8px 10px; }
+    .stat-card .value { font-size: 1.3em; }
+    .stat-card .label { font-size: 0.65em; }
+    .tabs { flex-wrap: wrap; gap: 4px; }
+    .tab { padding: 6px 10px; font-size: 0.8em; }
+    .agent-row { flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
+    .agent-row .progress-bar { width: 60px; }
+    .agent-row .duration { min-width: 40px; font-size: 0.75em; }
+    .workflow-bar { padding: 8px; }
+    .workflow-step { min-width: 70px; }
+    .workflow-step .step-label { font-size: 0.6em; }
+    .detail-panel { padding: 12px; }
+    .msg-input { flex-wrap: wrap; }
+    .msg-input select { width: 100%; }
+    .header h1 { font-size: 1.1em; }
+    .analytics-table { font-size: 0.75em; }
+    .analytics-table td, .analytics-table th { padding: 4px; }
+  }
 
   /* --- Message / Chat styles --- */
   .msg-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
@@ -111,10 +176,13 @@
 <div class="header">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
     <h1>Agent Dashboard</h1>
-    <select id="session-selector" onchange="switchSession(this.value)"
-      style="background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:0.8em;cursor:pointer;">
-      <option value="current">Current Session</option>
-    </select>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="notif-toggle" id="notif-toggle" onclick="toggleNotifications()" title="Enable browser notifications">Notify</button>
+      <select id="session-selector" onchange="switchSession(this.value)"
+        style="background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:0.8em;cursor:pointer;">
+        <option value="current">Current Session</option>
+      </select>
+    </div>
   </div>
   <div class="meta">
     <span id="session-id">Session: --</span> &nbsp;|&nbsp;
@@ -131,9 +199,12 @@
   <div class="stat-card time"><div class="value" id="session-time">--</div><div class="label">Session</div></div>
 </div>
 
+<div id="workflow-bar" class="workflow-bar" style="display:none;"></div>
+
 <div class="tabs">
   <div class="tab active" onclick="showTab('agents')">Agents</div>
   <div class="tab" onclick="showTab('commands')">Commands</div>
+  <div class="tab" onclick="showTab('errors')">Errors</div>
   <div class="tab" onclick="showTab('history')">History</div>
   <div class="tab" onclick="showTab('analytics')">Analytics</div>
 </div>
@@ -144,17 +215,43 @@
 </div>
 
 <div class="commands-section" id="commands-section"></div>
+<div class="errors-section" id="errors-section"></div>
 <div class="history-section" id="history-section"></div>
 <div class="analytics-section" id="analytics-section"></div>
 
 <div class="msg-toast" id="msg-toast"></div>
 
-<div class="refresh-note">Auto-refreshes every 3 seconds &nbsp;|&nbsp; Served by agent-dashboard.sh --web</div>
+<div class="kb-overlay" id="kb-overlay" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="kb-panel">
+    <h3>Keyboard Shortcuts</h3>
+    <div class="kb-row"><span>Select agent 1-9</span><kbd>1</kbd> - <kbd>9</kbd></div>
+    <div class="kb-row"><span>Deselect agent</span><kbd>Esc</kbd></div>
+    <div class="kb-row"><span>Agents tab</span><kbd>a</kbd></div>
+    <div class="kb-row"><span>Commands tab</span><kbd>c</kbd></div>
+    <div class="kb-row"><span>Errors tab</span><kbd>e</kbd></div>
+    <div class="kb-row"><span>History tab</span><kbd>h</kbd></div>
+    <div class="kb-row"><span>Stats/Analytics tab</span><kbd>s</kbd></div>
+    <div class="kb-row"><span>Show this help</span><kbd>?</kbd></div>
+    <div style="text-align:center;margin-top:16px;color:var(--text-dim);font-size:0.8em;">Press <kbd>Esc</kbd> or click outside to close</div>
+  </div>
+</div>
+
+<div class="refresh-note">Auto-refreshes every 3 seconds &nbsp;|&nbsp; Served by agent-dashboard.sh --web &nbsp;|&nbsp; Press <kbd style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.9em;">?</kbd> for shortcuts</div>
 
 <script>
 const DEPT_ORDER = ['Orchestrator','Product','Engineering','Quality','Operations','Marketing','Support','IT','Other'];
 const DATA_BASE = 'data';
 const API_BASE = '/api/messages';
+
+// Workflow phase definitions with agent mappings
+const WORKFLOW_PHASES = [
+  { label: 'Requirements', agents: ['product-manager'] },
+  { label: 'Design', agents: ['architecture-agent', 'ui-ux-designer'] },
+  { label: 'Implementation', agents: ['backend-engineer', 'frontend-engineer', 'database-engineer', 'prompt-engineer'] },
+  { label: 'Testing', agents: ['qa-agent'] },
+  { label: 'Security', agents: ['security-agent'] },
+  { label: 'Deploy', agents: ['devops-engineer', 'documentation-agent', 'monitoring-agent'] }
+];
 
 function formatDuration(s) {
   if (!s || s <= 0) return '--';
@@ -194,6 +291,109 @@ function showToast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// --- Workflow Progress Bar (#2) ---
+
+function renderWorkflowBar(agents) {
+  const bar = document.getElementById('workflow-bar');
+  const entries = Object.entries(agents);
+  if (entries.length === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+
+  const running = entries.filter(([,v]) => v.status === 'running').map(([k]) => k);
+  const completed = entries.filter(([,v]) => v.status === 'completed').map(([k]) => k);
+
+  let html = '';
+  for (const phase of WORKFLOW_PHASES) {
+    const phaseRunning = phase.agents.some(a => running.includes(a));
+    const phaseCompleted = phase.agents.some(a => completed.includes(a));
+    let state = 'pending';
+    if (phaseRunning) state = 'active';
+    else if (phaseCompleted) state = 'done';
+    html += '<div class="workflow-step ' + state + '">'
+      + '<div class="step-dot"></div>'
+      + '<div class="step-label">' + phase.label + '</div>'
+      + '</div>';
+  }
+  bar.innerHTML = html;
+}
+
+// --- Desktop Notifications (#4) ---
+
+let notificationsEnabled = false;
+let prevAgentStatuses = {};
+
+function toggleNotifications() {
+  const btn = document.getElementById('notif-toggle');
+  if (!notificationsEnabled) {
+    if (!('Notification' in window)) {
+      showToast('Browser does not support notifications');
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      notificationsEnabled = true;
+      btn.classList.add('active');
+      btn.textContent = 'Notify ON';
+      showToast('Notifications enabled');
+    } else if (Notification.permission === 'denied') {
+      showToast('Notifications blocked by browser');
+    } else {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') {
+          notificationsEnabled = true;
+          btn.classList.add('active');
+          btn.textContent = 'Notify ON';
+          showToast('Notifications enabled');
+        } else {
+          showToast('Notification permission denied');
+        }
+      });
+    }
+  } else {
+    notificationsEnabled = false;
+    btn.classList.remove('active');
+    btn.textContent = 'Notify';
+    showToast('Notifications disabled');
+  }
+}
+
+function checkNotifications(agents) {
+  if (!notificationsEnabled) { prevAgentStatuses = {}; return; }
+  const entries = Object.entries(agents);
+  for (const [name, info] of entries) {
+    const prev = prevAgentStatuses[name];
+    if (prev === 'running' && info.status === 'completed') {
+      new Notification('Agent Completed', { body: name + ' has finished', icon: undefined });
+    }
+  }
+  // Check all complete
+  const allComplete = entries.length > 0 && entries.every(([,v]) => v.status === 'completed');
+  const prevAnyRunning = Object.values(prevAgentStatuses).some(s => s === 'running');
+  if (allComplete && prevAnyRunning) {
+    new Notification('All Agents Complete', { body: entries.length + ' agents finished successfully' });
+  }
+  // Check new errors
+  const totalErrors = entries.reduce((s,[,v]) => s + (v.error_count || 0), 0);
+  const prevTotalErrors = Object.values(prevAgentStatuses).reduce((s, v) => s + ((typeof v === 'object' ? v : 0)), 0);
+  // Store current statuses
+  prevAgentStatuses = {};
+  for (const [name, info] of entries) prevAgentStatuses[name] = info.status;
+}
+
+// --- Smooth Timer (#8) ---
+
+let sessionEarliestStart = null;
+let timerInterval = null;
+
+function startSmoothTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    if (sessionEarliestStart) {
+      const elapsed = Math.floor(Date.now() / 1000 - sessionEarliestStart);
+      document.getElementById('session-time').textContent = formatDuration(elapsed);
+    }
+  }, 1000);
 }
 
 // --- Message API ---
@@ -265,7 +465,7 @@ function buildMessageInput(agent) {
 
 // --- Session management ---
 
-let viewingSession = 'current'; // 'current' or a session_id from history
+let viewingSession = 'current';
 let sessionSelectorPopulated = false;
 
 function switchSession(value) {
@@ -281,7 +481,6 @@ async function populateSessionSelector() {
   const history = await fetchJSON(DATA_BASE + '/history.json');
   if (!history || !history.sessions || history.sessions.length === 0) return;
 
-  // Remove old history options (keep "Current Session")
   while (sel.options.length > 1) sel.remove(1);
 
   const sessions = history.sessions.slice().reverse().slice(0, 10);
@@ -317,22 +516,22 @@ function buildHistoryAgentsData(history, sessionId) {
 // --- Main refresh ---
 
 let selectedAgent = null;
+let agentNamesList = []; // for keyboard shortcuts
 
 async function refresh() {
-  // Populate session selector once
   if (!sessionSelectorPopulated) populateSessionSelector();
 
   let data;
   if (viewingSession === 'current') {
     data = await fetchJSON(DATA_BASE + '/agents.json');
   } else {
-    // Build agents data from history
     const history = await fetchJSON(DATA_BASE + '/history.json');
     data = history ? buildHistoryAgentsData(history, viewingSession) : null;
   }
 
   if (!data || !data.agents) {
     document.getElementById('agents-container').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;">No active session data. Waiting for agents...</div>';
+    document.getElementById('workflow-bar').style.display = 'none';
     return;
   }
 
@@ -343,6 +542,12 @@ async function refresh() {
   const phase = inferPhase(agents);
   document.getElementById('workflow-phase').textContent = phase;
 
+  // Render workflow bar (#2)
+  renderWorkflowBar(agents);
+
+  // Check notifications (#4)
+  checkNotifications(agents);
+
   const entries = Object.entries(agents);
   const active = entries.filter(([,v]) => v.status === 'running').length;
   const completed = entries.filter(([,v]) => v.status === 'completed').length;
@@ -352,9 +557,14 @@ async function refresh() {
   document.getElementById('completed-count').textContent = completed;
   document.getElementById('error-count').textContent = totalErrors;
 
+  // Smooth timer (#8)
   const now = Date.now() / 1000;
   const starts = entries.map(([,v]) => v.started_at ? new Date(v.started_at).getTime()/1000 : Infinity);
   const earliest = Math.min(...starts);
+  if (earliest < Infinity) {
+    sessionEarliestStart = earliest;
+    startSmoothTimer();
+  }
   document.getElementById('session-time').textContent = earliest < Infinity ? formatDuration(Math.floor(now - earliest)) : '--';
 
   // Group by department
@@ -372,11 +582,14 @@ async function refresh() {
     if (td) todos[name] = td;
   }
 
+  // Build agent names list for keyboard nav (#6)
+  agentNamesList = [];
   let html = '';
   for (const dept of DEPT_ORDER) {
     if (!byDept[dept]) continue;
     html += '<div class="dept-section"><div class="dept-header">' + dept + '</div>';
     for (const agent of byDept[dept]) {
+      agentNamesList.push(agent.name);
       const dur = agent.status === 'running' && agent.started_at
         ? Math.floor(now - new Date(agent.started_at).getTime()/1000)
         : (agent.duration_seconds || 0);
@@ -405,7 +618,7 @@ async function refresh() {
   }
   document.getElementById('agents-container').innerHTML = html;
 
-  // Detail panel with messages
+  // Detail panel with messages + active task highlight (#3)
   if (selectedAgent && agents[selectedAgent]) {
     const dp = document.getElementById('detail-panel');
     dp.classList.add('active');
@@ -415,7 +628,9 @@ async function refresh() {
       dhtml += '<div><strong>Tasks:</strong></div>';
       for (const t of td.todos) {
         const icon = t.status === 'completed' ? '&#10003;' : t.status === 'in_progress' ? '&#9679;' : '&#9675;';
-        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + escapeHtml(t.content) + '</span></div>';
+        // Show activeForm for in_progress tasks (#3)
+        const label = (t.status === 'in_progress' && t.activeForm) ? t.activeForm : t.content;
+        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + escapeHtml(label) + '</span></div>';
       }
     }
     // Errors
@@ -455,7 +670,6 @@ async function loadCommands() {
   html += '<h3>Orchestrator Commands</h3>';
   html += '<p style="color:var(--text-dim);font-size:0.85em;margin-bottom:16px;">Send instructions to the master orchestrator. Commands are delivered asynchronously via the message queue.</p>';
 
-  // Quick action buttons
   html += '<div class="cmd-quick-actions">';
   html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'reprioritize\',\'Reprioritize remaining tasks based on current progress\')">Reprioritize</div>';
   html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'question\',\'What is the current status and what blockers exist?\')">Status Report</div>';
@@ -463,10 +677,8 @@ async function loadCommands() {
   html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'resume-workflow\',\'Resume workflow execution\')">Resume Workflow</div>';
   html += '</div>';
 
-  // Free-text command input
   html += buildMessageInput('master-orchestrator');
 
-  // Command history
   if (messages.length > 0) {
     html += '<div class="cmd-log"><h4>Command History</h4>';
     html += '<div class="msg-log">' + renderMessages(messages) + '</div>';
@@ -477,7 +689,49 @@ async function loadCommands() {
   el.innerHTML = html;
 }
 
-// --- History & Analytics (unchanged) ---
+// --- Error Timeline Tab (#5) ---
+
+async function loadErrors() {
+  const el = document.getElementById('errors-section');
+  const data = await fetchJSON(DATA_BASE + '/agents.json');
+  if (!data || !data.agents) {
+    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No agent data available.</div>';
+    return;
+  }
+
+  const allErrors = [];
+  const agentNames = Object.keys(data.agents);
+  for (const name of agentNames) {
+    const errData = await fetchJSON(DATA_BASE + '/errors/' + name + '.json');
+    if (errData && errData.errors) {
+      for (const e of errData.errors) {
+        allErrors.push({ agent: name, ...e });
+      }
+    }
+  }
+
+  if (allErrors.length === 0) {
+    el.innerHTML = '<div style="padding:20px;"><h3 style="color:var(--text-bright);margin-bottom:12px;">Error Timeline</h3><div style="color:var(--green);font-size:0.9em;">No errors recorded. All clear!</div></div>';
+    return;
+  }
+
+  // Sort by timestamp descending
+  allErrors.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+  let html = '<h3 style="color:var(--text-bright);margin-bottom:12px;">Error Timeline <span style="color:var(--red);font-size:0.8em;">(' + allErrors.length + ' total)</span></h3>';
+  for (const e of allErrors.slice(0, 50)) {
+    const time = (e.timestamp || '').substring(11, 19);
+    html += '<div class="error-timeline-item">'
+      + '<span class="et-time">' + time + '</span>'
+      + '<span class="et-agent">' + escapeHtml(e.agent) + '</span>'
+      + '<span class="et-tool">' + escapeHtml(e.tool || '--') + '</span>'
+      + '<span class="et-msg">' + escapeHtml((e.message || '').substring(0, 200)) + '</span>'
+      + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// --- History & Analytics ---
 
 async function loadHistory() {
   const data = await fetchJSON(DATA_BASE + '/history.json');
@@ -528,15 +782,62 @@ function showTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('agents-section').style.display = tab === 'agents' ? 'block' : 'none';
   document.getElementById('commands-section').classList.toggle('active', tab === 'commands');
+  document.getElementById('errors-section').classList.toggle('active', tab === 'errors');
   document.getElementById('history-section').classList.toggle('active', tab === 'history');
   document.getElementById('analytics-section').classList.toggle('active', tab === 'analytics');
-  event.target.classList.add('active');
+  // Find the clicked tab element
+  const tabs = document.querySelectorAll('.tab');
+  const tabNames = ['agents', 'commands', 'errors', 'history', 'analytics'];
+  const idx = tabNames.indexOf(tab);
+  if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
   if (tab === 'commands') loadCommands();
+  if (tab === 'errors') loadErrors();
   if (tab === 'history') loadHistory();
   if (tab === 'analytics') loadAnalytics();
 }
 
+// --- Keyboard Shortcuts (#6) ---
+
+document.addEventListener('keydown', function(e) {
+  // Don't capture when typing in an input/select/textarea
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+  const overlay = document.getElementById('kb-overlay');
+
+  if (e.key === '?') {
+    overlay.classList.toggle('active');
+    e.preventDefault();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (overlay.classList.contains('active')) {
+      overlay.classList.remove('active');
+    } else if (selectedAgent) {
+      selectedAgent = null;
+      refresh();
+    }
+    e.preventDefault();
+    return;
+  }
+  // Number keys 1-9 select agents
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 9 && agentNamesList.length >= num) {
+    const name = agentNamesList[num - 1];
+    selectedAgent = selectedAgent === name ? null : name;
+    refresh();
+    e.preventDefault();
+    return;
+  }
+  // Tab shortcuts
+  if (e.key === 'a') { showTab('agents'); e.preventDefault(); }
+  if (e.key === 'c') { showTab('commands'); e.preventDefault(); }
+  if (e.key === 'e') { showTab('errors'); e.preventDefault(); }
+  if (e.key === 'h') { showTab('history'); e.preventDefault(); }
+  if (e.key === 's') { showTab('analytics'); e.preventDefault(); }
+});
+
 refresh();
+startSmoothTimer();
 setInterval(refresh, 3000);
 </script>
 </body>
