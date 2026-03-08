@@ -228,6 +228,163 @@
   .stat-label { color: #8b949e; }
   .footer-uptime { color: #8b949e; }
   .footer-uptime span { color: #79c0ff; font-weight: 600; }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    background: #161b22;
+    border-left: 1px solid #30363d;
+    border-right: 1px solid #30363d;
+  }
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b949e;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: #c9d1d9; }
+  .tab.active { color: #f0f6fc; border-bottom-color: #58a6ff; }
+
+  /* ── Detail panel (agent messaging) ── */
+  .detail-panel {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .detail-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #21262d;
+  }
+  .msg-section { margin-top: 16px; }
+  .msg-section h4 { font-size: 12px; color: #39d2c0; margin-bottom: 12px; }
+  .msg-log { max-height: 200px; overflow-y: auto; margin-bottom: 12px; }
+  .msg-bubble {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    max-width: 85%;
+  }
+  .msg-bubble.user {
+    background: rgba(88,166,255,0.15);
+    border: 1px solid rgba(88,166,255,0.3);
+    margin-left: auto;
+    text-align: right;
+  }
+  .msg-bubble.agent {
+    background: rgba(63,185,80,0.1);
+    border: 1px solid rgba(63,185,80,0.2);
+    margin-right: auto;
+  }
+  .msg-meta {
+    font-size: 10px;
+    color: #8b949e;
+    margin-top: 4px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .msg-bubble.user .msg-meta { justify-content: flex-end; }
+  .msg-bubble.agent .msg-meta { justify-content: flex-start; }
+  .msg-status {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .msg-status.pending { background: rgba(210,153,34,0.2); color: #d29922; }
+  .msg-status.delivered { background: rgba(88,166,255,0.2); color: #58a6ff; }
+  .msg-status.acknowledged { background: rgba(63,185,80,0.2); color: #3fb950; }
+  .msg-type-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: rgba(188,140,255,0.15);
+    color: #bc8cff;
+  }
+  .msg-input-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    background: #21262d;
+    border-radius: 8px;
+  }
+  .msg-input-bar select {
+    background: #0d1117;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-family: inherit;
+  }
+  .msg-input-bar input {
+    flex: 1;
+    background: #0d1117;
+    color: #f0f6fc;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+  }
+  .msg-input-bar input:focus { border-color: #58a6ff; }
+  .msg-input-bar button {
+    background: #58a6ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .msg-input-bar button:hover { opacity: 0.85; }
+
+  /* ── Toast notification ── */
+  .msg-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #3fb950;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .msg-toast.show { opacity: 1; }
+
+  /* ── Error card ── */
+  .error-section { margin-top: 12px; }
+  .error-item {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.2);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+  .error-item .tool { color: #f85149; font-weight: 600; }
+  .error-item .time { color: #8b949e; font-size: 10px; }
 </style>
 </head>
 <body>
@@ -248,6 +405,14 @@
     <span class="history-badge">HISTORY</span>
     <span>12:34:56 UTC &middot; Auto-refresh 2s</span>
   </div>
+</div>
+
+<!-- ── TAB BAR ── -->
+<div class="tabs">
+  <span class="tab active">Agents</span>
+  <span class="tab">Commands</span>
+  <span class="tab">History</span>
+  <span class="tab">Analytics</span>
 </div>
 
 <!-- ── WORKFLOW BAR ── -->
@@ -490,7 +655,69 @@
     </div>
   </div>
 
+  <!-- Detail Panel — Agent Messaging (shown on agent click) -->
+  <div class="detail-panel" style="margin: 0 24px 24px;">
+    <div class="detail-title">backend-engineer — Detail Panel</div>
+
+    <!-- Task list in detail -->
+    <ul class="task-list" style="margin-bottom: 16px;">
+      <li><span class="task-icon done">&#10003;</span><span class="task-text done">Create migration for invoices table</span></li>
+      <li><span class="task-icon done">&#10003;</span><span class="task-text done">Build InvoiceService with CRUD</span></li>
+      <li><span class="task-icon done">&#10003;</span><span class="task-text done">Add PDF generation via Snappy</span></li>
+      <li><span class="task-icon active">&#9679;</span><span class="task-text active">Implement email delivery via Queue</span></li>
+      <li><span class="task-icon pending">&#9675;</span><span class="task-text pending">Write unit tests for InvoiceService</span></li>
+    </ul>
+
+    <!-- Recent errors -->
+    <div class="error-section">
+      <div class="detail-title" style="font-size: 12px;">Recent Errors (0)</div>
+      <div style="font-size: 12px; color: #484f58;">No errors recorded</div>
+    </div>
+
+    <!-- Messages / Chat -->
+    <div class="msg-section">
+      <h4>Messages</h4>
+      <div class="msg-log">
+        <div class="msg-bubble user">
+          Focus on REST API endpoints first, skip admin panel.
+          <div class="msg-meta">
+            <span class="msg-type-badge">instruction</span>
+            <span class="msg-status acknowledged">acknowledged</span>
+            <span>10:30 AM</span>
+          </div>
+        </div>
+        <div class="msg-bubble agent">
+          Understood. Prioritizing /api/v1/invoices and /api/v1/customers.
+          <div class="msg-meta">
+            <span>10:31 AM</span>
+          </div>
+        </div>
+        <div class="msg-bubble user">
+          How's the progress on invoice endpoints?
+          <div class="msg-meta">
+            <span class="msg-type-badge">question</span>
+            <span class="msg-status delivered">delivered</span>
+            <span>10:45 AM</span>
+          </div>
+        </div>
+      </div>
+      <div class="msg-input-bar">
+        <select>
+          <option>instruction</option>
+          <option>question</option>
+          <option>priority</option>
+          <option>note</option>
+        </select>
+        <input type="text" placeholder="Send a message to backend-engineer..." />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- ── Toast ── -->
+<div class="msg-toast">Message sent!</div>
 
 <!-- ── FOOTER ── -->
 <div class="footer">

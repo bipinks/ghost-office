@@ -40,7 +40,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 
 **Cloud/Infra**: aws, terraform, networking, ansible, nginx | **Container**: docker, kubernetes | **CI/CD**: cicd-patterns, github-workflows | **Security**: security-hardening, secrets-management, ssl-tls | **Monitoring**: monitoring-patterns, log-management | **Database**: database-ops, postgresql, redis | **Backend**: laravel, api-design, authentication, multi-tenancy | **Frontend**: vue, typescript, frontend-patterns, accessibility, design-systems | **Testing**: testing-patterns, qa-testing-strategy | **Performance**: performance-optimization, cloud-cost-optimization | **AI/ML**: prompt-design, llm-integration, conversational-ai, ai-evaluation | **Marketing**: seo, content-strategy, copywriting, email-marketing, paid-advertising, social-media-strategy, analytics-reporting, community-management | **Product**: product-management, ux-research, wireframing-prototyping | **Docs**: documentation-standards | **Backup**: backup-disaster-recovery | **MS365**: ms365-admin, entra-id, exchange-online, intune | **Domain**: acodax-erp-office-admin, deploy-acodax-property
 
-## Hooks (12)
+## Hooks (13)
 
 | Hook | Event | Purpose |
 |------|-------|---------|
@@ -53,6 +53,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 | ms365-audit-log.sh | PreToolUse (MS365) | Audit logging |
 | todo-tracker.sh | PostToolUse (TodoWrite) | Per-agent task progress tracking |
 | subagent-lifecycle.sh | SubagentStart/Stop | Agent tracking + session history |
+| message-check.sh | PostToolUse | Dashboard↔agent messaging delivery |
 | notification.sh | Notification | Desktop alerts |
 | stop-validation.sh | Stop | Staged secrets check |
 | tool-failure.sh | PostToolUseFailure | Failure diagnostics + error tracking |

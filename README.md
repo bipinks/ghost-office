@@ -222,6 +222,52 @@ Press a number key to see that agent's task list in real-time:
 
 ---
 
+### Interactive messaging — talk to agents live
+
+Send instructions, questions, and commands to agents from the dashboard. Messages are delivered asynchronously via the `message-check` hook.
+
+**Web dashboard** (recommended):
+```
+Click an agent → detail panel opens → type message → Send
+```
+
+**Terminal dashboard**:
+```
+Press [m] to view all messages
+Press [c] to send a command to the orchestrator
+```
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  backend-engineer — Messages                                     ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  ┌─────────────────────────────────────────────────────┐  YOU   ║
+║  │  Focus on REST API endpoints first, skip admin.     │ 10:30  ║
+║  │  [instruction]              ✓ acknowledged           │        ║
+║  └─────────────────────────────────────────────────────┘        ║
+║                                                                  ║
+║  AGENT  ┌──────────────────────────────────────────────┐        ║
+║  10:31  │  Understood. Prioritizing /api/v1/invoices   │        ║
+║         │  and /api/v1/customers.                      │        ║
+║         └──────────────────────────────────────────────┘        ║
+║                                                                  ║
+║  ┌─────────────────────────────────────────────────────┐  YOU   ║
+║  │  How's the progress on invoice endpoints?           │ 10:45  ║
+║  │  [question]                 ● delivered              │        ║
+║  └─────────────────────────────────────────────────────┘        ║
+║                                                                  ║
+║  ┌──────────────────────────────────────────────────────────┐   ║
+║  │ [instruction ▾]  Type a message...            [ Send ]   │   ║
+║  └──────────────────────────────────────────────────────────┘   ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+Message types: `instruction`, `question`, `priority`, `note`, `pause`, `cancel`
+Status flow: **pending** → **delivered** (hook notifies agent) → **acknowledged** (agent responds)
+
+---
+
 ### Session history — `--history`
 
 ```
@@ -385,8 +431,9 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 | Agent status + duration | `.claude/status/agents.json` (written by `subagent-lifecycle` hook) |
 | Task progress bars | `.claude/status/todos/{agent}.json` (written by `todo-tracker` hook) |
 | Workflow phase label | Inferred from which agents are currently active |
-| Error indicators | `.claude/status/errors.json` (written by `tool-failure` hook) |
-| Session history | `.claude/status/history/` — last 50 sessions, auto-pruned |
+| Error indicators | `.claude/status/errors/{agent}.json` (written by `tool-failure` hook) |
+| Interactive messaging | `.claude/status/messages/{agent}.json` (written by web API + `message-check` hook) |
+| Session history | `.claude/status/history.json` — last 50 sessions, auto-pruned |
 | Desktop notification | Fires via `notification` hook when all agents finish |
 
 ---
@@ -403,6 +450,7 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 | **todo-tracker** | Captures per-agent task progress for the dashboard |
 | **tool-failure** | Logs tool failures, tracks errors per agent |
 | **subagent-lifecycle** | Tracks agent start/stop, session history, notifications |
+| **message-check** | Delivers dashboard messages to agents on every tool use |
 | **session-start** | Auto-injects project context on every session |
 | **pre-compact** | Preserves critical context before auto-compaction |
 
