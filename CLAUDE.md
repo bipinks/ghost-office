@@ -8,13 +8,13 @@ Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7
 
 ```
 .claude/
-├── agents/      — 18 agents (1 orchestrator + 17 departments)
+├── agents/      — 18 agents (1 orchestrator + 17 specialists)
 ├── commands/    — 23 slash commands
 ├── workflows/   — 6 workflow definitions
 ├── memory/      — 6 knowledge docs + 7 domain templates
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
-├── hooks/       — 12 safety/audit/lifecycle hooks
+├── hooks/       — 13 safety/audit/lifecycle hooks
 ├── status/      — Runtime agent status, todos, errors, session history
 ├── tools/       — 4 tool references
 └── settings.json
