@@ -25,7 +25,7 @@ The project has **6 main parts**:
                        │
                        ▼
 ┌─────────────────────────────────────────────────────┐
-│              COMMANDS (22 shortcuts)                │
+│              COMMANDS (23 shortcuts)                │
 │   /cicd-setup, /deploy-staging, /fix-bug, etc.      │
 │   → These are quick shortcuts you type              │
 └──────────────────────┬──────────────────────────────┘

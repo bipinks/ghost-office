@@ -55,7 +55,7 @@ function run() {
 
   const expectedCommands = [
     'implement-feature', 'fix-bug', 'deploy-staging', 'deploy-production',
-    'security-scan', 'write-tests', 'analyze-project',
+    'security-scan', 'write-tests', 'analyze-project', 'agent-status',
   ];
 
   expectedCommands.forEach(name => {
@@ -183,7 +183,7 @@ function run() {
     'session-start.sh', 'pre-compact.sh', 'infra-safety-check.sh',
     'git-safety-check.sh', 'file-write-check.sh', 'migration-check.sh',
     'ms365-audit-log.sh', 'tool-failure.sh', 'stop-validation.sh',
-    'notification.sh', 'subagent-lifecycle.sh',
+    'notification.sh', 'subagent-lifecycle.sh', 'todo-tracker.sh',
   ];
 
   if (fs.existsSync(hooksDir)) {

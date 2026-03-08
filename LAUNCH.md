@@ -53,7 +53,7 @@ It's not a toy — it has production-grade safety:
 • Enforces multi-tenant isolation in migrations
 • Audit logs for all MS365 operations
 
-11 hooks running automatically on every action.
+12 hooks running automatically on every action.
 ```
 
 ### Tweet 4 (What's inside)
@@ -61,9 +61,9 @@ It's not a toy — it has production-grade safety:
 What's in the box:
 
 📦 18 agents (product, engineering, QA, security, devops, marketing, support, IT)
-⚡ 21 slash commands (/implement-feature, /fix-bug, /deploy-production, etc.)
+⚡ 23 slash commands (/implement-feature, /fix-bug, /deploy-production, etc.)
 🧠 54 domain skills (AWS, Terraform, K8s, Laravel, Vue, PostgreSQL, SEO...)
-🔒 11 safety hooks
+🔒 12 safety hooks
 📋 6 end-to-end workflows
 📚 6 knowledge base docs
 
@@ -87,7 +87,7 @@ Built for Claude Code, but the patterns work for any AI coding assistant.
 
 ### Title
 ```
-I built an autonomous AI software company you can drop into any project — 18 agents, 54 skills, 21 commands (open source)
+I built an autonomous AI software company you can drop into any project — 18 agents, 54 skills, 23 commands (open source)
 ```
 
 ### Body
@@ -112,9 +112,9 @@ When you type `/implement-feature "Add user authentication with OAuth"`, the orc
 **What's inside:**
 - 18 agents with department-based specialization
 - 54 domain knowledge skills (AWS, Terraform, K8s, Docker, Laravel, Vue, PostgreSQL, SEO, etc.)
-- 21 slash commands for common workflows
+- 23 slash commands for common workflows
 - 6 end-to-end workflows (feature dev, bug fix, release, incident response, etc.)
-- 11 safety hooks (secret detection, force-push prevention, infra safety)
+- 12 safety hooks (secret detection, force-push prevention, infra safety)
 - 6 knowledge base documents for persistent context
 - Built-in ERP domain expertise (accounting, inventory, sales, HR, procurement)
 
@@ -124,7 +124,7 @@ When you type `/implement-feature "Add user authentication with OAuth"`, the orc
 - No build step, no dependencies beyond Claude Code + Node.js 18+
 
 **Safety:**
-I took safety seriously — 11 hooks run automatically to block force-pushes, scan for secrets, warn before destructive operations, enforce multi-tenant data isolation, and maintain audit logs.
+I took safety seriously — 12 hooks run automatically to block force-pushes, scan for secrets, warn before destructive operations, enforce multi-tenant data isolation, and maintain audit logs.
 
 **Setup:**
 ```
@@ -155,8 +155,8 @@ Built a Claude Code workspace with 18 specialized agents across 7 departments. Y
 - A master orchestrator that breaks down tasks and assigns them to specialist agents
 - Backend, frontend, database, DevOps, QA, security, and more
 - 54 domain skills with real-world patterns (not just "best practices" fluff)
-- 11 safety hooks that prevent common mistakes (secret leaks, force-push, destructive ops)
-- 21 slash commands for workflows like /implement-feature, /fix-bug, /deploy-production
+- 12 safety hooks that prevent common mistakes (secret leaks, force-push, destructive ops)
+- 23 slash commands for workflows like /implement-feature, /fix-bug, /deploy-production
 
 It's not a SaaS — it's markdown files. Zero install. MIT licensed.
 
@@ -186,7 +186,7 @@ Key design decisions:
 
 1. **Agents are just markdown files** with frontmatter (name, tools, model, skills). No runtime, no framework.
 
-2. **Safety hooks are enforced at the tool level** — 11 hooks block force-pushes, scan for secrets, warn before destructive infra commands, and enforce multi-tenant data isolation.
+2. **Safety hooks are enforced at the tool level** — 12 hooks block force-pushes, scan for secrets, warn before destructive infra commands, and enforce multi-tenant data isolation.
 
 3. **Skills are deep, not shallow** — each skill pack has real patterns (e.g., the Terraform skill covers module design, state management, workspace strategy, drift detection, and CI/CD integration).
 
@@ -194,7 +194,7 @@ Key design decisions:
 
 5. **ERP domain knowledge built-in** — double-entry accounting, inventory management, procurement workflows, HR/payroll. Remove or replace for your domain.
 
-The repo has 54 skills, 21 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
+The repo has 54 skills, 23 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
 
 https://github.com/bipinks/devops-agent-hub
 
@@ -220,7 +220,7 @@ One command kicks off an entire feature lifecycle:
 → Documentation
 → Deployment preparation
 
-The workspace includes 54 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 11 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
+The workspace includes 54 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 12 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
 
 It's MIT licensed and requires zero installation — just markdown, JSON, and shell scripts.
 
@@ -249,8 +249,8 @@ GitHub: https://github.com/bipinks/devops-agent-hub
 - IT: Microsoft 365 administration
 
 **54 domain skills** with real patterns (not generic advice)
-**21 slash commands** for common workflows
-**11 safety hooks** (secret detection, force-push blocking, infra safety)
+**23 slash commands** for common workflows
+**12 safety hooks** (secret detection, force-push blocking, infra safety)
 **6 workflows** (feature dev, bug fix, release, incident response)
 
 Setup: copy `.claude/` into your project → run `claude` → done.

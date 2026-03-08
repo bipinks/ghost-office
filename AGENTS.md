@@ -1,6 +1,6 @@
 # Autonomous AI Software Company — Agent Instructions
 
-18 agents (7 departments), 54 skills, 22 commands, 6 workflows, 11 hooks, 7 domain templates.
+18 agents (7 departments), 54 skills, 23 commands, 6 workflows, 12 hooks, 7 domain templates.
 
 ## Principles
 
@@ -70,12 +70,12 @@ Before any change: no hardcoded secrets, least-privilege IAM, encryption at rest
 ```
 .claude/
   agents/    — 18 agents (7 departments)
-  commands/  — 22 slash commands
+  commands/  — 23 slash commands
   workflows/ — 6 workflow definitions
   memory/    — 6 knowledge docs + 7 domain templates
   skills/    — 54 domain knowledge packs
   rules/     — 12 guidelines (7 categories)
-  hooks/     — 11 safety/audit hooks
+  hooks/     — 12 safety/audit hooks
   tools/     — 4 tool references
   settings.json
 ```

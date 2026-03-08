@@ -13,12 +13,12 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 ```
 .claude/
 ├── agents/      — 18 agents (1 orchestrator + 17 departments)
-├── commands/    — 22 slash commands
+├── commands/    — 23 slash commands
 ├── workflows/   — 6 workflow definitions
 ├── memory/      — 6 knowledge docs + 7 domain templates
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
-├── hooks/       — 11 safety/audit/lifecycle hooks
+├── hooks/       — 12 safety/audit/lifecycle hooks
 ├── tools/       — 4 tool reference documents
 └── settings.json
 ```

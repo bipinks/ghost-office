@@ -2,19 +2,19 @@
 
 ## Overview
 
-Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7 departments, 54 skills, 22 commands, 6 workflows, 11 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
+Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7 departments, 54 skills, 23 commands, 6 workflows, 12 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
 
 ## Structure
 
 ```
 .claude/
 ├── agents/      — 18 agents (1 orchestrator + 17 departments)
-├── commands/    — 22 slash commands
+├── commands/    — 23 slash commands
 ├── workflows/   — 6 workflow definitions
 ├── memory/      — 6 knowledge docs + 7 domain templates
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
-├── hooks/       — 11 safety/audit/lifecycle hooks
+├── hooks/       — 12 safety/audit/lifecycle hooks
 ├── tools/       — 4 tool references
 └── settings.json
 ```
@@ -43,7 +43,7 @@ Agents reference `.claude/memory/` before decisions:
 
 ## Key Commands
 
-`/implement-feature`, `/fix-bug`, `/deploy-staging`, `/deploy-production`, `/analyze-project`, `/write-tests`, `/refactor-module`, `/monitor-system`, `/investigate-incident`, `/security-scan`, `/create-content`, `/social-media`, `/design-ui`, `/ai-prompt`, `/set-domain`
+`/implement-feature`, `/fix-bug`, `/deploy-staging`, `/deploy-production`, `/analyze-project`, `/write-tests`, `/refactor-module`, `/monitor-system`, `/investigate-incident`, `/security-scan`, `/create-content`, `/social-media`, `/design-ui`, `/ai-prompt`, `/set-domain`, `/agent-status`
 
 ## Conventions
 

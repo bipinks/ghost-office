@@ -85,6 +85,16 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/todo-tracker.sh",
+            "statusMessage": "Tracking agent task progress..."
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit",
         "hooks": [
           {

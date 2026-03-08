@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Agents](https://img.shields.io/badge/agents-18-blue)](.claude/agents/)
 [![Skills](https://img.shields.io/badge/skills-54-green)](.claude/skills/)
-[![Commands](https://img.shields.io/badge/commands-22-orange)](.claude/commands/)
+[![Commands](https://img.shields.io/badge/commands-23-orange)](.claude/commands/)
 [![Domains](https://img.shields.io/badge/domains-7-purple)](.claude/memory/domains/)
 
 </div>
@@ -105,7 +105,9 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/infra-plan "..."` | Cloud architecture with Terraform |
 | `/set-domain <name>` | Switch domain knowledge |
 
-[All 22 commands →](.claude/commands/)
+| `/agent-status` | Live agent progress and task tracking |
+
+[All 23 commands →](.claude/commands/)
 
 ---
 
@@ -175,12 +177,12 @@ Switch domain knowledge with `/set-domain <name>`:
 your-project/
 ├── .claude/                 Auto-discovered by Claude Code
 │   ├── agents/              18 agents (1 orchestrator + 17 specialists)
-│   ├── commands/            22 slash commands
+│   ├── commands/            23 slash commands
 │   ├── workflows/           6 workflow definitions
 │   ├── memory/              6 knowledge docs + 7 domain templates
 │   ├── skills/              54 domain knowledge packs
 │   ├── rules/               12 guidelines (7 categories)
-│   ├── hooks/               11 safety/audit/lifecycle hooks
+│   ├── hooks/               12 safety/audit/lifecycle hooks
 │   └── settings.json        Permissions, hooks, autonomous config
 ├── CLAUDE.md                Project instructions (loaded every session)
 ├── AGENTS.md                Agent roster and orchestration
