@@ -80,7 +80,7 @@ Switchable domain knowledge packs — use `/set-domain <name>` to activate:
 | Education | `education.md` | Courses, assessments, LMS, FERPA/COPPA compliance |
 | CMS | `cms.md` | Content authoring, SEO, headless API, localization |
 
-The active domain is cached in `.claude/memory/domain.lock` — detection runs once, not every session.
+Domain detection is fully autonomous: when no `domain.lock` exists, the session-start hook instructs Claude to auto-detect the domain by reading project files and running `/set-domain`. Once set, the result is cached in `domain.lock` — zero overhead on subsequent sessions. Use `/set-domain` to manually override at any time.
 
 ## Key Commands
 

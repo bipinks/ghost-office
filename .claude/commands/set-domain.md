@@ -27,6 +27,16 @@ Set the active domain knowledge pack for this project: **$ARGUMENTS**
 3. **Copy Domain Knowledge**: Copy `.claude/memory/domains/$ARGUMENTS.md` content to `.claude/memory/domain-knowledge.md`
 4. **Confirm**: Report the active domain and key knowledge areas loaded
 
+### How Domain Detection Works
+
+Domain detection is **fully autonomous** with three layers:
+
+1. **Auto-detection (first session)**: When no `domain.lock` exists, the `session-start.sh` hook instructs Claude to read key project files (composer.json, package.json, README.md, etc.), understand the project's domain using AI comprehension, and run `/set-domain` automatically. This leverages Claude's contextual understanding — far more accurate than keyword matching.
+
+2. **Cached (subsequent sessions)**: Once set, the domain is stored in `.claude/memory/domain.lock`. All future sessions read from cache — zero overhead.
+
+3. **Manual override (`/set-domain`)**: Always works. Overrides auto-detection or switches domains instantly.
+
 ### Behavior
 
 - The `domain.lock` file caches the active domain so detection only happens once

@@ -32,7 +32,7 @@ if [ -f "$DOMAIN_LOCK" ]; then
   ACTIVE_DOMAIN="$(cat "$DOMAIN_LOCK" 2>/dev/null | tr -d '[:space:]')"
   DOMAIN_STATUS="$ACTIVE_DOMAIN (cached — use /set-domain to change)"
 else
-  DOMAIN_STATUS="not set — use /set-domain <domain> to activate"
+  DOMAIN_STATUS="not set — IMPORTANT: Auto-detect the domain by reading key project files (composer.json, package.json, README.md, etc.) and run /set-domain <domain> to activate. Available: erp, ecommerce, saas, healthcare, fintech, education, cms"
 fi
 
 # --- Output context summary ---
