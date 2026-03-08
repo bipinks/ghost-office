@@ -11,6 +11,7 @@
 #   ./scripts/agent-dashboard.sh --analytics        # Show agent performance analytics
 #   ./scripts/agent-dashboard.sh --export           # Export current status as markdown
 #   ./scripts/agent-dashboard.sh --web              # Launch web dashboard (opens browser)
+#   ./scripts/agent-dashboard.sh --web-docker       # Launch web dashboard via Docker Compose
 #
 # Interactive keys:
 #   [1-9] = agent detail  [b] = back  [h] = history  [s] = stats
@@ -50,6 +51,7 @@ for i in "${!args[@]}"; do
     --analytics) MODE="analytics" ;;
     --export)    MODE="export" ;;
     --web)       MODE="web" ;;
+    --web-docker) MODE="web-docker" ;;
     --sessions)  MODE="sessions" ;;
     --session)
       if [ -n "${args[$((i+1))]:-}" ]; then
@@ -526,6 +528,14 @@ handle_web() {
 
   local port=8686
   local server_py="$WEB_DIR/server.py"
+
+  # Hint about Docker option if available
+  local project_root
+  project_root="$(cd "$SCRIPT_DIR/.." && pwd)"
+  if [ -f "$project_root/docker-compose.yml" ] && command -v docker >/dev/null 2>&1; then
+    echo "Tip: use --web-docker for containerized mode (docker compose)"
+  fi
+
   echo "Starting web dashboard on http://localhost:$port"
   echo "Press Ctrl+C to stop."
 
@@ -547,6 +557,33 @@ handle_web() {
     echo "Install Python 3 or open $html_file directly in a browser."
     exit 1
   fi
+  exit 0
+}
+
+# ====================================================================
+# MODE: --web-docker (launch web dashboard via Docker Compose)
+# ====================================================================
+handle_web_docker() {
+  local project_root
+  project_root="$(cd "$SCRIPT_DIR/.." && pwd)"
+  local compose_file="$project_root/docker-compose.yml"
+
+  if [ ! -f "$compose_file" ]; then
+    echo "Error: docker-compose.yml not found at $project_root"
+    exit 1
+  fi
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "Error: docker is not installed. Use --web for bare-metal mode."
+    exit 1
+  fi
+
+  echo "Starting containerized web dashboard..."
+  cd "$project_root"
+  docker compose up -d dashboard
+  echo "Web dashboard running at http://localhost:${DASHBOARD_PORT:-8686}"
+  echo "Press Ctrl+C to stop following logs. Container keeps running."
+  echo "Stop with: docker compose down"
+  docker compose logs -f dashboard
   exit 0
 }
 
@@ -611,8 +648,9 @@ case "$MODE" in
   export)    handle_export ;;
   history)   handle_history ;;
   analytics) handle_analytics ;;
-  web)       handle_web ;;
-  sessions)  handle_sessions_list ;;
+  web)        handle_web ;;
+  web-docker) handle_web_docker ;;
+  sessions)   handle_sessions_list ;;
 esac
 
 # ====================================================================

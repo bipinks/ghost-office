@@ -223,6 +223,14 @@ Slash commands are immediately available. Here are the most useful ones to start
 ./scripts/agent-dashboard.sh --analytics  # Agent performance stats
 ./scripts/agent-dashboard.sh --export     # Export as markdown
 ./scripts/agent-dashboard.sh --web        # Web dashboard on :8686
+./scripts/agent-dashboard.sh --web-docker # Web dashboard via Docker
+```
+
+**Docker option:**
+```bash
+docker compose up dashboard      # Start containerized dashboard on :8686
+docker compose logs -f dashboard # Follow logs
+docker compose down              # Stop
 ```
 
 **Multi-session:** If you have multiple sessions (active + past), press `[l]` in the dashboard to open the session list. Select a session by number to drill into it. The web dashboard has a session selector dropdown in the header.

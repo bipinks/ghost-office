@@ -56,6 +56,8 @@ Monitor multi-agent sessions from a second terminal:
 - `./scripts/agent-dashboard.sh --analytics` — Per-agent performance stats
 - `./scripts/agent-dashboard.sh --export` — Export current status as markdown
 - `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686 (includes session selector dropdown)
+- `./scripts/agent-dashboard.sh --web-docker` — Containerized web dashboard via Docker Compose
+- `docker compose up dashboard` — Alternative: run dashboard container directly
 - Analytics dashboard at `http://localhost:8686/analytics.html` — cross-session charts and insights (SQLite-backed, auto-created)
 - Analytics API: `GET /api/analytics/{summary,agent-performance,session-trends,error-breakdown,token-usage,...}`
 

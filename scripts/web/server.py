@@ -5,6 +5,7 @@ Endpoints:
   GET  /                              → dashboard.html
   GET  /analytics.html                → analytics dashboard
   GET  /data/*                        → static JSON files (agents, todos, errors)
+  GET  /api/health                     → health check
   GET  /api/messages/{agent}          → read agent's message queue
   POST /api/messages/{agent}          → send message to agent
   GET  /api/analytics/summary         → aggregate stats
@@ -28,12 +29,12 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8686
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("DASHBOARD_PORT", "8686"))
 
 # Resolve paths
 SCRIPT_DIR = Path(__file__).resolve().parent
 WEB_DIR = SCRIPT_DIR
-STATUS_DIR = SCRIPT_DIR.parent.parent / ".claude" / "status"
+STATUS_DIR = Path(os.environ.get("STATUS_DIR", str(SCRIPT_DIR.parent.parent / ".claude" / "status")))
 DATA_DIR = WEB_DIR / "data"
 MESSAGES_DIR = STATUS_DIR / "messages"
 DB_PATH = DATA_DIR / "dashboard.db"
@@ -669,6 +670,11 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(WEB_DIR), **kwargs)
 
     def do_GET(self):
+        # API: health check
+        if self.path == "/api/health":
+            self._json_response(200, {"status": "ok", "port": PORT})
+            return
+
         # API: read messages for an agent
         m = re.match(r"^/api/messages/([\w-]+)$", self.path)
         if m:

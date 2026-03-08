@@ -677,6 +677,47 @@ print(json.dumps(results))
   }
 
   // ==========================================
+  // Docker configuration
+  // ==========================================
+
+  const dockerfilePath = path.join(WEB_DIR, 'Dockerfile');
+  const dockerComposePath = path.join(ROOT, 'docker-compose.yml');
+  const dockerignorePath = path.join(WEB_DIR, '.dockerignore');
+
+  assert(fs.existsSync(dockerfilePath), 'Dockerfile exists in scripts/web/');
+  assert(fs.existsSync(dockerComposePath), 'docker-compose.yml exists at project root');
+  assert(fs.existsSync(dockerignorePath), '.dockerignore exists in scripts/web/');
+
+  if (fs.existsSync(dockerfilePath)) {
+    const dockerfile = fs.readFileSync(dockerfilePath, 'utf8');
+    assert(dockerfile.includes('python:'), 'Dockerfile: uses Python base image');
+    assert(dockerfile.includes('alpine'), 'Dockerfile: uses Alpine variant');
+    assert(dockerfile.includes('HEALTHCHECK'), 'Dockerfile: has health check');
+    assert(dockerfile.includes('USER'), 'Dockerfile: runs as non-root user');
+    assert(dockerfile.includes('server.py'), 'Dockerfile: copies server.py');
+    assert(dockerfile.includes('EXPOSE'), 'Dockerfile: exposes port');
+  }
+
+  if (fs.existsSync(dockerComposePath)) {
+    const compose = fs.readFileSync(dockerComposePath, 'utf8');
+    assert(compose.includes('8686'), 'docker-compose.yml: maps port 8686');
+    assert(compose.includes('/status'), 'docker-compose.yml: mounts status directory');
+    assert(compose.includes('restart'), 'docker-compose.yml: has restart policy');
+    assert(compose.includes('volumes'), 'docker-compose.yml: defines volumes');
+    assert(compose.includes('STATUS_DIR'), 'docker-compose.yml: sets STATUS_DIR env var');
+  }
+
+  // Server Docker-readiness
+  assert(serverPy.includes('os.environ.get("STATUS_DIR"'), 'server.py: STATUS_DIR configurable via env');
+  assert(serverPy.includes('os.environ.get("DASHBOARD_PORT"'), 'server.py: port configurable via env');
+  assert(serverPy.includes('/api/health'), 'server.py: has /api/health endpoint');
+
+  // Dashboard script Docker support
+  const dashScript = fs.readFileSync(path.join(ROOT, 'scripts', 'agent-dashboard.sh'), 'utf8');
+  assert(dashScript.includes('--web-docker'), 'agent-dashboard.sh: supports --web-docker flag');
+  assert(dashScript.includes('docker compose'), 'agent-dashboard.sh: uses docker compose');
+
+  // ==========================================
   // Documentation
   // ==========================================
 

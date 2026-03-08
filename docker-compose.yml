@@ -1,0 +1,19 @@
+services:
+  dashboard:
+    build:
+      context: ./scripts/web
+      dockerfile: Dockerfile
+    container_name: agent-dashboard-web
+    ports:
+      - "${DASHBOARD_PORT:-8686}:${DASHBOARD_PORT:-8686}"
+    environment:
+      - DASHBOARD_PORT=${DASHBOARD_PORT:-8686}
+      - STATUS_DIR=/status
+    volumes:
+      - ./.claude/status:/status
+      - dashboard-data:/app/data
+    restart: unless-stopped
+    command: ["${DASHBOARD_PORT:-8686}"]
+
+volumes:
+  dashboard-data:
