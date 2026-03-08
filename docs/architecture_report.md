@@ -18,7 +18,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 ├── memory/      — 6 knowledge docs + 7 domain templates
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
-├── hooks/       — 12 safety/audit/lifecycle hooks
+├── hooks/       — 13 safety/audit/lifecycle hooks
 ├── status/      — Runtime: agent status, todos, errors, session history
 ├── tools/       — 4 tool reference documents
 └── settings.json

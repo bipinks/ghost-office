@@ -53,7 +53,7 @@ It's not a toy — it has production-grade safety:
 • Enforces multi-tenant isolation in migrations
 • Audit logs for all MS365 operations
 
-12 hooks running automatically on every action.
+13 hooks running automatically on every action.
 ```
 
 ### Tweet 4 (What's inside)
@@ -170,7 +170,7 @@ Press a number to drill into any agent's individual task list. `--web` for a dar
 - No build step, no dependencies beyond Claude Code + Node.js 18+
 
 **Safety:**
-I took safety seriously — 12 hooks run automatically to block force-pushes, scan for secrets, warn before destructive operations, enforce multi-tenant data isolation, and maintain audit logs.
+I took safety seriously — 13 hooks run automatically to block force-pushes, scan for secrets, warn before destructive operations, enforce multi-tenant data isolation, and maintain audit logs.
 
 **Setup:**
 ```
@@ -232,7 +232,7 @@ Key design decisions:
 
 1. **Agents are just markdown files** with frontmatter (name, tools, model, skills). No runtime, no framework.
 
-2. **Safety hooks are enforced at the tool level** — 12 hooks block force-pushes, scan for secrets, warn before destructive infra commands, and enforce multi-tenant data isolation.
+2. **Safety hooks are enforced at the tool level** — 13 hooks block force-pushes, scan for secrets, warn before destructive infra commands, and enforce multi-tenant data isolation.
 
 3. **Skills are deep, not shallow** — each skill pack has real patterns (e.g., the Terraform skill covers module design, state management, workspace strategy, drift detection, and CI/CD integration).
 

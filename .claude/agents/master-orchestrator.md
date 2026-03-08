@@ -63,6 +63,18 @@ permissionMode: default
 - [ ] No breaking API changes
 - [ ] Performance impact assessed
 
+## Dashboard Messages
+
+When a hook notifies you of pending dashboard messages:
+1. Read `.claude/status/messages/master-orchestrator.json`
+2. Process each message by type:
+   - **instruction** → follow the user's directive
+   - **question** → answer in the `response` field
+   - **reprioritize** → adjust agent task ordering
+   - **pause-workflow** → pause current workflow, notify agents
+   - **resume-workflow** → resume paused workflow
+3. Update each message: set `status` to `"acknowledged"`, set `acknowledged_at` to current UTC timestamp, write your response in the `response` field
+
 ## Reporting Format
 
 1. **Status** — Done / in progress / blocked

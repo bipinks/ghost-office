@@ -9,6 +9,7 @@ node_modules/
 .claude/status/agents.json
 .claude/status/todos/*.json
 .claude/status/errors/*.json
+.claude/status/messages/*.json
 .claude/status/history.json
 scripts/web/data/
 .claude/memory/domain.lock

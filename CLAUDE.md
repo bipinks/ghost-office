@@ -2,7 +2,7 @@
 
 ## Overview
 
-Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7 departments, 54 skills, 23 commands, 6 workflows, 12 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
+Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7 departments, 54 skills, 23 commands, 6 workflows, 13 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
 
 ## Structure
 
@@ -54,6 +54,10 @@ Monitor multi-agent sessions from a second terminal:
 - `./scripts/agent-dashboard.sh --analytics` — Per-agent performance stats
 - `./scripts/agent-dashboard.sh --export` — Export current status as markdown
 - `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686
+
+Interactive messaging: send commands/questions to agents from the dashboard.
+- Terminal: `[m]` messages view, `[c]` send command
+- Web: chat panel in agent detail, Commands tab for orchestrator
 
 ## Conventions
 

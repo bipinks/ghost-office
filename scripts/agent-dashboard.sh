@@ -12,7 +12,8 @@
 #
 # Interactive keys:
 #   [1-9] = agent detail  [b] = back  [h] = history  [s] = stats
-#   [e] = errors  [w] = workflow  [r] = reset  [q] = quit
+#   [e] = errors  [w] = workflow  [m] = messages  [c] = command
+#   [r] = reset  [q] = quit
 
 set -euo pipefail
 
@@ -22,6 +23,7 @@ STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
 AGENTS_FILE="$STATUS_DIR/agents.json"
 TODOS_DIR="$STATUS_DIR/todos"
 ERRORS_DIR="$STATUS_DIR/errors"
+MESSAGES_DIR="$STATUS_DIR/messages"
 HISTORY_FILE="$STATUS_DIR/history.json"
 STALE_THRESHOLD=3600  # 1 hour
 WEB_DIR="$(dirname "$0")/web"
@@ -398,14 +400,23 @@ handle_web() {
   fi
 
   local port=8686
+  local server_py="$WEB_DIR/server.py"
   echo "Starting web dashboard on http://localhost:$port"
   echo "Press Ctrl+C to stop."
 
-  # Try python3 first, then python
+  # Use custom server.py (supports message API) or fall back to static server
   if command -v python3 >/dev/null 2>&1; then
-    cd "$WEB_DIR" && python3 -m http.server "$port"
+    if [ -f "$server_py" ]; then
+      python3 "$server_py" "$port"
+    else
+      cd "$WEB_DIR" && python3 -m http.server "$port"
+    fi
   elif command -v python >/dev/null 2>&1; then
-    cd "$WEB_DIR" && python -m http.server "$port"
+    if [ -f "$server_py" ]; then
+      python "$server_py" "$port"
+    else
+      cd "$WEB_DIR" && python -m http.server "$port"
+    fi
   else
     echo "Error: Python is required for the web dashboard."
     echo "Install Python 3 or open $html_file directly in a browser."
@@ -578,7 +589,8 @@ render_overview() {
   fi
 
   separator
-  printf "  ${DIM}[1-%d] detail  [h] history  [s] stats  [e] errors  [w] workflow  [q] quit${RESET}\n" "$idx"
+  printf "  ${DIM}[1-%d] detail  [h] history  [s] stats  [e] errors  [w] workflow${RESET}\n" "$idx"
+  printf "  ${DIM}[m] messages  [c] command  [q] quit${RESET}\n"
 }
 
 # --- Render detail view ---
@@ -688,7 +700,7 @@ render_detail() {
 
   printf '\n'
   separator
-  printf "  ${DIM}[b] back  │  [e] errors  │  [q] quit${RESET}\n"
+  printf "  ${DIM}[b] back  │  [c] command  │  [e] errors  │  [q] quit${RESET}\n"
 }
 
 # --- Render errors view ---
@@ -898,6 +910,150 @@ render_stats_interactive() {
   printf "  ${DIM}[b] back  │  [q] quit${RESET}\n"
 }
 
+# --- Render messages view ---
+render_messages() {
+  local current_time
+  current_time="$(date -u +"%H:%M:%S UTC")"
+
+  printf '\033[2J\033[H'
+  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT MESSAGES                           $current_time"
+  separator
+
+  if [ ! -d "$MESSAGES_DIR" ]; then
+    printf '\n  %sNo messages directory found.%s\n' "${DIM}" "${RESET}"
+    printf '\n'
+    separator
+    printf "  ${DIM}[b] back  │  [q] quit${RESET}\n"
+    return
+  fi
+
+  local found=0
+  for msg_file in "$MESSAGES_DIR"/*.json; do
+    [ -f "$msg_file" ] || continue
+    jq empty "$msg_file" 2>/dev/null || continue
+    local agent_name
+    agent_name="$(jq -r '.agent // "unknown"' "$msg_file" 2>/dev/null)"
+    local total pending delivered acked
+    total="$(jq '[.messages | length] | add // 0' "$msg_file" 2>/dev/null)" || total=0
+    pending="$(jq '[.messages[] | select(.status == "pending")] | length' "$msg_file" 2>/dev/null)" || pending=0
+    delivered="$(jq '[.messages[] | select(.status == "delivered")] | length' "$msg_file" 2>/dev/null)" || delivered=0
+    acked="$(jq '[.messages[] | select(.status == "acknowledged")] | length' "$msg_file" 2>/dev/null)" || acked=0
+
+    if [ "$total" -gt 0 ]; then
+      found=1
+      printf '\n  %s%s%s  total:%d' "${BOLD}" "$agent_name" "${RESET}" "$total"
+      [ "$pending" -gt 0 ] && printf "  ${YELLOW}pending:%d${RESET}" "$pending"
+      [ "$delivered" -gt 0 ] && printf "  ${CYAN}delivered:%d${RESET}" "$delivered"
+      [ "$acked" -gt 0 ] && printf "  ${GREEN}acked:%d${RESET}" "$acked"
+      printf '\n'
+
+      # Show last 3 messages
+      jq -r '.messages | reverse | .[0:3][] | "\(.status)\t\(.type)\t\(.from)\t\(.content[0:60])"' "$msg_file" 2>/dev/null | \
+        while IFS=$'\t' read -r status mtype mfrom mcontent; do
+          local color="$DIM"
+          case "$status" in
+            pending)      color="$YELLOW" ;;
+            delivered)    color="$CYAN" ;;
+            acknowledged) color="$GREEN" ;;
+          esac
+          printf '    %s[%s] %s → %s%s\n' "$color" "$mtype" "$mfrom" "$mcontent" "${RESET}"
+        done
+    fi
+  done
+
+  if [ "$found" -eq 0 ]; then
+    printf '\n  %sNo messages yet. Use [c] to send a command.%s\n' "${DIM}" "${RESET}"
+  fi
+
+  printf '\n'
+  separator
+  printf "  ${DIM}[b] back  │  [c] command  │  [q] quit${RESET}\n"
+}
+
+# --- Write message to agent's message file ---
+write_message_file() {
+  local agent="$1" msg_type="$2" content="$3"
+  mkdir -p "$MESSAGES_DIR" 2>/dev/null
+
+  local msg_file="$MESSAGES_DIR/${agent}.json"
+  local now
+  now="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  local msg_id="msg_$(date +%s)_$(( $(date +%N 2>/dev/null || echo 0) / 1000000 % 1000 ))"
+
+  local new_msg
+  new_msg="$(cat <<MSGEOF
+{
+  "id": "$msg_id",
+  "type": "$msg_type",
+  "from": "user",
+  "content": "$content",
+  "priority": "normal",
+  "status": "pending",
+  "created_at": "$now",
+  "delivered_at": null,
+  "acknowledged_at": null,
+  "response": null
+}
+MSGEOF
+)"
+
+  if [ -f "$msg_file" ] && jq empty "$msg_file" 2>/dev/null; then
+    local tmp
+    tmp="$(mktemp "${msg_file}.XXXXXX" 2>/dev/null)" || return 1
+    jq --argjson msg "$new_msg" '.messages += [$msg]' "$msg_file" > "$tmp" 2>/dev/null && mv "$tmp" "$msg_file"
+    rm -f "$tmp" 2>/dev/null
+  else
+    printf '{"agent":"%s","messages":[%s]}' "$agent" "$new_msg" | jq '.' > "$msg_file" 2>/dev/null
+  fi
+}
+
+# --- Send message (interactive command mode) ---
+send_message() {
+  local target="$1"  # agent name or "master-orchestrator"
+
+  printf '\033[2J\033[H'
+  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  SEND COMMAND TO: $target"
+  separator
+
+  printf '\n  Message types: instruction, question, priority, note\n'
+  if [ "$target" = "master-orchestrator" ]; then
+    printf '  Orchestrator: reprioritize, pause-workflow, resume-workflow\n'
+  fi
+  printf '\n'
+
+  # Show cursor for input
+  printf '\033[?25h'
+
+  printf '  Type [default=instruction]: '
+  local msg_type=""
+  read -r msg_type </dev/tty 2>/dev/null || msg_type=""
+  msg_type="${msg_type:-instruction}"
+
+  printf '  Message: '
+  local content=""
+  read -r content </dev/tty 2>/dev/null || content=""
+
+  # Hide cursor again
+  printf '\033[?25l'
+
+  if [ -z "$content" ]; then
+    printf '\n  %sCancelled (empty message).%s\n' "${YELLOW}" "${RESET}"
+    sleep 1
+    return
+  fi
+
+  # Escape quotes in content for JSON safety
+  content="$(printf '%s' "$content" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+
+  if command -v jq >/dev/null 2>&1; then
+    write_message_file "$target" "$msg_type" "$content"
+    printf '\n  %s✓ Message sent to %s%s\n' "${GREEN}" "$target" "${RESET}"
+  else
+    printf '\n  %sError: jq is required for messaging.%s\n' "${RED}" "${RESET}"
+  fi
+  sleep 1
+}
+
 # --- Main loop ---
 printf '\033[?25l'  # hide cursor
 
@@ -909,6 +1065,7 @@ while true; do
     workflow)  render_workflow ;;
     history)   render_history_interactive ;;
     stats)     render_stats_interactive ;;
+    messages)  render_messages ;;
   esac
 
   if [ "$RUN_ONCE" = "true" ]; then
@@ -927,6 +1084,14 @@ while true; do
       s|S) VIEW_MODE="stats" ;;
       e|E) VIEW_MODE="errors" ;;
       w|W) VIEW_MODE="workflow" ;;
+      m|M) VIEW_MODE="messages" ;;
+      c|C)
+        if [ "$VIEW_MODE" = "detail" ] && [ -n "$DETAIL_AGENT" ]; then
+          send_message "$DETAIL_AGENT"
+        else
+          send_message "master-orchestrator"
+        fi
+        ;;
       r|R)
         if [ "$VIEW_MODE" = "overview" ]; then
           rm -f "$AGENTS_FILE" "$TODOS_DIR"/*.json "$ERRORS_DIR"/*.json 2>/dev/null

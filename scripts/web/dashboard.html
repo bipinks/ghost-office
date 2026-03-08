@@ -29,6 +29,7 @@
   .dept-header { color: var(--purple); font-weight: bold; font-size: 0.9em; padding: 8px 16px; border-bottom: 1px solid var(--border); }
   .agent-row { display: flex; align-items: center; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin: 4px 0; cursor: pointer; transition: background 0.15s; }
   .agent-row:hover { background: #1c2333; }
+  .agent-row.selected { border-color: var(--blue); background: rgba(88,166,255,0.05); }
   .agent-row .indicator { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
   .agent-row .indicator.running { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); animation: pulse 1.5s infinite; }
   .agent-row .indicator.completed { background: var(--green); }
@@ -57,8 +58,8 @@
   .tab { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-size: 0.85em; transition: all 0.15s; }
   .tab:hover { color: var(--text); border-color: var(--blue); }
   .tab.active { color: var(--blue); border-color: var(--blue); background: rgba(88,166,255,0.1); }
-  .history-section, .analytics-section { display: none; }
-  .history-section.active, .analytics-section.active { display: block; }
+  .history-section, .analytics-section, .commands-section { display: none; }
+  .history-section.active, .analytics-section.active, .commands-section.active { display: block; }
   .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; }
   .session-card .sid { color: var(--cyan); font-size: 0.85em; }
   .session-card .info { color: var(--text-dim); font-size: 0.8em; margin-top: 4px; }
@@ -67,6 +68,42 @@
   .analytics-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
   .refresh-note { text-align: center; color: var(--text-dim); font-size: 0.75em; margin-top: 20px; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* --- Message / Chat styles --- */
+  .msg-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .msg-section h4 { color: var(--cyan); font-size: 0.9em; margin-bottom: 12px; }
+  .msg-log { max-height: 300px; overflow-y: auto; margin-bottom: 12px; padding-right: 4px; }
+  .msg-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85em; max-width: 85%; }
+  .msg-bubble.user { background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.3); margin-left: auto; text-align: right; }
+  .msg-bubble.agent { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.2); margin-right: auto; }
+  .msg-bubble .msg-meta { font-size: 0.75em; color: var(--text-dim); margin-top: 4px; display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+  .msg-bubble.agent .msg-meta { justify-content: flex-start; }
+  .msg-status { font-size: 0.7em; padding: 1px 6px; border-radius: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .msg-status.pending { background: rgba(210,153,34,0.2); color: var(--yellow); }
+  .msg-status.delivered { background: rgba(88,166,255,0.2); color: var(--blue); }
+  .msg-status.acknowledged { background: rgba(63,185,80,0.2); color: var(--green); }
+  .msg-type-badge { font-size: 0.7em; padding: 1px 6px; border-radius: 10px; background: rgba(188,140,255,0.15); color: var(--purple); }
+  .msg-input { display: flex; gap: 8px; align-items: center; }
+  .msg-input select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-family: inherit; font-size: 0.8em; }
+  .msg-input input { flex: 1; background: var(--bg); color: var(--text-bright); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: inherit; font-size: 0.85em; outline: none; }
+  .msg-input input:focus { border-color: var(--blue); }
+  .msg-input input::placeholder { color: var(--text-dim); }
+  .msg-input button { background: var(--blue); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: inherit; font-size: 0.85em; font-weight: 600; transition: opacity 0.15s; }
+  .msg-input button:hover { opacity: 0.85; }
+  .msg-input button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .msg-toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 0.85em; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
+  .msg-toast.show { opacity: 1; }
+
+  /* --- Commands tab --- */
+  .cmd-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .cmd-panel h3 { color: var(--text-bright); margin-bottom: 16px; font-size: 1.1em; }
+  .cmd-quick-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .cmd-btn { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: inherit; font-size: 0.85em; transition: all 0.15s; }
+  .cmd-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .cmd-btn.danger { border-color: rgba(248,81,73,0.3); }
+  .cmd-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .cmd-log { margin-top: 16px; }
+  .cmd-log h4 { color: var(--text-dim); font-size: 0.85em; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -89,6 +126,7 @@
 
 <div class="tabs">
   <div class="tab active" onclick="showTab('agents')">Agents</div>
+  <div class="tab" onclick="showTab('commands')">Commands</div>
   <div class="tab" onclick="showTab('history')">History</div>
   <div class="tab" onclick="showTab('analytics')">Analytics</div>
 </div>
@@ -98,14 +136,18 @@
   <div class="detail-panel" id="detail-panel"></div>
 </div>
 
+<div class="commands-section" id="commands-section"></div>
 <div class="history-section" id="history-section"></div>
 <div class="analytics-section" id="analytics-section"></div>
+
+<div class="msg-toast" id="msg-toast"></div>
 
 <div class="refresh-note">Auto-refreshes every 3 seconds &nbsp;|&nbsp; Served by agent-dashboard.sh --web</div>
 
 <script>
 const DEPT_ORDER = ['Orchestrator','Product','Engineering','Quality','Operations','Marketing','Support','IT','Other'];
 const DATA_BASE = 'data';
+const API_BASE = '/api/messages';
 
 function formatDuration(s) {
   if (!s || s <= 0) return '--';
@@ -130,9 +172,91 @@ function inferPhase(agents) {
   return '';
 }
 
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
 async function fetchJSON(url) {
   try { const r = await fetch(url + '?t=' + Date.now()); if (!r.ok) return null; return await r.json(); } catch { return null; }
 }
+
+function showToast(msg) {
+  const el = document.getElementById('msg-toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// --- Message API ---
+
+async function sendMessage(agent, type, content) {
+  if (!content.trim()) return;
+  try {
+    const r = await fetch(API_BASE + '/' + agent, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: type, content: content.trim() })
+    });
+    if (r.ok) {
+      showToast('Message sent to ' + agent);
+      refresh();
+    } else {
+      const err = await r.json();
+      showToast('Error: ' + (err.error || 'Failed'));
+    }
+  } catch (e) {
+    showToast('Network error');
+  }
+}
+
+function renderMessages(messages) {
+  if (!messages || messages.length === 0) {
+    return '<div style="color:var(--text-dim);font-size:0.85em;padding:8px 0;">No messages yet. Send one below.</div>';
+  }
+  let html = '';
+  for (const m of messages) {
+    const isUser = m.from === 'user';
+    const time = (m.created_at || '').substring(11, 19);
+    html += '<div class="msg-bubble ' + (isUser ? 'user' : 'agent') + '">';
+    html += '<div>' + escapeHtml(m.content) + '</div>';
+    html += '<div class="msg-meta">';
+    html += '<span class="msg-type-badge">' + m.type + '</span>';
+    html += '<span class="msg-status ' + m.status + '">' + m.status + '</span>';
+    html += '<span>' + time + '</span>';
+    html += '</div>';
+    if (m.response) {
+      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--green);font-size:0.85em;">';
+      html += '<strong>Response:</strong> ' + escapeHtml(m.response);
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+function buildMessageInput(agent) {
+  const types = agent === 'master-orchestrator'
+    ? ['instruction','question','reprioritize','pause-workflow','resume-workflow','note']
+    : ['instruction','question','priority','note','pause','cancel'];
+
+  let opts = '';
+  for (const t of types) opts += '<option value="' + t + '">' + t + '</option>';
+
+  return '<div class="msg-input">'
+    + '<select id="msg-type-' + agent + '">' + opts + '</select>'
+    + '<input id="msg-input-' + agent + '" placeholder="Type a message to ' + agent + '..." '
+    + 'onkeydown="if(event.key===\'Enter\')document.getElementById(\'msg-send-' + agent + '\').click()">'
+    + '<button id="msg-send-' + agent + '" onclick="'
+    + 'sendMessage(\'' + agent + '\','
+    + 'document.getElementById(\'msg-type-' + agent + '\').value,'
+    + 'document.getElementById(\'msg-input-' + agent + '\').value);'
+    + 'document.getElementById(\'msg-input-' + agent + '\').value=\'\';">Send</button>'
+    + '</div>';
+}
+
+// --- Main refresh ---
 
 let selectedAgent = null;
 
@@ -199,7 +323,8 @@ async function refresh() {
       let errorHTML = '';
       if (agent.error_count > 0) errorHTML = '<span class="error-badge">' + agent.error_count + ' err</span>';
 
-      html += '<div class="agent-row" onclick="toggleDetail(\'' + agent.name + '\')">'
+      const sel = selectedAgent === agent.name ? ' selected' : '';
+      html += '<div class="agent-row' + sel + '" onclick="toggleDetail(\'' + agent.name + '\')">'
         + '<div class="indicator ' + agent.status + '"></div>'
         + '<span class="name">' + agent.name + '</span>'
         + '<span class="status ' + agent.status + '">' + (agent.status === 'running' ? 'RUNNING' : agent.status === 'completed' ? 'DONE' : 'IDLE') + '</span>'
@@ -211,7 +336,7 @@ async function refresh() {
   }
   document.getElementById('agents-container').innerHTML = html;
 
-  // Detail panel
+  // Detail panel with messages
   if (selectedAgent && agents[selectedAgent]) {
     const dp = document.getElementById('detail-panel');
     dp.classList.add('active');
@@ -220,18 +345,25 @@ async function refresh() {
     if (td && td.todos) {
       dhtml += '<div><strong>Tasks:</strong></div>';
       for (const t of td.todos) {
-        const icon = t.status === 'completed' ? '✓' : t.status === 'in_progress' ? '●' : '○';
-        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + t.content + '</span></div>';
+        const icon = t.status === 'completed' ? '&#10003;' : t.status === 'in_progress' ? '&#9679;' : '&#9675;';
+        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + escapeHtml(t.content) + '</span></div>';
       }
     }
-    // Load errors
+    // Errors
     const errData = await fetchJSON(DATA_BASE + '/errors/' + selectedAgent + '.json');
     if (errData && errData.errors && errData.errors.length > 0) {
       dhtml += '<div style="margin-top:16px"><strong style="color:var(--red)">Recent Errors:</strong></div>';
       for (const e of errData.errors.slice(-5).reverse()) {
-        dhtml += '<div class="error-item"><span class="time">' + (e.timestamp||'').substring(11,19) + '</span> <span class="tool">' + e.tool + '</span>: ' + (e.message||'').substring(0,80) + '</div>';
+        dhtml += '<div class="error-item"><span class="time">' + (e.timestamp||'').substring(11,19) + '</span> <span class="tool">' + escapeHtml(e.tool||'') + '</span>: ' + escapeHtml((e.message||'').substring(0,80)) + '</div>';
       }
     }
+    // Messages (chat)
+    const msgData = await fetchJSON(API_BASE + '/' + selectedAgent);
+    dhtml += '<div class="msg-section">';
+    dhtml += '<h4>Messages</h4>';
+    dhtml += '<div class="msg-log">' + renderMessages(msgData ? msgData.messages : []) + '</div>';
+    dhtml += buildMessageInput(selectedAgent);
+    dhtml += '</div>';
     dp.innerHTML = dhtml;
   } else {
     document.getElementById('detail-panel').classList.remove('active');
@@ -242,6 +374,41 @@ function toggleDetail(name) {
   selectedAgent = selectedAgent === name ? null : name;
   refresh();
 }
+
+// --- Commands tab ---
+
+async function loadCommands() {
+  const el = document.getElementById('commands-section');
+  const msgData = await fetchJSON(API_BASE + '/master-orchestrator');
+  const messages = msgData ? msgData.messages : [];
+
+  let html = '<div class="cmd-panel">';
+  html += '<h3>Orchestrator Commands</h3>';
+  html += '<p style="color:var(--text-dim);font-size:0.85em;margin-bottom:16px;">Send instructions to the master orchestrator. Commands are delivered asynchronously via the message queue.</p>';
+
+  // Quick action buttons
+  html += '<div class="cmd-quick-actions">';
+  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'reprioritize\',\'Reprioritize remaining tasks based on current progress\')">Reprioritize</div>';
+  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'question\',\'What is the current status and what blockers exist?\')">Status Report</div>';
+  html += '<div class="cmd-btn danger" onclick="sendMessage(\'master-orchestrator\',\'pause-workflow\',\'Pause workflow after current agent completes\')">Pause Workflow</div>';
+  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'resume-workflow\',\'Resume workflow execution\')">Resume Workflow</div>';
+  html += '</div>';
+
+  // Free-text command input
+  html += buildMessageInput('master-orchestrator');
+
+  // Command history
+  if (messages.length > 0) {
+    html += '<div class="cmd-log"><h4>Command History</h4>';
+    html += '<div class="msg-log">' + renderMessages(messages) + '</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// --- History & Analytics (unchanged) ---
 
 async function loadHistory() {
   const data = await fetchJSON(DATA_BASE + '/history.json');
@@ -291,9 +458,11 @@ async function loadAnalytics() {
 function showTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('agents-section').style.display = tab === 'agents' ? 'block' : 'none';
+  document.getElementById('commands-section').classList.toggle('active', tab === 'commands');
   document.getElementById('history-section').classList.toggle('active', tab === 'history');
   document.getElementById('analytics-section').classList.toggle('active', tab === 'analytics');
   event.target.classList.add('active');
+  if (tab === 'commands') loadCommands();
   if (tab === 'history') loadHistory();
   if (tab === 'analytics') loadAnalytics();
 }

@@ -415,7 +415,7 @@ your-project/
 │   ├── memory/              6 knowledge docs + 7 domain templates
 │   ├── skills/              54 domain knowledge packs
 │   ├── rules/               12 guidelines (7 categories)
-│   ├── hooks/               12 safety/audit/lifecycle hooks
+│   ├── hooks/               13 safety/audit/lifecycle hooks
 │   ├── status/              Runtime: agent status, todos, errors, history
 │   └── settings.json        Permissions, hooks, autonomous config
 ├── scripts/

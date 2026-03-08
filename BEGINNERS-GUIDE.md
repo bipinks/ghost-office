@@ -227,7 +227,27 @@ You can also type `/agent-status` inside Claude Code for a quick status check.
 
 ---
 
-### Task 8: Handle a Production Incident
+### Task 8: Interact with Agents from Dashboard
+
+**Terminal dashboard:**
+```bash
+./scripts/agent-dashboard.sh
+# Press [m] to view all messages
+# Press [c] to send a command (to selected agent or orchestrator)
+```
+
+**Web dashboard:**
+```bash
+./scripts/agent-dashboard.sh --web
+# Click an agent → use the chat panel to send messages
+# Click "Commands" tab → send orchestrator instructions
+```
+
+**What happens:** Your message is written to `.claude/status/messages/{agent}.json`. On the agent's next tool use, a hook detects the pending message and notifies the agent. The agent reads the message, processes it, and writes a response that appears in the dashboard.
+
+---
+
+### Task 9: Handle a Production Incident
 
 **What you type:**
 ```

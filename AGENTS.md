@@ -1,6 +1,6 @@
 # Autonomous AI Software Company — Agent Instructions
 
-18 agents (7 departments), 54 skills, 23 commands, 6 workflows, 12 hooks, 7 domain templates.
+18 agents (7 departments), 54 skills, 23 commands, 6 workflows, 13 hooks, 7 domain templates.
 
 ## Principles
 
@@ -41,6 +41,8 @@
 **Parallel execution**: Backend + frontend (after design). Security + architecture review (post-implementation). Docs + deployment prep.
 
 **Dashboard**: Monitor live progress with `./scripts/agent-dashboard.sh` (terminal) or `--web` (browser). Session history, per-agent analytics, error tracking, workflow phase inference, and markdown export included. Use `/agent-status` for in-session status.
+
+**Interactive Messaging**: Send instructions, questions, and commands to agents from the dashboard. Terminal: press `[m]` for messages, `[c]` to send a command. Web: use the chat panel in agent detail view or the Commands tab for orchestrator actions. Messages are delivered asynchronously via the `message-check` hook and stored in `.claude/status/messages/`.
 
 ## Workflows
 

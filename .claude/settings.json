@@ -95,6 +95,16 @@
         ]
       },
       {
+        "matcher": "TodoWrite|Agent|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/message-check.sh",
+            "statusMessage": "Checking for dashboard messages..."
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit",
         "hooks": [
           {
