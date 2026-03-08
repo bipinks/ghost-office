@@ -1,7 +1,7 @@
 FROM python:3.11-alpine
 
 LABEL description="Agent Dashboard Web Server" \
-      maintainer="devops-agent-hub"
+      maintainer="ghost-office"
 
 WORKDIR /app
 

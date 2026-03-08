@@ -52,7 +52,7 @@ function run() {
     const pkgPath = path.join(getProjectRoot(), 'package.json');
     const result = readJSON(pkgPath);
     assert(result !== null, 'readJSON returned null for valid file');
-    assert(result.name === 'devops-agent-hub', 'readJSON: unexpected package name');
+    assert(result.name === 'ghost-office', 'readJSON: unexpected package name');
   });
 
   test('readJSON returns null for invalid file', () => {

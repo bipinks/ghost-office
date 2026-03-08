@@ -1,7 +1,7 @@
 {
-  "name": "devops-agent-hub",
+  "name": "ghost-office",
   "version": "1.0.0",
-  "description": "Production-ready DevOps AI toolkit with specialized agents, skills, commands, and security guardrails for infrastructure, CI/CD, cloud operations, and reliable deployments.",
+  "description": "Ghost Office — autonomous AI software company with 18 specialized agents, 54 skills, 23 commands, and safety guardrails for infrastructure, CI/CD, cloud operations, and reliable deployments.",
   "main": "scripts/lib/utils.js",
   "scripts": {
     "test": "node scripts/tests/run-all.js",

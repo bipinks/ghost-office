@@ -1,5 +1,5 @@
 /**
- * DevOps Agent Hub — Utility Library
+ * Ghost Office — Utility Library
  * Cross-platform utilities for file, path, and system operations.
  */
 

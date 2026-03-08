@@ -1,4 +1,4 @@
-# Contributing to DevOps Agent Hub
+# Contributing to Ghost Office
 
 ## Getting Started
 

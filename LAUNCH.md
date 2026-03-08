@@ -23,7 +23,7 @@ Just copy one folder, run Claude Code, and you have:
 
 Open source. Zero install.
 
-github.com/bipinks/devops-agent-hub
+github.com/bipinks/ghost-office
 ```
 
 ### Tweet 2 (How it works)
@@ -98,7 +98,7 @@ It's MIT licensed. Use it however you want.
 
 Star it if you find it useful ⭐
 
-github.com/bipinks/devops-agent-hub
+github.com/bipinks/ghost-office
 
 Built for Claude Code, but the patterns work for any AI coding assistant.
 ```
@@ -174,15 +174,15 @@ I took safety seriously — 13 hooks run automatically to block force-pushes, sc
 
 **Setup:**
 ```
-git clone https://github.com/bipinks/devops-agent-hub.git
-cd devops-agent-hub && claude
+git clone https://github.com/bipinks/ghost-office.git
+cd ghost-office && claude
 ```
 
 Or copy `.claude/` into your existing project.
 
 MIT licensed. Would love feedback, contributions, or ideas for new agents/skills.
 
-GitHub: https://github.com/bipinks/devops-agent-hub
+GitHub: https://github.com/bipinks/ghost-office
 ```
 
 ---
@@ -208,7 +208,7 @@ It's not a SaaS — it's markdown files. Zero install. MIT licensed.
 
 The orchestrator runs agents in parallel where possible (e.g., backend + frontend after design) and enforces quality gates (tests must pass, security review, docs updated).
 
-https://github.com/bipinks/devops-agent-hub
+https://github.com/bipinks/ghost-office
 ```
 
 ---
@@ -257,7 +257,7 @@ Key design decisions:
 
 The repo has 54 skills, 23 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
 
-https://github.com/bipinks/devops-agent-hub
+https://github.com/bipinks/ghost-office
 
 MIT licensed. Feedback welcome — especially on agent coordination patterns and what skills/agents would be most useful to add.
 ```
@@ -289,7 +289,7 @@ It's MIT licensed and requires zero installation — just markdown, JSON, and sh
 
 For teams exploring AI-augmented software development, this is a practical starting point.
 
-GitHub: https://github.com/bipinks/devops-agent-hub
+GitHub: https://github.com/bipinks/ghost-office
 
 #OpenSource #AI #SoftwareEngineering #DevOps #ClaudeCode #Automation
 ```
@@ -327,7 +327,7 @@ GitHub: https://github.com/bipinks/devops-agent-hub
 
 Setup: copy `.claude/` into your project → run `claude` → done.
 
-MIT licensed: https://github.com/bipinks/devops-agent-hub
+MIT licensed: https://github.com/bipinks/ghost-office
 
 Would love feedback! What agents or skills would be most useful to add?
 ```

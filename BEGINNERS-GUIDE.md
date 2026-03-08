@@ -1,6 +1,6 @@
 # Beginner's Guide
 
-A practical introduction to DevOps Agent Hub — what it is, how it works, and how to start using it.
+A practical introduction to Ghost Office — what it is, how it works, and how to start using it.
 
 ---
 
@@ -27,7 +27,7 @@ A practical introduction to DevOps Agent Hub — what it is, how it works, and h
 
 ## Overview
 
-DevOps Agent Hub is a drop-in configuration layer for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that transforms it into an autonomous AI software company. It provides **18 specialized agents** across **7 departments**, coordinated by a master orchestrator that breaks down tasks, delegates to the right agents, runs quality gates, and delivers production-ready results.
+Ghost Office is a drop-in configuration layer for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that transforms it into an autonomous AI software company. It provides **18 specialized agents** across **7 departments**, coordinated by a master orchestrator that breaks down tasks, delegates to the right agents, runs quality gates, and delivers production-ready results.
 
 Think of it as hiring an entire engineering department — product managers, architects, backend/frontend engineers, QA, security, DevOps, and more — all available through your terminal.
 
@@ -102,8 +102,8 @@ No other installation or build step is required. Claude Code auto-discovers ever
 ### Option 1: Use directly
 
 ```bash
-git clone https://github.com/bipinks/devops-agent-hub.git
-cd devops-agent-hub
+git clone https://github.com/bipinks/ghost-office.git
+cd ghost-office
 claude
 ```
 
@@ -111,12 +111,12 @@ claude
 
 ```bash
 # Required — agents, skills, commands, rules, hooks, and project instructions
-cp -r devops-agent-hub/.claude/ your-project/.claude/
-cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
+cp -r ghost-office/.claude/ your-project/.claude/
+cp ghost-office/CLAUDE.md your-project/CLAUDE.md
 
 # Recommended — MCP integrations and agent reference
-cp devops-agent-hub/.mcp.json your-project/.mcp.json
-cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
+cp ghost-office/.mcp.json your-project/.mcp.json
+cp ghost-office/AGENTS.md your-project/AGENTS.md
 ```
 
 Then activate your domain:
@@ -135,7 +135,7 @@ Edit `CLAUDE.md` to match your project's tech stack, architecture, and conventio
 ## Project Structure
 
 ```
-devops-agent-hub/
+ghost-office/
 ├── .claude/
 │   ├── agents/       # 18 agent definitions (1 orchestrator + 17 specialists)
 │   ├── commands/     # 23 slash commands

@@ -13,7 +13,7 @@ function main() {
   const root = getProjectRoot();
   const rulesDir = path.join(process.env.HOME || '~', '.claude', 'rules');
 
-  console.log('🚀 DevOps Agent Hub — Setup\n');
+  console.log('🚀 Ghost Office — Setup\n');
 
   // Step 1: Install rules
   console.log('📋 Installing rules...');
@@ -60,7 +60,7 @@ function main() {
   console.log('\n🔌 Attempting plugin registration...');
   try {
     execSync(`claude plugin marketplace add "${root}"`, { stdio: 'ignore' });
-    execSync('claude plugin install "devops-agent-hub@devops-agent-hub"', { stdio: 'ignore' });
+    execSync('claude plugin install "ghost-office@ghost-office"', { stdio: 'ignore' });
     console.log('  ✅ Plugin registered successfully');
   } catch {
     console.log('  ℹ️  Plugin registration skipped (Claude Code CLI not found or not supported)');

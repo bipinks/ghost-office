@@ -143,7 +143,7 @@ function run() {
     return { passed, failed };
   }
 
-  assert(pkg.name === 'devops-agent-hub', 'pkg: correct name');
+  assert(pkg.name === 'ghost-office', 'pkg: correct name');
   assert(typeof pkg.version === 'string', 'pkg: has version');
   assert(typeof pkg.scripts === 'object', 'pkg: has scripts');
   assert(typeof pkg.scripts.test === 'string', 'pkg: has test script');

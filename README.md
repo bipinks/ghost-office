@@ -45,26 +45,26 @@ Result: Complete feature — code, tests, docs, ready to deploy.
 
 ### Use directly
 ```bash
-git clone https://github.com/bipinks/devops-agent-hub.git
-cd devops-agent-hub && claude
+git clone https://github.com/bipinks/ghost-office.git
+cd ghost-office && claude
 ```
 
 ### Add to your project
 
 **Minimum:**
 ```bash
-cp -r devops-agent-hub/.claude/ your-project/.claude/
-cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
+cp -r ghost-office/.claude/ your-project/.claude/
+cp ghost-office/CLAUDE.md your-project/CLAUDE.md
 ```
 
 **Full setup:**
 ```bash
-cp -r devops-agent-hub/.claude/ your-project/.claude/
-cp devops-agent-hub/CLAUDE.md your-project/CLAUDE.md
-cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
-cp devops-agent-hub/.mcp.json your-project/.mcp.json      # MCP integrations
-cp -r devops-agent-hub/scripts/ your-project/scripts/      # Validation
-cp -r devops-agent-hub/contexts/ your-project/contexts/    # Context modes
+cp -r ghost-office/.claude/ your-project/.claude/
+cp ghost-office/CLAUDE.md your-project/CLAUDE.md
+cp ghost-office/AGENTS.md your-project/AGENTS.md
+cp ghost-office/.mcp.json your-project/.mcp.json      # MCP integrations
+cp -r ghost-office/scripts/ your-project/scripts/      # Validation
+cp -r ghost-office/contexts/ your-project/contexts/    # Context modes
 ```
 
 Then activate your domain: `/set-domain <name>` (erp, ecommerce, saas, healthcare, fintech, education, cms) and edit `CLAUDE.md` to match your project.
