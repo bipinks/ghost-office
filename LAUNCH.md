@@ -71,7 +71,28 @@ What's in the box:
 100% markdown, JSON, and shell scripts. No plugins. No build step.
 ```
 
-### Tweet 5 (CTA)
+### Tweet 5 (Dashboard)
+```
+The thing that surprised people most: there's a live dashboard.
+
+While agents work in parallel, open a second terminal → run one script → see this:
+
+╔══════════════════════════════════════╗
+║  ENGINEERING                         ║
+║  ● backend-engineer  RUNNING  4m 23s ║
+║    ████████░░  3/5 tasks             ║
+║  ● frontend-engineer RUNNING  3m 11s ║
+║    ██████░░░░  2/4 tasks             ║
+║  ✓ architecture      DONE    1m 47s  ║
+╠══════════════════════════════════════╣
+║  Active: 2  │  Done: 1  │  6m uptime ║
+╚══════════════════════════════════════╝
+
+Press a number → drill into that agent's task list.
+--web for a dark-mode browser version.
+```
+
+### Tweet 6 (CTA)
 ```
 It's MIT licensed. Use it however you want.
 
@@ -118,6 +139,30 @@ When you type `/implement-feature "Add user authentication with OAuth"`, the orc
 - 12 safety hooks (secret detection, force-push prevention, infra safety)
 - 6 knowledge base documents for persistent context
 - Built-in ERP domain expertise (accounting, inventory, sales, HR, procurement)
+- **Live agent dashboard** (terminal TUI + web UI) with per-agent task tracking
+
+**Live dashboard** — open a second terminal while agents work:
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  AGENT DASHBOARD        Session: a3f9b2       12:34:56 UTC      ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Workflow: Requirements ──▶ Design ──▶ [Implementation] ──▶ ... ║
+║                                                                  ║
+║  ENGINEERING                                                     ║
+║  [1] ● backend-engineer    RUNNING   4m 23s  ████████░░  3/5    ║
+║  [2] ● frontend-engineer   RUNNING   3m 11s  ██████░░░░  2/4    ║
+║  [3] ✓ architecture-agent  DONE      1m 47s  ██████████  4/4    ║
+║                                                                  ║
+║  PRODUCT                                                         ║
+║  [4] ✓ product-manager     DONE      2m 05s  ██████████  3/3    ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Active: 2  │  Completed: 2  │  Uptime: 6m 18s                 ║
+╚══════════════════════════════════════════════════════════════════╝
+  [1-4] detail view  │  [h] history  │  [s] stats  │  [q] quit
+```
+
+Press a number to drill into any agent's individual task list. `--web` for a dark-mode browser version with auto-refresh.
 
 **What it's NOT:**
 - Not a SaaS product or hosted service
@@ -195,6 +240,21 @@ Key design decisions:
 
 5. **ERP domain knowledge built-in** — double-entry accounting, inventory management, procurement workflows, HR/payroll. Remove or replace for your domain.
 
+6. **Live observability via hooks** — three hooks (`subagent-lifecycle`, `todo-tracker`, `tool-failure`) write structured JSON as agents work. A terminal TUI and web dashboard read those files in real-time, so you can watch agents work in parallel without touching the Claude Code session:
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  AGENT DASHBOARD              Session: a3f9b2    12:34:56 UTC   ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Workflow: Requirements ──▶ Design ──▶ [Implementation] ──▶ ... ║
+║  [1] ● backend-engineer   RUNNING  4m 23s  ████████░░  3/5     ║
+║  [2] ● frontend-engineer  RUNNING  3m 11s  ██████░░░░  2/4     ║
+║  [3] ✓ architecture-agent DONE     1m 47s  ██████████  4/4     ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Active: 2  │  Completed: 2  │  Uptime: 6m 18s                 ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
 The repo has 54 skills, 23 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
 
 https://github.com/bipinks/devops-agent-hub
@@ -222,6 +282,8 @@ One command kicks off an entire feature lifecycle:
 → Deployment preparation
 
 The workspace includes 54 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 12 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
+
+There's also a live agent dashboard — open a second terminal, run one script, and watch all agents work in parallel with real-time task progress bars, workflow phase tracking, and session history. A dark-themed web version runs on localhost:8686.
 
 It's MIT licensed and requires zero installation — just markdown, JSON, and shell scripts.
 
@@ -253,6 +315,15 @@ GitHub: https://github.com/bipinks/devops-agent-hub
 **23 slash commands** for common workflows
 **12 safety hooks** (secret detection, force-push blocking, infra safety)
 **6 workflows** (feature dev, bug fix, release, incident response)
+**Live dashboard** — watch agents work in parallel from a second terminal:
+
+```
+[1] ● backend-engineer   RUNNING  4m 23s  ████████░░  3/5 tasks
+[2] ● frontend-engineer  RUNNING  3m 11s  ██████░░░░  2/4 tasks
+[3] ✓ architecture-agent DONE     1m 47s  ██████████  4/4 tasks
+```
+
+`./scripts/agent-dashboard.sh` (terminal) or `--web` for dark-mode browser UI.
 
 Setup: copy `.claude/` into your project → run `claude` → done.
 

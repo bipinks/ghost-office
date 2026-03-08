@@ -104,7 +104,6 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/ai-prompt "..."` | Prompt engineering → evaluation → integration |
 | `/infra-plan "..."` | Cloud architecture with Terraform |
 | `/set-domain <name>` | Switch domain knowledge |
-
 | `/agent-status` | Live agent progress and task tracking |
 
 [All 23 commands →](.claude/commands/)
@@ -113,28 +112,147 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 
 ## Agent Dashboard
 
-Monitor agent progress in real-time with an interactive terminal or web dashboard.
+When you run `/implement-feature`, up to 9 agents work in parallel. The dashboard shows you exactly what each one is doing — in real-time, from a second terminal.
 
-**Terminal dashboard** (run from a second terminal):
 ```bash
-./scripts/agent-dashboard.sh              # Live interactive dashboard
-./scripts/agent-dashboard.sh --history    # View past sessions
-./scripts/agent-dashboard.sh --analytics  # Agent performance stats
-./scripts/agent-dashboard.sh --export     # Export status as markdown
-./scripts/agent-dashboard.sh --web        # Launch web dashboard on :8686
+./scripts/agent-dashboard.sh              # Live overview (1s refresh)
+./scripts/agent-dashboard.sh --history    # Browse past sessions
+./scripts/agent-dashboard.sh --analytics  # Per-agent performance stats
+./scripts/agent-dashboard.sh --export     # Save snapshot as markdown
+./scripts/agent-dashboard.sh --web        # Web UI on http://localhost:8686
 ```
 
-**In-session**: Use `/agent-status` to check progress without leaving Claude Code.
+**Or stay in Claude Code:** type `/agent-status` for an instant status snapshot.
 
-**Features**:
-- Department-grouped agent overview with live duration timers
-- Per-agent task progress (from TodoWrite) with progress bars
-- Workflow phase inference (Requirements → Design → Implementation → Testing → Security → Deploy)
-- Error tracking per agent with detailed error log view
-- Session history (last 50 sessions) with agent performance analytics
-- Desktop notifications when all agents complete
-- Web dashboard with dark theme, auto-refresh, and interactive detail panels
-- Markdown export for sharing in PRs or Slack
+---
+
+### Overview — all agents, live
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  AGENT DASHBOARD        Session: a3f9b2       12:34:56 UTC      ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  Workflow: Requirements ──▶ Design ──▶ [Implementation] ──▶ ... ║
+║                                                                  ║
+║  ENGINEERING                                                     ║
+║  [1] ● backend-engineer    RUNNING   4m 23s  ████████░░  3/5    ║
+║  [2] ● frontend-engineer   RUNNING   3m 11s  ██████░░░░  2/4    ║
+║  [3] ✓ architecture-agent  DONE      1m 47s  ██████████  4/4    ║
+║      ○ database-engineer   IDLE                                  ║
+║                                                                  ║
+║  QUALITY                                                         ║
+║      ○ qa-agent            IDLE                                  ║
+║      ○ security-agent      IDLE                                  ║
+║                                                                  ║
+║  PRODUCT                                                         ║
+║  [4] ✓ product-manager     DONE      2m 05s  ██████████  3/3    ║
+║                                                                  ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Active: 2  │  Completed: 2  │  Idle: 3  │  Uptime: 6m 18s    ║
+╚══════════════════════════════════════════════════════════════════╝
+  [1-4] detail  │  [a] all agents  │  [h] history  │  [q] quit
+```
+
+---
+
+### Detail view — drill into any agent
+
+Press a number key to see that agent's task list in real-time:
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  backend-engineer                     Engineering  ●  RUNNING   ║
+║  Running for 4m 23s                                              ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  Tasks:                                                          ║
+║  ✓  Create migration for invoices table (branch_id scoped)      ║
+║  ✓  Build InvoiceService with PDF generation                     ║
+║  ●  Implement email delivery via Laravel Queue                   ║
+║  ○  Add API resource transformer                                 ║
+║  ○  Write unit tests for InvoiceService                          ║
+║                                                                  ║
+║  Progress: ████████████░░░░░░░░  2/5 tasks done (40%)           ║
+║                                                                  ║
+║  Errors: 0                                                       ║
+╚══════════════════════════════════════════════════════════════════╝
+  [b] back to overview  │  [q] quit
+```
+
+---
+
+### Session history — `--history`
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  SESSION HISTORY                            Last 50 sessions     ║
+╠═══════════╦══════════════════╦══════════╦═════════╦═════════════╣
+║  Session  ║  Started         ║  Duration║  Agents ║  Status     ║
+╠═══════════╬══════════════════╬══════════╬═════════╬═════════════╣
+║  a3f9b2   ║  Mar 08  12:28   ║  6m 18s  ║    4    ║  running    ║
+║  7c2d1e   ║  Mar 08  09:14   ║  12m 44s ║    8    ║  completed  ║
+║  f81a3c   ║  Mar 07  16:52   ║  8m 30s  ║    6    ║  completed  ║
+║  b4e29a   ║  Mar 07  11:07   ║  15m 02s ║    9    ║  completed  ║
+╚═══════════╩══════════════════╩══════════╩═════════╩═════════════╝
+  [enter] view session  │  [b] back  │  [q] quit
+```
+
+---
+
+### Web dashboard — `--web`
+
+A dark-themed browser UI served locally on port 8686. Auto-refreshes every 2 seconds. No server setup — reads the same local JSON status files the terminal dashboard uses.
+
+```html
+<!-- http://localhost:8686  —  auto-refresh every 2s -->
+<div class="dashboard dark">
+  <header>Agent Dashboard · Session a3f9b2 · 12:34:56 UTC</header>
+
+  <div class="workflow-bar">
+    <span class="done">Requirements</span> ▶
+    <span class="done">Design</span> ▶
+    <span class="active">Implementation</span> ▶
+    <span class="pending">Testing</span> ▶
+    <span class="pending">Security</span> ▶
+    <span class="pending">Deploy</span>
+  </div>
+
+  <div class="agent-grid">
+    <div class="agent-card running">
+      <div class="agent-name">backend-engineer</div>
+      <div class="dept-badge">Engineering</div>
+      <div class="progress-bar"><div class="fill" style="width:40%"></div></div>
+      <div class="meta">2 / 5 tasks · 4m 23s</div>
+    </div>
+    <div class="agent-card running">
+      <div class="agent-name">frontend-engineer</div>
+      <div class="dept-badge">Engineering</div>
+      <div class="progress-bar"><div class="fill" style="width:50%"></div></div>
+      <div class="meta">2 / 4 tasks · 3m 11s</div>
+    </div>
+    <div class="agent-card done">
+      <div class="agent-name">architecture-agent</div>
+      <div class="dept-badge">Engineering</div>
+      <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
+      <div class="meta">4 / 4 tasks · 1m 47s ✓</div>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+**How the dashboard works — no magic:**
+
+| What you see | Where it comes from |
+|---|---|
+| Agent status + duration | `.claude/status/agents.json` (written by `subagent-lifecycle` hook) |
+| Task progress bars | `.claude/status/todos/{agent}.json` (written by `todo-tracker` hook) |
+| Workflow phase label | Inferred from which agents are currently active |
+| Error indicators | `.claude/status/errors.json` (written by `tool-failure` hook) |
+| Session history | `.claude/status/history/` — last 50 sessions, auto-pruned |
+| Desktop notification | Fires via `notification` hook when all agents finish |
 
 ---
 
