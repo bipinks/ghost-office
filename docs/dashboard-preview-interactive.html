@@ -25,6 +25,14 @@
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
   .badge-green { background: #23863620; color: #3fb950; border: 1px solid #23863640; }
   .badge-blue { background: #388bfd20; color: #58a6ff; border: 1px solid #388bfd40; }
+  .badge-red { background: #f8514920; color: #f85149; border: 1px solid #f8514940; display: none; }
+  .session-selector {
+    background: #0d1117; color: #c9d1d9; border: 1px solid #30363d;
+    border-radius: 6px; padding: 6px 12px; font-family: inherit;
+    font-size: 12px; cursor: pointer; outline: none;
+  }
+  .session-selector:hover { border-color: #388bfd; }
+  .session-selector:focus { border-color: #388bfd; box-shadow: 0 0 0 2px #388bfd33; }
 
   .container {
     background: #161b22; border: 1px solid #30363d; border-top: 0;
@@ -154,9 +162,15 @@
     <h1>Agent Dashboard — Interactive Messaging</h1>
     <span class="subtitle">Bidirectional communication with agents and orchestrator</span>
   </div>
-  <div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <select class="session-selector">
+      <option value="current">Current Session</option>
+      <option value="7c2d1e">7c2d1e (8 agents, 12m 44s)</option>
+      <option value="f81a3c">f81a3c (6 agents, 8m 30s)</option>
+    </select>
     <span class="badge badge-green">LIVE</span>
     <span class="badge badge-blue">INTERACTIVE</span>
+    <span class="badge badge-red">HISTORY</span>
   </div>
 </div>
 

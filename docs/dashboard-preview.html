@@ -38,7 +38,30 @@
     color: #8b949e;
   }
   .session-badge code { color: #79c0ff; }
-  .header-right { font-size: 13px; color: #8b949e; }
+  .session-selector {
+    background: #0d1117;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+  }
+  .session-selector:hover { border-color: #58a6ff; }
+  .session-selector:focus { border-color: #58a6ff; box-shadow: 0 0 0 2px #1f6feb33; }
+  .history-badge {
+    display: none;
+    background: #f8514920;
+    color: #f85149;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .header-right { font-size: 13px; color: #8b949e; display: flex; align-items: center; gap: 12px; }
 
   /* ── Workflow bar ── */
   .workflow-bar {
@@ -216,7 +239,15 @@
     <h1>Agent Dashboard</h1>
     <span class="session-badge">Session <code>a3f9b2</code></span>
   </div>
-  <div class="header-right">12:34:56 UTC &middot; Auto-refresh 2s</div>
+  <div class="header-right">
+    <select class="session-selector">
+      <option value="current">Current Session</option>
+      <option value="7c2d1e">7c2d1e (8 agents, 12m 44s)</option>
+      <option value="f81a3c">f81a3c (6 agents, 8m 30s)</option>
+    </select>
+    <span class="history-badge">HISTORY</span>
+    <span>12:34:56 UTC &middot; Auto-refresh 2s</span>
+  </div>
 </div>
 
 <!-- ── WORKFLOW BAR ── -->
