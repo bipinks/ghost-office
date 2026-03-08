@@ -111,27 +111,171 @@
   .notif-toggle:hover { border-color: var(--blue); color: var(--blue); }
   .notif-toggle.active { border-color: var(--green); color: var(--green); background: rgba(63,185,80,0.1); }
 
-  /* --- Responsive layout --- */
+  /* --- Responsive layout — Tablet (≤ 768px) --- */
   @media (max-width: 768px) {
     body { padding: 10px; }
+
+    /* Header: stack title and controls vertically */
+    .header > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+    .header > div:first-child > div { width: 100%; justify-content: flex-start; }
+    .header h1 { font-size: 1.1em; }
+    .header #session-selector { flex: 1; min-width: 0; }
+
+    /* Stats bar */
     .stats-bar { gap: 8px; }
     .stat-card { min-width: 70px; padding: 8px 10px; }
     .stat-card .value { font-size: 1.3em; }
     .stat-card .label { font-size: 0.65em; }
-    .tabs { flex-wrap: wrap; gap: 4px; }
-    .tab { padding: 6px 10px; font-size: 0.8em; }
-    .agent-row { flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
-    .agent-row .progress-bar { width: 60px; }
-    .agent-row .duration { min-width: 40px; font-size: 0.75em; }
+
+    /* Tabs: scrollable row */
+    .tabs { flex-wrap: nowrap; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 8px 12px; font-size: 0.8em; white-space: nowrap; flex-shrink: 0; }
+
+    /* Workflow bar */
     .workflow-bar { padding: 8px; }
-    .workflow-step { min-width: 70px; }
+    .workflow-step { min-width: 60px; }
     .workflow-step .step-label { font-size: 0.6em; }
+
+    /* Agent rows: wrap into a 2-row card layout */
+    .agent-row { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+    .agent-row .name { flex-basis: calc(100% - 30px); font-size: 0.9em; }
+    .agent-row .status { order: 5; }
+    .agent-row .duration { min-width: 40px; font-size: 0.75em; }
+    .agent-row .progress-bar { width: 60px; }
+    .agent-row .error-badge { margin-left: 0; }
+
+    /* Detail panel */
     .detail-panel { padding: 12px; }
+
+    /* Message input: stack type selector above text input */
     .msg-input { flex-wrap: wrap; }
-    .msg-input select { width: 100%; }
-    .header h1 { font-size: 1.1em; }
+    .msg-input select { width: 100%; min-height: 36px; }
+    .msg-input input { min-height: 36px; }
+    .msg-input button { min-height: 36px; padding: 8px 20px; }
+
+    /* Message bubbles */
+    .msg-bubble { max-width: 95%; }
+
+    /* Error timeline: wrap columns */
+    .error-timeline-item { flex-wrap: wrap; gap: 4px 12px; }
+    .error-timeline-item .et-agent { min-width: auto; }
+    .error-timeline-item .et-tool { min-width: auto; }
+    .error-timeline-item .et-msg { flex-basis: 100%; margin-top: 2px; }
+
+    /* Analytics table */
     .analytics-table { font-size: 0.75em; }
-    .analytics-table td, .analytics-table th { padding: 4px; }
+    .analytics-table td, .analytics-table th { padding: 6px 4px; }
+
+    /* Commands */
+    .cmd-panel { padding: 14px; }
+    .cmd-btn { padding: 10px 14px; font-size: 0.8em; }
+
+    /* KB overlay */
+    .kb-panel { padding: 16px; }
+    .kb-row { font-size: 0.8em; }
+  }
+
+  /* --- Responsive layout — Phone (≤ 480px) --- */
+  @media (max-width: 480px) {
+    body { padding: 6px; }
+
+    /* Header: minimal */
+    .header { padding: 12px; border-radius: 6px; }
+    .header h1 { font-size: 1em; }
+    .header .meta { font-size: 0.75em; }
+    .header .phase { font-size: 0.8em; }
+    .header #session-selector { font-size: 0.75em; padding: 4px 6px; }
+    .notif-toggle { font-size: 0.7em; padding: 3px 8px; }
+
+    /* Stats bar: 2x2 grid */
+    .stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .stat-card { min-width: unset; padding: 8px; }
+    .stat-card .value { font-size: 1.2em; }
+
+    /* Tabs: compact scrollable */
+    .tab { padding: 6px 10px; font-size: 0.75em; border-radius: 4px; }
+
+    /* Workflow bar: horizontal scroll with smaller dots */
+    .workflow-bar { padding: 6px 8px; border-radius: 6px; gap: 0; }
+    .workflow-step { min-width: 50px; }
+    .workflow-step .step-dot { width: 14px; height: 14px; }
+    .workflow-step .step-label { font-size: 0.55em; }
+    .workflow-step::after { top: 7px; }
+
+    /* Agent rows: full card layout */
+    .agent-row { padding: 10px; border-radius: 8px; gap: 4px 8px; }
+    .agent-row .indicator { width: 8px; height: 8px; margin-right: 8px; }
+    .agent-row .name { font-size: 0.85em; flex-basis: calc(100% - 24px); }
+    .agent-row .status { font-size: 0.7em; padding: 2px 6px; }
+    .agent-row .duration { font-size: 0.7em; min-width: 36px; }
+    .agent-row .progress-bar { width: 50px; height: 4px; }
+    .agent-row .progress-text { font-size: 0.7em; }
+    .agent-row .error-badge { font-size: 0.65em; }
+
+    /* Dept headers */
+    .dept-header { font-size: 0.8em; padding: 6px 10px; }
+
+    /* Detail panel */
+    .detail-panel { padding: 10px; border-radius: 6px; margin-top: 10px; }
+    .detail-panel h3 { font-size: 1em; }
+    .todo-item { font-size: 0.85em; padding: 4px 0; }
+    .error-item { font-size: 0.8em; }
+
+    /* Messages: full width bubbles */
+    .msg-section h4 { font-size: 0.85em; }
+    .msg-bubble { max-width: 100%; font-size: 0.8em; }
+    .msg-bubble .msg-meta { font-size: 0.65em; flex-wrap: wrap; }
+    .msg-log { max-height: 200px; }
+    .msg-input { gap: 6px; }
+    .msg-input select { font-size: 0.75em; min-height: 40px; }
+    .msg-input input { font-size: 0.8em; min-height: 40px; padding: 8px; }
+    .msg-input button { font-size: 0.8em; min-height: 40px; padding: 8px 14px; }
+
+    /* Error timeline: fully stacked */
+    .error-timeline-item { flex-direction: column; gap: 2px; padding: 8px 0; font-size: 0.8em; }
+    .error-timeline-item .et-time { min-width: auto; }
+    .error-timeline-item .et-agent { min-width: auto; }
+    .error-timeline-item .et-tool { min-width: auto; }
+
+    /* Analytics table: scrollable container */
+    .analytics-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .analytics-table { min-width: 400px; font-size: 0.7em; }
+    .analytics-table td, .analytics-table th { padding: 4px 3px; white-space: nowrap; }
+
+    /* Session cards */
+    .session-card { padding: 10px; }
+    .session-card .sid { font-size: 0.8em; }
+    .session-card .info { font-size: 0.75em; }
+
+    /* Commands */
+    .cmd-panel { padding: 10px; }
+    .cmd-panel h3 { font-size: 1em; }
+    .cmd-quick-actions { gap: 6px; }
+    .cmd-btn { padding: 10px 12px; font-size: 0.75em; flex: 1; min-width: 0; text-align: center; }
+
+    /* Toast */
+    .msg-toast { bottom: 10px; right: 10px; left: 10px; text-align: center; font-size: 0.8em; }
+
+    /* Refresh note */
+    .refresh-note { font-size: 0.65em; margin-top: 12px; }
+
+    /* KB overlay */
+    .kb-panel { padding: 14px; max-width: 95%; }
+    .kb-panel h3 { font-size: 1em; }
+    .kb-row { font-size: 0.75em; padding: 4px 0; }
+  }
+
+  /* --- Touch-friendly: ensure minimum tap targets --- */
+  @media (pointer: coarse) {
+    .agent-row { min-height: 48px; }
+    .tab { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .cmd-btn { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .msg-input button { min-height: 44px; }
+    .msg-input select { min-height: 44px; }
+    .msg-input input { min-height: 44px; }
+    .notif-toggle { min-height: 36px; padding: 6px 12px; }
+    .session-card { padding: 14px; }
   }
 
   /* --- Message / Chat styles --- */
