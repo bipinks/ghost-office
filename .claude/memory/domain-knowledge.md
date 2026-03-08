@@ -1,6 +1,7 @@
-# Domain Knowledge — Business Rules & Modules
+# Domain Knowledge — Enterprise Resource Planning (ERP)
 
-> **Current Specialty**: Enterprise Resource Planning (ERP). This document serves as the domain knowledge base for ERP projects. For other project types, extend or replace with relevant domain knowledge.
+> **Domain**: Enterprise Resource Planning (ERP)
+> Auto-loaded via `domain.lock` or `/set-domain erp`
 
 ## Core Business Concepts
 
@@ -25,7 +26,7 @@
 
 ---
 
-## ERP Modules (Built-in Specialty)
+## ERP Modules
 
 ### 1. Accounting & Finance
 **Entities**: Account, Journal Entry, Ledger, Bank Account, Bank Transaction
@@ -50,7 +51,7 @@
 ### 3. Sales & CRM
 **Entities**: Customer, Quotation, Sales Order, Invoice, Payment, Credit Note
 **Key Rules**:
-- Workflow: Quotation → Sales Order → Delivery → Invoice → Payment
+- Workflow: Quotation -> Sales Order -> Delivery -> Invoice -> Payment
 - Quotations have expiry dates
 - Sales orders reserve stock
 - Invoices generate accounting entries automatically
@@ -61,7 +62,7 @@
 ### 4. Procurement
 **Entities**: Vendor, Purchase Request, Purchase Order, Bill, Payment
 **Key Rules**:
-- Workflow: Purchase Request → Approval → Purchase Order → Receipt → Bill → Payment
+- Workflow: Purchase Request -> Approval -> Purchase Order -> Receipt -> Bill -> Payment
 - Approval workflows based on amount thresholds
 - Three-way matching: PO vs Receipt vs Bill
 - Vendor evaluation and preferred vendor management
@@ -70,7 +71,7 @@
 ### 5. Human Resources & Payroll
 **Entities**: Employee, Department, Attendance, Leave, Payroll, Salary Component
 **Key Rules**:
-- Employee lifecycle: hire → active → on leave → resigned → terminated
+- Employee lifecycle: hire -> active -> on leave -> resigned -> terminated
 - Attendance tracking with check-in/check-out
 - Leave types: annual, sick, casual, maternity, etc.
 - Leave balance accrual and carry-forward rules
