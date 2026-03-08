@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Dashboard — Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; background: #161b22;
+    border: 1px solid #30363d; border-radius: 12px 12px 0 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 { font-size: 18px; font-weight: 600; color: #f0f6fc; }
+  .header .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #3fb950; box-shadow: 0 0 8px #3fb95066; }
+  .nav-link {
+    color: #58a6ff; text-decoration: none; font-size: 13px;
+    padding: 4px 12px; border: 1px solid #30363d; border-radius: 6px;
+    background: #21262d; transition: all 0.15s;
+  }
+  .nav-link:hover { background: #30363d; border-color: #58a6ff; }
+  .header-right { font-size: 13px; color: #8b949e; display: flex; align-items: center; gap: 12px; }
+  .refresh-btn {
+    background: #238636; color: #fff; border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+  }
+  .refresh-btn:hover { background: #2ea043; }
+
+  /* ── Container ── */
+  .container {
+    background: #0d1117;
+    border-left: 1px solid #30363d;
+    border-right: 1px solid #30363d;
+    padding: 24px;
+  }
+
+  /* ── Summary Cards ── */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .summary-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+  }
+  .summary-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 4px;
+  }
+  .summary-card .label {
+    font-size: 11px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .summary-card.blue .value { color: #58a6ff; }
+  .summary-card.green .value { color: #3fb950; }
+  .summary-card.purple .value { color: #bc8cff; }
+  .summary-card.yellow .value { color: #d29922; }
+  .summary-card.red .value { color: #f85149; }
+
+  /* ── Charts Grid ── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-card.wide { grid-column: span 2; }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #21262d;
+  }
+
+  /* ── Mock Chart: Line ── */
+  .mock-line-chart {
+    height: 160px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 0 4px;
+  }
+  .mock-line-chart .bar {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    min-width: 4px;
+    transition: height 0.3s;
+  }
+  .mock-line-chart .bar.blue { background: linear-gradient(180deg, #58a6ff, #1f6feb88); }
+  .mock-line-chart .bar.green { background: linear-gradient(180deg, #3fb950, #23863688); }
+  .mock-line-chart .bar.purple { background: linear-gradient(180deg, #bc8cff, #8b5cf688); }
+  .mock-line-chart .bar.red { background: linear-gradient(180deg, #f85149, #da363488); }
+  .mock-line-chart .bar.yellow { background: linear-gradient(180deg, #d29922, #b0820088); }
+
+  /* ── Mock Chart: Doughnut ── */
+  .mock-doughnut {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 0 auto;
+    background: conic-gradient(
+      #58a6ff 0deg 100deg,
+      #3fb950 100deg 190deg,
+      #bc8cff 190deg 260deg,
+      #d29922 260deg 310deg,
+      #f85149 310deg 340deg,
+      #8b949e 340deg 360deg
+    );
+    position: relative;
+  }
+  .mock-doughnut::after {
+    content: '';
+    position: absolute;
+    top: 35px; left: 35px;
+    width: 90px; height: 90px;
+    background: #161b22;
+    border-radius: 50%;
+  }
+  .doughnut-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    font-size: 11px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Mock Chart: Horizontal Bar ── */
+  .mock-hbar { display: flex; flex-direction: column; gap: 10px; }
+  .hbar-row { display: flex; align-items: center; gap: 12px; }
+  .hbar-label { font-size: 11px; color: #8b949e; width: 120px; text-align: right; flex-shrink: 0; }
+  .hbar-track { flex: 1; height: 20px; background: #21262d; border-radius: 4px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 4px; }
+  .hbar-fill.blue { background: linear-gradient(90deg, #1f6feb, #58a6ff); }
+  .hbar-fill.green { background: linear-gradient(90deg, #238636, #3fb950); }
+  .hbar-fill.purple { background: linear-gradient(90deg, #8b5cf6, #bc8cff); }
+  .hbar-fill.yellow { background: linear-gradient(90deg, #b08200, #d29922); }
+  .hbar-fill.red { background: linear-gradient(90deg, #da3634, #f85149); }
+  .hbar-value { font-size: 11px; color: #f0f6fc; width: 50px; font-weight: 600; }
+
+  /* ── Table ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #8b949e;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #30363d;
+  }
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #21262d;
+    color: #c9d1d9;
+  }
+  .data-table tr:hover td { background: #161b2280; }
+  .data-table .agent-name { color: #58a6ff; font-weight: 600; }
+  .data-table .error-count { color: #f85149; }
+  .data-table .success { color: #3fb950; }
+
+  /* ── Footer ── */
+  .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: #161b22;
+    border: 1px solid #30363d; border-radius: 0 0 12px 12px;
+    font-size: 12px; color: #8b949e;
+  }
+  .footer a { color: #58a6ff; text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── Responsive — Tablet ── */
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; }
+    .header h1 { font-size: 15px; }
+    .summary-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .summary-card { padding: 12px; }
+    .summary-card .value { font-size: 22px; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: span 1; }
+    .hbar-label { width: 80px; font-size: 10px; }
+    .mock-doughnut { width: 130px; height: 130px; }
+    .mock-doughnut::after { top: 28px; left: 28px; width: 74px; height: 74px; }
+    .data-table { font-size: 11px; }
+    .data-table th, .data-table td { padding: 6px 8px; }
+  }
+
+  /* ── Responsive — Phone ── */
+  @media (max-width: 480px) {
+    body { padding: 6px; }
+    .header { border-radius: 6px; padding: 10px 12px; }
+    .header h1 { font-size: 14px; }
+    .summary-cards { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .summary-card .value { font-size: 20px; }
+    .summary-card .label { font-size: 9px; }
+    .chart-card { padding: 14px; }
+    .chart-title { font-size: 12px; }
+    .mock-line-chart { height: 100px; }
+    .hbar-label { width: 60px; font-size: 9px; }
+    .hbar-value { font-size: 10px; width: 40px; }
+    .hbar-track { height: 14px; }
+    .mock-doughnut { width: 110px; height: 110px; }
+    .mock-doughnut::after { top: 24px; left: 24px; width: 62px; height: 62px; }
+    .doughnut-legend { font-size: 9px; gap: 8px; }
+    .data-table { font-size: 10px; display: block; overflow-x: auto; }
+    .footer { flex-direction: column; gap: 8px; text-align: center; }
+  }
+
+  /* ── Touch targets ── */
+  @media (pointer: coarse) {
+    .nav-link { min-height: 44px; display: inline-flex; align-items: center; }
+    .refresh-btn { min-height: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <span class="dot"></span>
+    <h1>Analytics Dashboard</h1>
+    <a class="nav-link" href="#">&larr; Back to Dashboard</a>
+  </div>
+  <div class="header-right">
+    <span>All Sessions &middot; Last 50</span>
+    <button class="refresh-btn">Refresh</button>
+  </div>
+</div>
+
+<!-- ── SUMMARY CARDS ── -->
+<div class="container">
+  <div class="summary-cards">
+    <div class="summary-card blue">
+      <div class="value">47</div>
+      <div class="label">Total Sessions</div>
+    </div>
+    <div class="summary-card green">
+      <div class="value">312</div>
+      <div class="label">Agents Run</div>
+    </div>
+    <div class="summary-card red">
+      <div class="value">23</div>
+      <div class="label">Total Errors</div>
+    </div>
+    <div class="summary-card purple">
+      <div class="value">1.2M</div>
+      <div class="label">Total Tokens</div>
+    </div>
+    <div class="summary-card yellow">
+      <div class="value">8m 24s</div>
+      <div class="label">Avg Duration</div>
+    </div>
+  </div>
+
+  <!-- ── CHARTS ── -->
+  <div class="charts-grid">
+
+    <!-- Session Duration Trend (Line) -->
+    <div class="chart-card wide">
+      <div class="chart-title">Session Duration Trend</div>
+      <div class="mock-line-chart">
+        <div class="bar blue" style="height:40%"></div>
+        <div class="bar blue" style="height:55%"></div>
+        <div class="bar blue" style="height:30%"></div>
+        <div class="bar blue" style="height:70%"></div>
+        <div class="bar blue" style="height:45%"></div>
+        <div class="bar blue" style="height:80%"></div>
+        <div class="bar blue" style="height:60%"></div>
+        <div class="bar blue" style="height:50%"></div>
+        <div class="bar blue" style="height:90%"></div>
+        <div class="bar blue" style="height:65%"></div>
+        <div class="bar blue" style="height:35%"></div>
+        <div class="bar blue" style="height:75%"></div>
+        <div class="bar blue" style="height:55%"></div>
+        <div class="bar blue" style="height:40%"></div>
+        <div class="bar blue" style="height:85%"></div>
+        <div class="bar blue" style="height:50%"></div>
+        <div class="bar blue" style="height:60%"></div>
+        <div class="bar blue" style="height:45%"></div>
+        <div class="bar blue" style="height:70%"></div>
+        <div class="bar blue" style="height:55%"></div>
+      </div>
+    </div>
+
+    <!-- Agent Performance (Horizontal Bar) -->
+    <div class="chart-card">
+      <div class="chart-title">Agent Performance (Avg Duration)</div>
+      <div class="mock-hbar">
+        <div class="hbar-row">
+          <span class="hbar-label">backend-engineer</span>
+          <div class="hbar-track"><div class="hbar-fill blue" style="width:85%"></div></div>
+          <span class="hbar-value">5m 12s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">frontend-engineer</span>
+          <div class="hbar-track"><div class="hbar-fill green" style="width:70%"></div></div>
+          <span class="hbar-value">4m 18s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">architecture</span>
+          <div class="hbar-track"><div class="hbar-fill purple" style="width:40%"></div></div>
+          <span class="hbar-value">2m 30s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">qa-agent</span>
+          <div class="hbar-track"><div class="hbar-fill yellow" style="width:55%"></div></div>
+          <span class="hbar-value">3m 24s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">security-agent</span>
+          <div class="hbar-track"><div class="hbar-fill red" style="width:30%"></div></div>
+          <span class="hbar-value">1m 50s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Breakdown (Doughnut) -->
+    <div class="chart-card">
+      <div class="chart-title">Department Breakdown</div>
+      <div class="mock-doughnut"></div>
+      <div class="doughnut-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#58a6ff"></span>Engineering</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#3fb950"></span>Quality</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#bc8cff"></span>Product</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#d29922"></span>Operations</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f85149"></span>Support</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#8b949e"></span>Other</span>
+      </div>
+    </div>
+
+    <!-- Token Usage Trend (Stacked Area) -->
+    <div class="chart-card">
+      <div class="chart-title">Token Usage Trend</div>
+      <div class="mock-line-chart">
+        <div class="bar purple" style="height:50%"></div>
+        <div class="bar purple" style="height:65%"></div>
+        <div class="bar purple" style="height:40%"></div>
+        <div class="bar purple" style="height:80%"></div>
+        <div class="bar purple" style="height:55%"></div>
+        <div class="bar purple" style="height:90%"></div>
+        <div class="bar purple" style="height:70%"></div>
+        <div class="bar purple" style="height:45%"></div>
+        <div class="bar purple" style="height:75%"></div>
+        <div class="bar purple" style="height:60%"></div>
+        <div class="bar purple" style="height:85%"></div>
+        <div class="bar purple" style="height:50%"></div>
+        <div class="bar purple" style="height:65%"></div>
+        <div class="bar purple" style="height:40%"></div>
+        <div class="bar purple" style="height:70%"></div>
+      </div>
+    </div>
+
+    <!-- Error Rate (Bar) -->
+    <div class="chart-card">
+      <div class="chart-title">Error Rate Over Time</div>
+      <div class="mock-line-chart">
+        <div class="bar red" style="height:20%"></div>
+        <div class="bar red" style="height:10%"></div>
+        <div class="bar red" style="height:35%"></div>
+        <div class="bar red" style="height:15%"></div>
+        <div class="bar red" style="height:5%"></div>
+        <div class="bar red" style="height:25%"></div>
+        <div class="bar red" style="height:10%"></div>
+        <div class="bar red" style="height:30%"></div>
+        <div class="bar red" style="height:5%"></div>
+        <div class="bar red" style="height:15%"></div>
+        <div class="bar red" style="height:20%"></div>
+        <div class="bar red" style="height:10%"></div>
+        <div class="bar red" style="height:5%"></div>
+        <div class="bar red" style="height:40%"></div>
+        <div class="bar red" style="height:10%"></div>
+      </div>
+    </div>
+
+    <!-- Workflow Bottlenecks (Horizontal Bar) -->
+    <div class="chart-card">
+      <div class="chart-title">Workflow Bottlenecks (Avg Time)</div>
+      <div class="mock-hbar">
+        <div class="hbar-row">
+          <span class="hbar-label">Engineering</span>
+          <div class="hbar-track"><div class="hbar-fill blue" style="width:90%"></div></div>
+          <span class="hbar-value">6m 30s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Quality</span>
+          <div class="hbar-track"><div class="hbar-fill green" style="width:55%"></div></div>
+          <span class="hbar-value">3m 50s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Product</span>
+          <div class="hbar-track"><div class="hbar-fill purple" style="width:35%"></div></div>
+          <span class="hbar-value">2m 20s</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Operations</span>
+          <div class="hbar-track"><div class="hbar-fill yellow" style="width:25%"></div></div>
+          <span class="hbar-value">1m 45s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Error-Prone Tools (Bar) -->
+    <div class="chart-card">
+      <div class="chart-title">Top Error-Prone Tools</div>
+      <div class="mock-hbar">
+        <div class="hbar-row">
+          <span class="hbar-label">Bash</span>
+          <div class="hbar-track"><div class="hbar-fill red" style="width:75%"></div></div>
+          <span class="hbar-value">12</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Write</span>
+          <div class="hbar-track"><div class="hbar-fill red" style="width:40%"></div></div>
+          <span class="hbar-value">5</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Edit</span>
+          <div class="hbar-track"><div class="hbar-fill red" style="width:25%"></div></div>
+          <span class="hbar-value">3</span>
+        </div>
+        <div class="hbar-row">
+          <span class="hbar-label">Grep</span>
+          <div class="hbar-track"><div class="hbar-fill red" style="width:15%"></div></div>
+          <span class="hbar-value">2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Activity (Line) -->
+    <div class="chart-card">
+      <div class="chart-title">Message Activity</div>
+      <div class="mock-line-chart">
+        <div class="bar green" style="height:30%"></div>
+        <div class="bar green" style="height:50%"></div>
+        <div class="bar green" style="height:20%"></div>
+        <div class="bar green" style="height:60%"></div>
+        <div class="bar green" style="height:40%"></div>
+        <div class="bar green" style="height:70%"></div>
+        <div class="bar green" style="height:35%"></div>
+        <div class="bar green" style="height:55%"></div>
+        <div class="bar green" style="height:80%"></div>
+        <div class="bar green" style="height:45%"></div>
+        <div class="bar green" style="height:25%"></div>
+        <div class="bar green" style="height:65%"></div>
+        <div class="bar green" style="height:40%"></div>
+        <div class="bar green" style="height:50%"></div>
+        <div class="bar green" style="height:35%"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── AGENT PERFORMANCE TABLE ── -->
+  <div class="chart-card" style="margin-bottom: 16px;">
+    <div class="chart-title">Agent Performance Details</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <th>Department</th>
+          <th>Sessions</th>
+          <th>Avg Duration</th>
+          <th>Errors</th>
+          <th>Error Rate</th>
+          <th>Tokens</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="agent-name">backend-engineer</td>
+          <td>Engineering</td>
+          <td>38</td>
+          <td>5m 12s</td>
+          <td class="error-count">8</td>
+          <td>21%</td>
+          <td>245K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">frontend-engineer</td>
+          <td>Engineering</td>
+          <td>35</td>
+          <td>4m 18s</td>
+          <td class="error-count">5</td>
+          <td>14%</td>
+          <td>198K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">architecture-agent</td>
+          <td>Engineering</td>
+          <td>42</td>
+          <td>2m 30s</td>
+          <td class="error-count">2</td>
+          <td>5%</td>
+          <td>156K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">qa-agent</td>
+          <td>Quality</td>
+          <td>30</td>
+          <td>3m 24s</td>
+          <td class="error-count">4</td>
+          <td>13%</td>
+          <td>120K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">security-agent</td>
+          <td>Quality</td>
+          <td>25</td>
+          <td>1m 50s</td>
+          <td class="error-count">1</td>
+          <td class="success">4%</td>
+          <td>89K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">product-manager</td>
+          <td>Product</td>
+          <td>40</td>
+          <td>2m 05s</td>
+          <td class="error-count">0</td>
+          <td class="success">0%</td>
+          <td>112K</td>
+        </tr>
+        <tr>
+          <td class="agent-name">devops-engineer</td>
+          <td>Operations</td>
+          <td>18</td>
+          <td>4m 45s</td>
+          <td class="error-count">3</td>
+          <td>17%</td>
+          <td>95K</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── RECENT ERRORS TABLE ── -->
+  <div class="chart-card">
+    <div class="chart-title">Recent Errors</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Agent</th>
+          <th>Tool</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#8b949e">12:34:56</td>
+          <td class="agent-name">backend-engineer</td>
+          <td>Bash</td>
+          <td>npm: command not found</td>
+        </tr>
+        <tr>
+          <td style="color:#8b949e">12:30:12</td>
+          <td class="agent-name">frontend-engineer</td>
+          <td>Write</td>
+          <td>Permission denied: /etc/nginx/conf.d/</td>
+        </tr>
+        <tr>
+          <td style="color:#8b949e">12:25:08</td>
+          <td class="agent-name">devops-engineer</td>
+          <td>Bash</td>
+          <td>docker: daemon not running</td>
+        </tr>
+        <tr>
+          <td style="color:#8b949e">12:20:45</td>
+          <td class="agent-name">qa-agent</td>
+          <td>Edit</td>
+          <td>old_string not found in file</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <span>Data source: SQLite (data/dashboard.db) &middot; Powered by Chart.js in production</span>
+  <span><a href="#">Dashboard</a> &middot; <a href="#">API Docs</a></span>
+</div>
+
+</body>
+</html>

@@ -58,6 +58,41 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 | stop-validation.sh | Stop | Staged secrets check |
 | tool-failure.sh | PostToolUseFailure | Failure diagnostics + error tracking |
 
+## Dashboard & Analytics
+
+### Terminal Dashboard
+- `./scripts/agent-dashboard.sh` — Live TUI with overview, detail, errors, workflow, history, analytics views
+- Multi-session support: `--sessions`, `--session <id>`, `--history`, `--analytics`, `--export`
+- Interactive messaging: `[m]` messages, `[c]` send command to agents
+
+### Web Dashboard (`:8686`)
+- `scripts/web/dashboard.html` — Real-time agent monitoring with session selector
+- `scripts/web/analytics.html` — Cross-session analytics with Chart.js charts
+- `scripts/web/server.py` — Python HTTP server with JSON sync + SQLite analytics backend
+
+### SQLite Analytics Backend
+- Auto-created `data/dashboard.db` on first web server run
+- Tables: `sessions`, `agent_runs`, `errors`, `messages`
+- JSON → SQLite sync on each request (idempotent upsert)
+- WAL journal mode for concurrent read/write
+- Auto-prune: retains last 200 sessions
+
+### Analytics API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/analytics/summary` | Total sessions, agents, errors, tokens, avg duration |
+| `GET /api/analytics/agent-performance` | Per-agent: avg duration, error rate, usage count |
+| `GET /api/analytics/department-performance` | Per-department aggregates |
+| `GET /api/analytics/session-trends` | Last 50 sessions: duration, agent count, errors, tokens |
+| `GET /api/analytics/workflow-bottlenecks` | Average time per workflow phase by department |
+| `GET /api/analytics/error-breakdown` | Errors by tool and by agent |
+| `GET /api/analytics/token-usage` | Token usage trends per session |
+| `GET /api/analytics/message-stats` | Message volume, types, response times |
+
+### Analytics Charts
+Session duration trend (line), agent performance (bar), department breakdown (doughnut), error rate (bar), token usage (stacked area), workflow bottlenecks (horizontal bar), top error-prone tools (bar), message activity (line).
+
 ## Permissions
 
 - **Allow**: Read-only tools auto-approved (Read, Glob, Grep, TodoWrite, Agent, WebSearch, MS365 list/get)
