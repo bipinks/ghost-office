@@ -15,6 +15,7 @@ Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
 ├── hooks/       — 12 safety/audit/lifecycle hooks
+├── status/      — Runtime agent status, todos, errors, session history
 ├── tools/       — 4 tool references
 └── settings.json
 ```
@@ -44,6 +45,15 @@ Agents reference `.claude/memory/` before decisions:
 ## Key Commands
 
 `/implement-feature`, `/fix-bug`, `/deploy-staging`, `/deploy-production`, `/analyze-project`, `/write-tests`, `/refactor-module`, `/monitor-system`, `/investigate-incident`, `/security-scan`, `/create-content`, `/social-media`, `/design-ui`, `/ai-prompt`, `/set-domain`, `/agent-status`
+
+## Agent Dashboard
+
+Monitor multi-agent sessions from a second terminal:
+- `./scripts/agent-dashboard.sh` — Live interactive TUI (overview, detail, errors, workflow, history, analytics)
+- `./scripts/agent-dashboard.sh --history` — Past session history
+- `./scripts/agent-dashboard.sh --analytics` — Per-agent performance stats
+- `./scripts/agent-dashboard.sh --export` — Export current status as markdown
+- `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686
 
 ## Conventions
 

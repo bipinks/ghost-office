@@ -40,6 +40,8 @@
 
 **Parallel execution**: Backend + frontend (after design). Security + architecture review (post-implementation). Docs + deployment prep.
 
+**Dashboard**: Monitor live progress with `./scripts/agent-dashboard.sh` (terminal) or `--web` (browser). Session history, per-agent analytics, error tracking, workflow phase inference, and markdown export included. Use `/agent-status` for in-session status.
+
 ## Workflows
 
 | Workflow | Phases |
@@ -76,6 +78,7 @@ Before any change: no hardcoded secrets, least-privilege IAM, encryption at rest
   skills/    — 54 domain knowledge packs
   rules/     — 12 guidelines (7 categories)
   hooks/     — 12 safety/audit hooks
+  status/    — Runtime: agent status, todos, errors, history
   tools/     — 4 tool references
   settings.json
 ```

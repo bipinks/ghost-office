@@ -61,7 +61,7 @@ Open the project folder in your editor. You'll see:
 devops-agent-hub/
 ├── .claude/
 │   ├── agents/    ← 18 AI "expert" definitions
-│   ├── commands/  ← 22 shortcut commands
+│   ├── commands/  ← 23 shortcut commands
 │   ├── skills/    ← 54 knowledge guides with code examples
 │   ├── rules/     ← Safety and best practice rules
 │   └── settings.json ← Automatic safety hooks
@@ -201,7 +201,33 @@ Slash commands are immediately available. Here are the most useful ones to start
 
 ---
 
-### Task 7: Handle a Production Incident
+### Task 7: Monitor Agent Progress
+
+**What you type (in a second terminal):**
+```
+./scripts/agent-dashboard.sh
+```
+
+**What happens:** A live terminal dashboard shows:
+1. All running and completed agents grouped by department
+2. Per-agent task progress with progress bars
+3. Current workflow phase (Requirements → Design → Implementation → etc.)
+4. Error indicators for agents that hit issues
+5. Interactive navigation — press number keys for agent details, `[h]` for history, `[s]` for stats
+
+**Other modes:**
+```bash
+./scripts/agent-dashboard.sh --history    # Past session history
+./scripts/agent-dashboard.sh --analytics  # Agent performance stats
+./scripts/agent-dashboard.sh --export     # Export as markdown
+./scripts/agent-dashboard.sh --web        # Web dashboard on :8686
+```
+
+You can also type `/agent-status` inside Claude Code for a quick status check.
+
+---
+
+### Task 8: Handle a Production Incident
 
 **What you type:**
 ```

@@ -66,9 +66,14 @@ All Claude Code components live under `.claude/`:
 .claude/
 ├── agents/      # Subagent definitions
 ├── commands/    # Slash commands
+├── workflows/   # Workflow definitions
+├── memory/      # Knowledge docs + domain templates
 ├── skills/      # Domain knowledge packs
 ├── rules/       # Path-scoped guidelines
-└── settings.json # Hooks configuration
+├── hooks/       # Safety/audit/lifecycle hooks
+├── status/      # Runtime agent status and session history
+├── tools/       # Tool reference documents
+└── settings.json # Permissions + hooks configuration
 ```
 
 ## Code of Conduct

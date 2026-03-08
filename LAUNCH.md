@@ -66,6 +66,7 @@ What's in the box:
 🔒 12 safety hooks
 📋 6 end-to-end workflows
 📚 6 knowledge base docs
+📊 Live agent dashboard (terminal + web) with history & analytics
 
 100% markdown, JSON, and shell scripts. No plugins. No build step.
 ```

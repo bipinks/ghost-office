@@ -19,6 +19,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 ├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
 ├── hooks/       — 12 safety/audit/lifecycle hooks
+├── status/      — Runtime: agent status, todos, errors, session history
 ├── tools/       — 4 tool reference documents
 └── settings.json
 ```
@@ -39,7 +40,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 
 **Cloud/Infra**: aws, terraform, networking, ansible, nginx | **Container**: docker, kubernetes | **CI/CD**: cicd-patterns, github-workflows | **Security**: security-hardening, secrets-management, ssl-tls | **Monitoring**: monitoring-patterns, log-management | **Database**: database-ops, postgresql, redis | **Backend**: laravel, api-design, authentication, multi-tenancy | **Frontend**: vue, typescript, frontend-patterns, accessibility, design-systems | **Testing**: testing-patterns, qa-testing-strategy | **Performance**: performance-optimization, cloud-cost-optimization | **AI/ML**: prompt-design, llm-integration, conversational-ai, ai-evaluation | **Marketing**: seo, content-strategy, copywriting, email-marketing, paid-advertising, social-media-strategy, analytics-reporting, community-management | **Product**: product-management, ux-research, wireframing-prototyping | **Docs**: documentation-standards | **Backup**: backup-disaster-recovery | **MS365**: ms365-admin, entra-id, exchange-online, intune | **Domain**: acodax-erp-office-admin, deploy-acodax-property
 
-## Hooks (11)
+## Hooks (12)
 
 | Hook | Event | Purpose |
 |------|-------|---------|
@@ -50,10 +51,11 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 | file-write-check.sh | PostToolUse (Write/Edit) | Secret scanning |
 | migration-check.sh | PostToolUse (Write/Edit) | branch_id enforcement |
 | ms365-audit-log.sh | PreToolUse (MS365) | Audit logging |
-| subagent-lifecycle.sh | SubagentStart/Stop | Agent tracking |
+| todo-tracker.sh | PostToolUse (TodoWrite) | Per-agent task progress tracking |
+| subagent-lifecycle.sh | SubagentStart/Stop | Agent tracking + session history |
 | notification.sh | Notification | Desktop alerts |
 | stop-validation.sh | Stop | Staged secrets check |
-| tool-failure.sh | PostToolUseFailure | Failure diagnostics |
+| tool-failure.sh | PostToolUseFailure | Failure diagnostics + error tracking |
 
 ## Permissions
 

@@ -111,6 +111,33 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 
 ---
 
+## Agent Dashboard
+
+Monitor agent progress in real-time with an interactive terminal or web dashboard.
+
+**Terminal dashboard** (run from a second terminal):
+```bash
+./scripts/agent-dashboard.sh              # Live interactive dashboard
+./scripts/agent-dashboard.sh --history    # View past sessions
+./scripts/agent-dashboard.sh --analytics  # Agent performance stats
+./scripts/agent-dashboard.sh --export     # Export status as markdown
+./scripts/agent-dashboard.sh --web        # Launch web dashboard on :8686
+```
+
+**In-session**: Use `/agent-status` to check progress without leaving Claude Code.
+
+**Features**:
+- Department-grouped agent overview with live duration timers
+- Per-agent task progress (from TodoWrite) with progress bars
+- Workflow phase inference (Requirements → Design → Implementation → Testing → Security → Deploy)
+- Error tracking per agent with detailed error log view
+- Session history (last 50 sessions) with agent performance analytics
+- Desktop notifications when all agents complete
+- Web dashboard with dark theme, auto-refresh, and interactive detail panels
+- Markdown export for sharing in PRs or Slack
+
+---
+
 ## Safety Hooks
 
 | Hook | What It Prevents |
@@ -120,6 +147,9 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | **file-write-check** | Scans every write for hardcoded secrets and API keys |
 | **migration-check** | Enforces `branch_id` in all migrations (multi-tenant) |
 | **ms365-audit-log** | Logs all Microsoft 365 operations for compliance |
+| **todo-tracker** | Captures per-agent task progress for the dashboard |
+| **tool-failure** | Logs tool failures, tracks errors per agent |
+| **subagent-lifecycle** | Tracks agent start/stop, session history, notifications |
 | **session-start** | Auto-injects project context on every session |
 | **pre-compact** | Preserves critical context before auto-compaction |
 
@@ -183,7 +213,11 @@ your-project/
 │   ├── skills/              54 domain knowledge packs
 │   ├── rules/               12 guidelines (7 categories)
 │   ├── hooks/               12 safety/audit/lifecycle hooks
+│   ├── status/              Runtime: agent status, todos, errors, history
 │   └── settings.json        Permissions, hooks, autonomous config
+├── scripts/
+│   ├── agent-dashboard.sh   Terminal dashboard (live + history + analytics)
+│   └── web/dashboard.html   Web dashboard (dark theme, auto-refresh)
 ├── CLAUDE.md                Project instructions (loaded every session)
 ├── AGENTS.md                Agent roster and orchestration
 └── .mcp.json                MCP connections (GitHub, AWS, MS365, etc.)
