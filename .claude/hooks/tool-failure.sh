@@ -1,7 +1,7 @@
 #!/bin/bash
 # Hook: PostToolUseFailure — Tool Failure Handler
-# Logs tool failures and provides diagnostic hints.
-# Exit 0 = allow (logging only, never block)
+# Logs tool failures, provides diagnostic hints, and tracks errors per agent
+# for the agent dashboard to display. Exit 0 = allow (logging only, never block)
 
 INPUT_JSON="$(cat)"
 TOOL_NAME=""
@@ -39,5 +39,51 @@ case "$TOOL_NAME" in
     fi
     ;;
 esac
+
+# --- Track errors per agent for dashboard ---
+if command -v jq >/dev/null 2>&1; then
+  STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
+  ERRORS_DIR="$STATUS_DIR/errors"
+  AGENTS_FILE="$STATUS_DIR/agents.json"
+  mkdir -p "$ERRORS_DIR" 2>/dev/null
+
+  # Find the currently running agent
+  AGENT_NAME="session"
+  if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
+    RUNNING_AGENT="$(jq -r '
+      [.agents | to_entries[] | select(.value.status == "running")]
+      | sort_by(.value.started_at) | last | .key // empty
+    ' "$AGENTS_FILE" 2>/dev/null)"
+    if [ -n "$RUNNING_AGENT" ]; then
+      AGENT_NAME="$RUNNING_AGENT"
+
+      # Increment error_count in agents.json
+      TMPFILE="$(mktemp "${AGENTS_FILE}.XXXXXX" 2>/dev/null)"
+      if [ -n "$TMPFILE" ]; then
+        jq --arg agent "$AGENT_NAME" \
+           '.agents[$agent].error_count = ((.agents[$agent].error_count // 0) + 1)' \
+           "$AGENTS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$AGENTS_FILE"
+        rm -f "$TMPFILE" 2>/dev/null
+      fi
+    fi
+  fi
+
+  # Append error to per-agent error log
+  ERROR_FILE="$ERRORS_DIR/${AGENT_NAME}.json"
+  if [ ! -f "$ERROR_FILE" ] || ! jq empty "$ERROR_FILE" 2>/dev/null; then
+    printf '{"agent":"%s","errors":[]}' "$AGENT_NAME" > "$ERROR_FILE"
+  fi
+
+  ERR_TMP="$(mktemp "${ERROR_FILE}.XXXXXX" 2>/dev/null)"
+  if [ -n "$ERR_TMP" ]; then
+    jq --arg tool "$TOOL_NAME" \
+       --arg msg "$ERROR_MSG" \
+       --arg ts "$TIMESTAMP" \
+       '.errors += [{"tool": $tool, "message": $msg, "timestamp": $ts}] |
+        .errors = (.errors | .[-20:])' \
+       "$ERROR_FILE" > "$ERR_TMP" 2>/dev/null && mv "$ERR_TMP" "$ERROR_FILE"
+    rm -f "$ERR_TMP" 2>/dev/null
+  fi
+fi
 
 exit 0

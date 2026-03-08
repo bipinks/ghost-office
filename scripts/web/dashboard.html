@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --text-dim: #8b949e; --text-bright: #f0f6fc;
+    --green: #3fb950; --yellow: #d29922; --red: #f85149;
+    --blue: #58a6ff; --purple: #bc8cff; --cyan: #39d2c0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace; background: var(--bg); color: var(--text); padding: 20px; }
+  .header { background: linear-gradient(135deg, #1a3a5c, #1a2744); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .header h1 { color: var(--text-bright); font-size: 1.4em; margin-bottom: 4px; }
+  .header .meta { color: var(--text-dim); font-size: 0.85em; }
+  .header .phase { color: var(--cyan); font-size: 0.95em; margin-top: 8px; font-weight: bold; }
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; flex: 1; min-width: 120px; text-align: center; }
+  .stat-card .value { font-size: 1.8em; font-weight: bold; }
+  .stat-card .label { font-size: 0.75em; color: var(--text-dim); text-transform: uppercase; }
+  .stat-card.active .value { color: var(--yellow); }
+  .stat-card.done .value { color: var(--green); }
+  .stat-card.errors .value { color: var(--red); }
+  .stat-card.time .value { color: var(--blue); }
+  .dept-section { margin-bottom: 16px; }
+  .dept-header { color: var(--purple); font-weight: bold; font-size: 0.9em; padding: 8px 16px; border-bottom: 1px solid var(--border); }
+  .agent-row { display: flex; align-items: center; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin: 4px 0; cursor: pointer; transition: background 0.15s; }
+  .agent-row:hover { background: #1c2333; }
+  .agent-row .indicator { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+  .agent-row .indicator.running { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); animation: pulse 1.5s infinite; }
+  .agent-row .indicator.completed { background: var(--green); }
+  .agent-row .indicator.idle { background: var(--border); }
+  .agent-row .name { flex: 1; font-weight: 600; color: var(--text-bright); }
+  .agent-row .status { font-size: 0.8em; padding: 2px 8px; border-radius: 4px; margin-right: 12px; }
+  .agent-row .status.running { background: rgba(210,153,34,0.2); color: var(--yellow); }
+  .agent-row .status.completed { background: rgba(63,185,80,0.2); color: var(--green); }
+  .agent-row .duration { color: var(--text-dim); font-size: 0.85em; min-width: 60px; text-align: right; margin-right: 12px; }
+  .agent-row .progress-bar { width: 80px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-right: 8px; }
+  .agent-row .progress-bar .fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .agent-row .progress-text { font-size: 0.8em; color: var(--text-dim); min-width: 30px; }
+  .agent-row .error-badge { background: rgba(248,81,73,0.2); color: var(--red); font-size: 0.75em; padding: 1px 6px; border-radius: 4px; margin-left: 8px; }
+  .detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-top: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-panel h3 { color: var(--text-bright); margin-bottom: 12px; }
+  .todo-item { padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+  .todo-item .icon { width: 16px; text-align: center; }
+  .todo-item.completed .icon { color: var(--green); }
+  .todo-item.in_progress .icon { color: var(--yellow); font-weight: bold; }
+  .todo-item.pending .icon { color: var(--text-dim); }
+  .error-item { padding: 6px 0; font-size: 0.85em; border-bottom: 1px solid var(--border); }
+  .error-item .tool { color: var(--yellow); }
+  .error-item .time { color: var(--text-dim); }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-size: 0.85em; transition: all 0.15s; }
+  .tab:hover { color: var(--text); border-color: var(--blue); }
+  .tab.active { color: var(--blue); border-color: var(--blue); background: rgba(88,166,255,0.1); }
+  .history-section, .analytics-section { display: none; }
+  .history-section.active, .analytics-section.active { display: block; }
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; }
+  .session-card .sid { color: var(--cyan); font-size: 0.85em; }
+  .session-card .info { color: var(--text-dim); font-size: 0.8em; margin-top: 4px; }
+  .analytics-table { width: 100%; border-collapse: collapse; }
+  .analytics-table th { text-align: left; color: var(--text-dim); font-size: 0.8em; padding: 8px; border-bottom: 1px solid var(--border); }
+  .analytics-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
+  .refresh-note { text-align: center; color: var(--text-dim); font-size: 0.75em; margin-top: 20px; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Agent Dashboard</h1>
+  <div class="meta">
+    <span id="session-id">Session: --</span> &nbsp;|&nbsp;
+    <span id="last-updated">Updated: --</span>
+  </div>
+  <div class="phase" id="workflow-phase"></div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card active"><div class="value" id="active-count">0</div><div class="label">Active</div></div>
+  <div class="stat-card done"><div class="value" id="completed-count">0</div><div class="label">Completed</div></div>
+  <div class="stat-card errors"><div class="value" id="error-count">0</div><div class="label">Errors</div></div>
+  <div class="stat-card time"><div class="value" id="session-time">--</div><div class="label">Session</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('agents')">Agents</div>
+  <div class="tab" onclick="showTab('history')">History</div>
+  <div class="tab" onclick="showTab('analytics')">Analytics</div>
+</div>
+
+<div id="agents-section">
+  <div id="agents-container"></div>
+  <div class="detail-panel" id="detail-panel"></div>
+</div>
+
+<div class="history-section" id="history-section"></div>
+<div class="analytics-section" id="analytics-section"></div>
+
+<div class="refresh-note">Auto-refreshes every 3 seconds &nbsp;|&nbsp; Served by agent-dashboard.sh --web</div>
+
+<script>
+const DEPT_ORDER = ['Orchestrator','Product','Engineering','Quality','Operations','Marketing','Support','IT','Other'];
+const DATA_BASE = 'data';
+
+function formatDuration(s) {
+  if (!s || s <= 0) return '--';
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's';
+  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+}
+
+function inferPhase(agents) {
+  const running = Object.entries(agents).filter(([,v]) => v.status === 'running').map(([k]) => k);
+  const completed = Object.entries(agents).filter(([,v]) => v.status === 'completed').map(([k]) => k);
+  if (running.includes('product-manager')) return 'Phase 1: Requirements';
+  if (running.includes('architecture-agent')) return 'Phase 2: Design';
+  if (running.some(a => ['backend-engineer','frontend-engineer','database-engineer'].includes(a))) return 'Phase 3: Implementation';
+  if (running.includes('qa-agent')) return 'Phase 4: Testing';
+  if (running.includes('security-agent')) return 'Phase 5: Security Review';
+  if (running.some(a => ['devops-engineer','documentation-agent'].includes(a))) return 'Phase 6: Deploy & Docs';
+  if (running.includes('master-orchestrator')) return 'Orchestrating...';
+  const total = Object.keys(agents).length;
+  if (total > 0 && completed.length === total) return 'All Complete';
+  if (total > 0) return 'In Progress';
+  return '';
+}
+
+async function fetchJSON(url) {
+  try { const r = await fetch(url + '?t=' + Date.now()); if (!r.ok) return null; return await r.json(); } catch { return null; }
+}
+
+let selectedAgent = null;
+
+async function refresh() {
+  const data = await fetchJSON(DATA_BASE + '/agents.json');
+  if (!data || !data.agents) {
+    document.getElementById('agents-container').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;">No active session data. Waiting for agents...</div>';
+    return;
+  }
+
+  document.getElementById('session-id').textContent = 'Session: ' + (data.session_id || '--').substring(0, 16);
+  document.getElementById('last-updated').textContent = 'Updated: ' + (data.updated_at || '--').substring(11, 19) + ' UTC';
+
+  const agents = data.agents;
+  const phase = inferPhase(agents);
+  document.getElementById('workflow-phase').textContent = phase;
+
+  const entries = Object.entries(agents);
+  const active = entries.filter(([,v]) => v.status === 'running').length;
+  const completed = entries.filter(([,v]) => v.status === 'completed').length;
+  const totalErrors = entries.reduce((s,[,v]) => s + (v.error_count || 0), 0);
+
+  document.getElementById('active-count').textContent = active;
+  document.getElementById('completed-count').textContent = completed;
+  document.getElementById('error-count').textContent = totalErrors;
+
+  const now = Date.now() / 1000;
+  const starts = entries.map(([,v]) => v.started_at ? new Date(v.started_at).getTime()/1000 : Infinity);
+  const earliest = Math.min(...starts);
+  document.getElementById('session-time').textContent = earliest < Infinity ? formatDuration(Math.floor(now - earliest)) : '--';
+
+  // Group by department
+  const byDept = {};
+  for (const [name, info] of entries) {
+    const dept = info.department || 'Other';
+    if (!byDept[dept]) byDept[dept] = [];
+    byDept[dept].push({ name, ...info });
+  }
+
+  // Load todos
+  const todos = {};
+  for (const [name] of entries) {
+    const td = await fetchJSON(DATA_BASE + '/todos/' + name + '.json');
+    if (td) todos[name] = td;
+  }
+
+  let html = '';
+  for (const dept of DEPT_ORDER) {
+    if (!byDept[dept]) continue;
+    html += '<div class="dept-section"><div class="dept-header">' + dept + '</div>';
+    for (const agent of byDept[dept]) {
+      const dur = agent.status === 'running' && agent.started_at
+        ? Math.floor(now - new Date(agent.started_at).getTime()/1000)
+        : (agent.duration_seconds || 0);
+      const durStr = dur > 0 ? formatDuration(dur) : '--';
+
+      let progressHTML = '';
+      const td = todos[agent.name];
+      if (td && td.progress && td.progress.total > 0) {
+        const pct = Math.floor((td.progress.completed / td.progress.total) * 100);
+        progressHTML = '<div class="progress-bar"><div class="fill" style="width:' + pct + '%"></div></div><span class="progress-text">' + td.progress.completed + '/' + td.progress.total + '</span>';
+      }
+
+      let errorHTML = '';
+      if (agent.error_count > 0) errorHTML = '<span class="error-badge">' + agent.error_count + ' err</span>';
+
+      html += '<div class="agent-row" onclick="toggleDetail(\'' + agent.name + '\')">'
+        + '<div class="indicator ' + agent.status + '"></div>'
+        + '<span class="name">' + agent.name + '</span>'
+        + '<span class="status ' + agent.status + '">' + (agent.status === 'running' ? 'RUNNING' : agent.status === 'completed' ? 'DONE' : 'IDLE') + '</span>'
+        + '<span class="duration">' + durStr + '</span>'
+        + progressHTML + errorHTML
+        + '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('agents-container').innerHTML = html;
+
+  // Detail panel
+  if (selectedAgent && agents[selectedAgent]) {
+    const dp = document.getElementById('detail-panel');
+    dp.classList.add('active');
+    let dhtml = '<h3>' + selectedAgent + '</h3>';
+    const td = todos[selectedAgent];
+    if (td && td.todos) {
+      dhtml += '<div><strong>Tasks:</strong></div>';
+      for (const t of td.todos) {
+        const icon = t.status === 'completed' ? '✓' : t.status === 'in_progress' ? '●' : '○';
+        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + t.content + '</span></div>';
+      }
+    }
+    // Load errors
+    const errData = await fetchJSON(DATA_BASE + '/errors/' + selectedAgent + '.json');
+    if (errData && errData.errors && errData.errors.length > 0) {
+      dhtml += '<div style="margin-top:16px"><strong style="color:var(--red)">Recent Errors:</strong></div>';
+      for (const e of errData.errors.slice(-5).reverse()) {
+        dhtml += '<div class="error-item"><span class="time">' + (e.timestamp||'').substring(11,19) + '</span> <span class="tool">' + e.tool + '</span>: ' + (e.message||'').substring(0,80) + '</div>';
+      }
+    }
+    dp.innerHTML = dhtml;
+  } else {
+    document.getElementById('detail-panel').classList.remove('active');
+  }
+}
+
+function toggleDetail(name) {
+  selectedAgent = selectedAgent === name ? null : name;
+  refresh();
+}
+
+async function loadHistory() {
+  const data = await fetchJSON(DATA_BASE + '/history.json');
+  const el = document.getElementById('history-section');
+  if (!data || !data.sessions || data.sessions.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No session history.</div>';
+    return;
+  }
+  let html = '<h3 style="margin-bottom:12px;color:var(--text-bright)">' + data.sessions.length + ' Sessions</h3>';
+  for (const s of [...data.sessions].reverse().slice(0, 20)) {
+    html += '<div class="session-card"><div class="sid">' + (s.session_id||'--').substring(0,20) + '</div>'
+      + '<div class="info">Started: ' + (s.started_at||'--') + ' | Agents: ' + (s.agents||[]).length + ' | Duration: ' + formatDuration(s.total_duration||0) + '</div>';
+    if (s.agents) {
+      html += '<div style="margin-top:4px;font-size:0.8em;color:var(--text-dim)">' + s.agents.map(a => a.name).join(', ') + '</div>';
+    }
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+async function loadAnalytics() {
+  const data = await fetchJSON(DATA_BASE + '/history.json');
+  const el = document.getElementById('analytics-section');
+  if (!data || !data.sessions || data.sessions.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No data for analytics.</div>';
+    return;
+  }
+  const allAgents = data.sessions.flatMap(s => s.agents || []);
+  const byName = {};
+  for (const a of allAgents) {
+    if (!byName[a.name]) byName[a.name] = [];
+    byName[a.name].push(a);
+  }
+  let html = '<h3 style="margin-bottom:12px;color:var(--text-bright)">Agent Performance</h3>';
+  html += '<table class="analytics-table"><tr><th>Agent</th><th>Runs</th><th>Avg Duration</th><th>Min</th><th>Max</th></tr>';
+  for (const [name, runs] of Object.entries(byName).sort((a,b) => a[0].localeCompare(b[0]))) {
+    const durations = runs.map(r => r.duration_seconds || 0);
+    const avg = Math.floor(durations.reduce((a,b)=>a+b,0) / durations.length);
+    html += '<tr><td>' + name + '</td><td>' + runs.length + '</td><td>' + formatDuration(avg)
+      + '</td><td>' + formatDuration(Math.min(...durations))
+      + '</td><td>' + formatDuration(Math.max(...durations)) + '</td></tr>';
+  }
+  html += '</table>';
+  el.innerHTML = html;
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('agents-section').style.display = tab === 'agents' ? 'block' : 'none';
+  document.getElementById('history-section').classList.toggle('active', tab === 'history');
+  document.getElementById('analytics-section').classList.toggle('active', tab === 'analytics');
+  event.target.classList.add('active');
+  if (tab === 'history') loadHistory();
+  if (tab === 'analytics') loadAnalytics();
+}
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>

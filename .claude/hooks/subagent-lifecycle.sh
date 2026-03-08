@@ -2,6 +2,9 @@
 # Hook: SubagentStart / SubagentStop — Subagent Lifecycle Tracking
 # Logs when subagents are spawned and completed for orchestration visibility.
 # Writes structured JSON status to .claude/status/agents.json for dashboard.
+# Logs session history to .claude/status/history.json on completion.
+# Sends desktop notification when all agents complete.
+# Attempts to capture token usage from hook data (best-effort).
 # Exit 0 = allow (log only, never block)
 
 INPUT_JSON="$(cat)"
@@ -46,6 +49,8 @@ fi
 STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
 mkdir -p "$STATUS_DIR" 2>/dev/null
 STATUS_FILE="$STATUS_DIR/agents.json"
+HISTORY_FILE="$STATUS_DIR/history.json"
+ERRORS_DIR="$STATUS_DIR/errors"
 
 # Department lookup
 get_department() {
@@ -71,6 +76,13 @@ fi
 
 TMPFILE="$(mktemp "${STATUS_FILE}.XXXXXX" 2>/dev/null)" || exit 0
 
+# --- Best-effort token usage capture ---
+# Claude Code may include usage data in future hook versions
+TOTAL_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.total_tokens // .usage.total_tokens // .tool_response.total_tokens // 0' 2>/dev/null)" || TOTAL_TOKENS=0
+INPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.input_tokens // .usage.input_tokens // .tool_response.input_tokens // 0' 2>/dev/null)" || INPUT_TOKENS=0
+OUTPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.output_tokens // .usage.output_tokens // .tool_response.output_tokens // 0' 2>/dev/null)" || OUTPUT_TOKENS=0
+TOOL_USES="$(printf '%s' "$INPUT_JSON" | jq -r '.tool_uses // .usage.tool_uses // .tool_response.tool_uses // 0' 2>/dev/null)" || TOOL_USES=0
+
 case "$EVENT_TYPE" in
   SubagentStart)
     jq --arg agent "$AGENT_NAME" \
@@ -82,7 +94,8 @@ case "$EVENT_TYPE" in
         .agents[$agent] = {
           "status": "running",
           "started_at": $ts,
-          "department": $dept
+          "department": $dept,
+          "error_count": 0
         }' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
     ;;
   SubagentStop)
@@ -97,19 +110,105 @@ case "$EVENT_TYPE" in
       fi
     fi
 
+    # Preserve error_count from running state
+    EXISTING_ERRORS="$(jq -r --arg agent "$AGENT_NAME" '.agents[$agent].error_count // 0' "$STATUS_FILE" 2>/dev/null)" || EXISTING_ERRORS=0
+
     jq --arg agent "$AGENT_NAME" \
        --arg ts "$TIMESTAMP" \
        --arg dept "$DEPARTMENT" \
        --arg sid "$SESSION_ID" \
        --argjson dur "$DURATION" \
+       --argjson errors "$EXISTING_ERRORS" \
+       --argjson tokens "$TOTAL_TOKENS" \
+       --argjson input_tok "$INPUT_TOKENS" \
+       --argjson output_tok "$OUTPUT_TOKENS" \
+       --argjson tools "$TOOL_USES" \
        '.session_id = $sid |
         .updated_at = $ts |
         .agents[$agent].status = "completed" |
         .agents[$agent].completed_at = $ts |
         .agents[$agent].duration_seconds = $dur |
+        .agents[$agent].error_count = $errors |
+        .agents[$agent].tokens = {
+          "total": $tokens,
+          "input": $input_tok,
+          "output": $output_tok,
+          "tool_uses": $tools
+        } |
         .agents[$agent].department = (
           if .agents[$agent].department then .agents[$agent].department else $dept end
         )' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
+
+    # --- Session history: log completed agent to history ---
+    if [ ! -f "$HISTORY_FILE" ] || ! jq empty "$HISTORY_FILE" 2>/dev/null; then
+      printf '{"sessions":[]}' > "$HISTORY_FILE"
+    fi
+
+    HIST_TMP="$(mktemp "${HISTORY_FILE}.XXXXXX" 2>/dev/null)"
+    if [ -n "$HIST_TMP" ]; then
+      jq --arg sid "$SESSION_ID" \
+         --arg agent "$AGENT_NAME" \
+         --arg dept "$DEPARTMENT" \
+         --arg ts "$TIMESTAMP" \
+         --arg started "$STARTED_AT" \
+         --argjson dur "$DURATION" \
+         --argjson tokens "$TOTAL_TOKENS" \
+         '
+         # Find or create session entry
+         (.sessions |= (
+           if any(.session_id == $sid) then
+             map(if .session_id == $sid then
+               .agents += [{
+                 "name": $agent,
+                 "department": $dept,
+                 "started_at": $started,
+                 "completed_at": $ts,
+                 "duration_seconds": $dur,
+                 "tokens": $tokens
+               }] |
+               .updated_at = $ts |
+               .total_duration = ([.agents[].duration_seconds] | add) |
+               .total_tokens = ([.agents[].tokens] | add)
+             else . end)
+           else
+             . + [{
+               "session_id": $sid,
+               "started_at": $started,
+               "updated_at": $ts,
+               "total_duration": $dur,
+               "total_tokens": $tokens,
+               "agents": [{
+                 "name": $agent,
+                 "department": $dept,
+                 "started_at": $started,
+                 "completed_at": $ts,
+                 "duration_seconds": $dur,
+                 "tokens": $tokens
+               }]
+             }]
+           end
+         )) |
+         # Keep only last 50 sessions
+         .sessions = (.sessions | .[-50:])
+         ' "$HISTORY_FILE" > "$HIST_TMP" 2>/dev/null && mv "$HIST_TMP" "$HISTORY_FILE"
+      rm -f "$HIST_TMP" 2>/dev/null
+    fi
+
+    # --- Notification: check if all agents are completed ---
+    STILL_RUNNING="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$STATUS_FILE" 2>/dev/null)" || STILL_RUNNING=1
+    TOTAL_AGENTS="$(jq '[.agents | to_entries[]] | length' "$STATUS_FILE" 2>/dev/null)" || TOTAL_AGENTS=0
+
+    if [ "$STILL_RUNNING" -eq 0 ] && [ "$TOTAL_AGENTS" -gt 0 ]; then
+      COMPLETED_COUNT="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$STATUS_FILE" 2>/dev/null)" || COMPLETED_COUNT=0
+      NOTIFY_MSG="All $COMPLETED_COUNT agents completed"
+
+      # Send desktop notification (cross-platform)
+      if command -v notify-send >/dev/null 2>&1; then
+        notify-send "Agent Dashboard" "$NOTIFY_MSG" --urgency=normal 2>/dev/null
+      elif command -v osascript >/dev/null 2>&1; then
+        osascript -e "display notification \"$NOTIFY_MSG\" with title \"Agent Dashboard\"" 2>/dev/null
+      fi
+    fi
     ;;
 esac
 

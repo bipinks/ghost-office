@@ -8,6 +8,9 @@ node_modules/
 .claude/logs/
 .claude/status/agents.json
 .claude/status/todos/*.json
+.claude/status/errors/*.json
+.claude/status/history.json
+scripts/web/data/
 .claude/memory/domain.lock
 
 # Environment and secrets
