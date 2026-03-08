@@ -71,9 +71,9 @@ TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 TMPFILE="$(mktemp "${MSG_FILE}.XXXXXX" 2>/dev/null)" || exit 0
 
 jq --arg ts "$TIMESTAMP" '
-  .messages |= [.[] | if .status == "pending" then
+  .messages |= ([.[] | if .status == "pending" then
     .status = "delivered" | .delivered_at = $ts
-  else . end]
+  else . end] | .[-100:])
 ' "$MSG_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$MSG_FILE"
 
 # Clean up on failure

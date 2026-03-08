@@ -13,6 +13,27 @@ fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 
+# --- Session cleanup: clear stale data from previous sessions ---
+if [ "$EVENT_TYPE" = "startup" ]; then
+  STATUS_DIR="$PROJECT_DIR/.claude/status"
+  if [ -d "$STATUS_DIR" ]; then
+    # Remove stale lock directories (older than 1 minute)
+    find "$STATUS_DIR" -name "*.lock" -type d -mmin +1 -exec rm -rf {} + 2>/dev/null
+
+    # Clear per-agent files from previous session (keep .gitkeep)
+    for subdir in todos errors messages; do
+      if [ -d "$STATUS_DIR/$subdir" ]; then
+        find "$STATUS_DIR/$subdir" -name "*.json" -type f -delete 2>/dev/null
+      fi
+    done
+
+    # Reset agents.json to empty
+    printf '{"session_id":"","updated_at":"","agents":{}}' > "$STATUS_DIR/agents.json" 2>/dev/null
+
+    # Leave history.json intact (capped at 50 sessions by subagent-lifecycle.sh)
+  fi
+fi
+
 # --- Detect git state (single command check) ---
 BRANCH=""
 RECENT_CHANGES=""

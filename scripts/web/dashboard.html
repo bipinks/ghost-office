@@ -332,6 +332,7 @@
     <span id="session-id">Session: --</span> &nbsp;|&nbsp;
     <span id="last-updated">Updated: --</span>
     <span id="history-badge" style="display:none;margin-left:8px;background:rgba(248,81,73,0.2);color:var(--red);padding:2px 8px;border-radius:4px;font-size:0.8em;">HISTORY</span>
+    &nbsp;|&nbsp; <a href="/analytics.html" style="color:var(--cyan);text-decoration:none;font-size:0.85em;" title="Open full analytics dashboard">Analytics Dashboard</a>
   </div>
   <div class="phase" id="workflow-phase"></div>
 </div>
@@ -909,7 +910,10 @@ async function loadAnalytics() {
     if (!byName[a.name]) byName[a.name] = [];
     byName[a.name].push(a);
   }
-  let html = '<h3 style="margin-bottom:12px;color:var(--text-bright)">Agent Performance</h3>';
+  let html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
+  html += '<h3 style="color:var(--text-bright)">Agent Performance</h3>';
+  html += '<a href="/analytics.html" style="color:var(--cyan);text-decoration:none;font-size:0.85em;padding:6px 14px;border:1px solid var(--cyan);border-radius:6px;">Full Analytics Dashboard &rarr;</a>';
+  html += '</div>';
   html += '<table class="analytics-table"><tr><th>Agent</th><th>Runs</th><th>Avg Duration</th><th>Min</th><th>Max</th></tr>';
   for (const [name, runs] of Object.entries(byName).sort((a,b) => a[0].localeCompare(b[0]))) {
     const durations = runs.map(r => r.duration_seconds || 0);

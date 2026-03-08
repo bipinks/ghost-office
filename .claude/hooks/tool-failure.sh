@@ -42,6 +42,11 @@ esac
 
 # --- Track errors per agent for dashboard ---
 if command -v jq >/dev/null 2>&1; then
+  # Source file locking helper
+  HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+  if [ -f "$HOOK_DIR/lib/filelock.sh" ]; then
+    . "$HOOK_DIR/lib/filelock.sh"
+  fi
   STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
   ERRORS_DIR="$STATUS_DIR/errors"
   AGENTS_FILE="$STATUS_DIR/agents.json"
@@ -57,7 +62,8 @@ if command -v jq >/dev/null 2>&1; then
     if [ -n "$RUNNING_AGENT" ]; then
       AGENT_NAME="$RUNNING_AGENT"
 
-      # Increment error_count in agents.json
+      # Increment error_count in agents.json (with lock)
+      if type acquire_lock >/dev/null 2>&1; then acquire_lock "$AGENTS_FILE"; fi
       TMPFILE="$(mktemp "${AGENTS_FILE}.XXXXXX" 2>/dev/null)"
       if [ -n "$TMPFILE" ]; then
         jq --arg agent "$AGENT_NAME" \
@@ -65,6 +71,7 @@ if command -v jq >/dev/null 2>&1; then
            "$AGENTS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$AGENTS_FILE"
         rm -f "$TMPFILE" 2>/dev/null
       fi
+      if type release_lock >/dev/null 2>&1; then release_lock "$AGENTS_FILE"; fi
     fi
   fi
 

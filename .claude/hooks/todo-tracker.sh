@@ -56,7 +56,7 @@ printf '%s' "$INPUT_JSON" | jq --arg agent "$AGENT_NAME" \
    '{
      "agent": $agent,
      "updated_at": $ts,
-     "todos": [.tool_input.todos[] | {content, status}],
+     "todos": ([.tool_input.todos[] | {content, status}] | .[-100:]),
      "progress": {
        "completed": $completed,
        "in_progress": $in_progress,

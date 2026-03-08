@@ -56,6 +56,8 @@ Monitor multi-agent sessions from a second terminal:
 - `./scripts/agent-dashboard.sh --analytics` — Per-agent performance stats
 - `./scripts/agent-dashboard.sh --export` — Export current status as markdown
 - `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686 (includes session selector dropdown)
+- Analytics dashboard at `http://localhost:8686/analytics.html` — cross-session charts and insights (SQLite-backed, auto-created)
+- Analytics API: `GET /api/analytics/{summary,agent-performance,session-trends,error-breakdown,token-usage,...}`
 
 Multi-session support: press `[l]` in the terminal dashboard to see all sessions (active + historical). Select a session by number to view its agent data. When viewing a historical session, the header turns red with a HISTORY badge. Press `[b]` to return to session list.
 

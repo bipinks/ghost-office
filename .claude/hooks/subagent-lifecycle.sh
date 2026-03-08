@@ -46,6 +46,12 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 0
 fi
 
+# Source file locking helper
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$HOOK_DIR/lib/filelock.sh" ]; then
+  . "$HOOK_DIR/lib/filelock.sh"
+fi
+
 STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
 mkdir -p "$STATUS_DIR" 2>/dev/null
 STATUS_FILE="$STATUS_DIR/agents.json"
@@ -85,6 +91,7 @@ TOOL_USES="$(printf '%s' "$INPUT_JSON" | jq -r '.tool_uses // .usage.tool_uses /
 
 case "$EVENT_TYPE" in
   SubagentStart)
+    if type acquire_lock >/dev/null 2>&1; then acquire_lock "$STATUS_FILE"; fi
     jq --arg agent "$AGENT_NAME" \
        --arg ts "$TIMESTAMP" \
        --arg dept "$DEPARTMENT" \
@@ -97,8 +104,10 @@ case "$EVENT_TYPE" in
           "department": $dept,
           "error_count": 0
         }' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
+    if type release_lock >/dev/null 2>&1; then release_lock "$STATUS_FILE"; fi
     ;;
   SubagentStop)
+    if type acquire_lock >/dev/null 2>&1; then acquire_lock "$STATUS_FILE"; fi
     # Compute duration if started_at exists
     STARTED_AT="$(jq -r --arg agent "$AGENT_NAME" '.agents[$agent].started_at // empty' "$STATUS_FILE" 2>/dev/null)"
     DURATION=0
@@ -138,6 +147,7 @@ case "$EVENT_TYPE" in
         .agents[$agent].department = (
           if .agents[$agent].department then .agents[$agent].department else $dept end
         )' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
+    if type release_lock >/dev/null 2>&1; then release_lock "$STATUS_FILE"; fi
 
     # --- Session history: log completed agent to history ---
     if [ ! -f "$HISTORY_FILE" ] || ! jq empty "$HISTORY_FILE" 2>/dev/null; then

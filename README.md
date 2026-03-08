@@ -424,6 +424,20 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 
 ---
 
+### Analytics dashboard
+
+The web server includes a full analytics dashboard at `http://localhost:8686/analytics.html` with cross-session charts and insights powered by SQLite and Chart.js.
+
+- **Summary cards**: Total sessions, agent runs, errors, tokens, avg duration
+- **8 interactive charts**: Session trends, agent performance, department breakdown, error analysis, token usage, workflow bottlenecks, message activity
+- **Sortable tables**: Agent performance details, recent errors
+- **Auto-created**: SQLite database (`data/dashboard.db`) syncs from JSON on each request — no setup needed
+- **API endpoints**: `GET /api/analytics/{summary,agent-performance,department-performance,session-trends,workflow-bottlenecks,error-breakdown,token-usage,message-stats}`
+
+See [docs/dashboard-data-model.md](docs/dashboard-data-model.md) for the full data model and schema.
+
+---
+
 **How the dashboard works — no magic:**
 
 | What you see | Where it comes from |
@@ -434,6 +448,7 @@ Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:868
 | Error indicators | `.claude/status/errors/{agent}.json` (written by `tool-failure` hook) |
 | Interactive messaging | `.claude/status/messages/{agent}.json` (written by web API + `message-check` hook) |
 | Session history | `.claude/status/history.json` — last 50 sessions, auto-pruned |
+| Analytics / charts | `data/dashboard.db` (SQLite, synced from JSON by server.py) |
 | Desktop notification | Fires via `notification` hook when all agents finish |
 
 ---
@@ -518,7 +533,10 @@ your-project/
 │   └── settings.json        Permissions, hooks, autonomous config
 ├── scripts/
 │   ├── agent-dashboard.sh   Terminal dashboard (live + history + analytics)
-│   └── web/dashboard.html   Web dashboard (dark theme, auto-refresh)
+│   └── web/
+│       ├── dashboard.html   Web dashboard (dark theme, auto-refresh)
+│       ├── analytics.html   Analytics dashboard (charts, SQLite-backed)
+│       └── server.py        Web server (JSON sync, SQLite, analytics API)
 ├── CLAUDE.md                Project instructions (loaded every session)
 ├── AGENTS.md                Agent roster and orchestration
 └── .mcp.json                MCP connections (GitHub, AWS, MS365, etc.)
