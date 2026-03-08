@@ -80,7 +80,11 @@ Switchable domain knowledge packs — use `/set-domain <name>` to activate:
 | Education | `education.md` | Courses, assessments, LMS, FERPA/COPPA compliance |
 | CMS | `cms.md` | Content authoring, SEO, headless API, localization |
 
-Domain detection is fully autonomous: when no `domain.lock` exists, the session-start hook instructs Claude to auto-detect the domain by reading project files and running `/set-domain`. Once set, the result is cached in `domain.lock` — zero overhead on subsequent sessions. Use `/set-domain` to manually override at any time.
+Domain detection is fully autonomous with auto-switching:
+- **No lock file**: Claude auto-detects the domain by reading project files and runs `/set-domain`
+- **New session (startup)**: Claude verifies the cached domain still matches the project — if the codebase has shifted to a different domain, it auto-switches without manual intervention
+- **Resume/compact**: Trusts the cache instantly — zero overhead within a session
+- **Manual override**: `/set-domain <domain>` switches immediately at any time
 
 ## Key Commands
 

@@ -30,7 +30,13 @@ DOMAIN_STATUS=""
 
 if [ -f "$DOMAIN_LOCK" ]; then
   ACTIVE_DOMAIN="$(cat "$DOMAIN_LOCK" 2>/dev/null | tr -d '[:space:]')"
-  DOMAIN_STATUS="$ACTIVE_DOMAIN (cached — use /set-domain to change)"
+  if [ "$EVENT_TYPE" = "startup" ]; then
+    # New session: verify cached domain still matches the project context
+    DOMAIN_STATUS="$ACTIVE_DOMAIN (cached) — VERIFY: Quickly check if '$ACTIVE_DOMAIN' still matches this project by scanning key files (composer.json, package.json, README.md, src/, app/). If the project domain has changed, run /set-domain <correct-domain> to switch. Available: erp, ecommerce, saas, healthcare, fintech, education, cms. If it still matches, no action needed."
+  else
+    # Resume/compact: trust cache within same session
+    DOMAIN_STATUS="$ACTIVE_DOMAIN (cached — use /set-domain to change)"
+  fi
 else
   DOMAIN_STATUS="not set — IMPORTANT: Auto-detect the domain by reading key project files (composer.json, package.json, README.md, etc.) and run /set-domain <domain> to activate. Available: erp, ecommerce, saas, healthcare, fintech, education, cms"
 fi

@@ -33,9 +33,11 @@ Domain detection is **fully autonomous** with three layers:
 
 1. **Auto-detection (first session)**: When no `domain.lock` exists, the `session-start.sh` hook instructs Claude to read key project files (composer.json, package.json, README.md, etc.), understand the project's domain using AI comprehension, and run `/set-domain` automatically. This leverages Claude's contextual understanding — far more accurate than keyword matching.
 
-2. **Cached (subsequent sessions)**: Once set, the domain is stored in `.claude/memory/domain.lock`. All future sessions read from cache — zero overhead.
+2. **Auto-verification (new sessions)**: On every new session start, even with a cached domain, Claude is instructed to quickly verify the cached domain still matches the project. If the project has shifted (e.g., ERP repo replaced with e-commerce code), Claude auto-switches by running `/set-domain` with the correct domain. On resume/compact within the same session, the cache is trusted without re-verification.
 
-3. **Manual override (`/set-domain`)**: Always works. Overrides auto-detection or switches domains instantly.
+3. **Cached (resume/compact)**: Within a session, `domain.lock` is trusted instantly — zero overhead on resume or compaction events.
+
+4. **Manual override (`/set-domain`)**: Always works. Overrides auto-detection or switches domains instantly.
 
 ### Behavior
 
