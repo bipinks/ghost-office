@@ -1,86 +1,113 @@
-# 🎓 Beginner's Guide to DevOps Agent Hub
+# Beginner's Guide
 
-Welcome! If you're new to DevOps and wondering what this project does and how to use it — this guide is for you.
-
----
-
-## What Is This Project?
-
-**DevOps Agent Hub** is a toolkit that makes Claude Code incredibly good at DevOps tasks. Think of it as a "brain upgrade" for your AI assistant — it teaches the AI about infrastructure, deployments, servers, and cloud services so it can actually help you do DevOps work.
-
-### Simple Analogy
-Imagine you hired 18 expert engineers across 7 departments — from product management and engineering to marketing, security, and IT. This project puts all their knowledge into your AI assistant so you can just ask it to do things and it knows how.
+A practical introduction to DevOps Agent Hub — what it is, how it works, and how to start using it.
 
 ---
 
-## How Does It Work?
+## Table of Contents
 
-The project has **6 main parts**:
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  YOU (the user)                     │
-│         "Set up CI/CD for my Node.js app"           │
-└──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│              COMMANDS (23 shortcuts)                │
-│   /cicd-setup, /deploy-staging, /fix-bug, etc.      │
-│   → These are quick shortcuts you type              │
-└──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│               AGENTS (18 experts)                   │
-│   The AI "experts" that handle the actual work      │
-│   backend-engineer, devops-engineer, qa-agent, etc. │
-└──────────────────────┬──────────────────────────────┘
-                       │ uses knowledge from
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│           SKILLS (54 knowledge packs)               │
-│   Step-by-step guides with real code examples       │
-│   Terraform, Docker, AWS, Laravel, Vue, MS365, etc. │
-└─────────────────────────────────────────────────────┘
-```
-
-Plus:
-- **Rules** — Guidelines the AI always follows (like "never commit passwords")
-- **Hooks** — Automatic safety checks (like warning before destructive operations)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Commands Reference](#commands-reference)
+- [Agents and Departments](#agents-and-departments)
+- [Common Workflows](#common-workflows)
+- [Live Dashboard](#live-dashboard)
+- [Domain Configuration](#domain-configuration)
+- [Skills and Knowledge Packs](#skills-and-knowledge-packs)
+- [Safety and Guardrails](#safety-and-guardrails)
+- [Key Concepts](#key-concepts)
+- [Learning Path](#learning-path)
+- [Troubleshooting](#troubleshooting)
+- [FAQ](#faq)
 
 ---
 
-## Getting Started (Step by Step)
+## Overview
 
-### Step 1: Understand What You Have
+DevOps Agent Hub is a drop-in configuration layer for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that transforms it into an autonomous AI software company. It provides **18 specialized agents** across **7 departments**, coordinated by a master orchestrator that breaks down tasks, delegates to the right agents, runs quality gates, and delivers production-ready results.
 
-Open the project folder in your editor. You'll see:
+Think of it as hiring an entire engineering department — product managers, architects, backend/frontend engineers, QA, security, DevOps, and more — all available through your terminal.
+
+**What it includes:**
+
+| Component | Count | Purpose |
+|-----------|-------|---------|
+| Agents | 18 | Specialized AI experts across 7 departments |
+| Skills | 54 | Domain knowledge packs with real code examples |
+| Commands | 23 | Slash commands for common operations |
+| Workflows | 6 | Multi-phase orchestrated processes |
+| Rules | 12 | Enforced guidelines across 7 categories |
+| Hooks | 13 | Automated safety checks and lifecycle events |
+| Domains | 7 | Switchable domain knowledge (ERP, SaaS, etc.) |
+
+**No plugins. No installation. Just markdown, JSON, and shell scripts.**
+
+---
+
+## Architecture
 
 ```
-devops-agent-hub/
-├── .claude/
-│   ├── agents/    ← 18 AI "expert" definitions
-│   ├── commands/  ← 23 shortcut commands
-│   ├── skills/    ← 54 knowledge guides with code examples
-│   ├── rules/     ← Safety and best practice rules
-│   └── settings.json ← Automatic safety hooks
-├── .mcp.json      ← External service connections
-├── contexts/      ← Mode switching (dev/deploy/incident)
-├── examples/      ← Sample configs for real projects
-└── scripts/       ← Helper utilities
+┌──────────────────────────────────────────────────────────┐
+│                      YOU (the user)                      │
+│       "Add invoice PDF generation with email delivery"   │
+└─────────────────────────┬────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│                  SLASH COMMANDS (23)                      │
+│  /implement-feature  /fix-bug  /deploy-staging  etc.     │
+└─────────────────────────┬────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────┐
+│              MASTER ORCHESTRATOR                         │
+│    Plans → Assigns → Tracks → Quality gates → Delivers  │
+└─────────────────────────┬────────────────────────────────┘
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+┌────────────────┐ ┌────────────┐ ┌──────────────┐
+│  AGENTS (18)   │ │ RULES (12) │ │  HOOKS (13)  │
+│  Specialized   │ │ Enforced   │ │  Automated   │
+│  AI experts    │ │ guidelines │ │  safety nets │
+└───────┬────────┘ └────────────┘ └──────────────┘
+        │ references
+        ▼
+┌──────────────────────────────────────────────────────────┐
+│                 SKILLS (54) + MEMORY (6)                  │
+│  Best practices, code patterns, domain knowledge         │
+│  Terraform, Docker, AWS, Laravel, Vue, K8s, and more     │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### Step 2: Start Claude Code
+---
 
-Everything auto-discovers from `.claude/` — no install or copy step needed:
+## Prerequisites
+
+- **Required:** [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
+- **Required:** `git` (version control)
+- **Optional:** `docker` (for containerized dashboard and deployments)
+- **Optional:** `node` (for running validation tests — `npm test`)
+- **Optional:** Cloud CLI tools as needed (`aws`, `terraform`, `kubectl`, `gh`)
+
+No other installation or build step is required. Claude Code auto-discovers everything from the `.claude/` directory.
+
+---
+
+## Quick Start
+
+### Option 1: Use directly
 
 ```bash
+git clone https://github.com/bipinks/devops-agent-hub.git
 cd devops-agent-hub
 claude
 ```
 
-To use in your own project, copy the core files into your project root:
+### Option 2: Add to your existing project
 
 ```bash
 # Required — agents, skills, commands, rules, hooks, and project instructions
@@ -92,265 +119,523 @@ cp devops-agent-hub/.mcp.json your-project/.mcp.json
 cp devops-agent-hub/AGENTS.md your-project/AGENTS.md
 ```
 
-> **Tip:** After copying, run `/set-domain <name>` to activate your domain (erp, ecommerce, saas, healthcare, fintech, education, cms). Then edit `CLAUDE.md` to match your project's tech stack and architecture.
+Then activate your domain:
 
-### Step 3: Start Using Commands
+```bash
+cd your-project
+claude
+# Inside Claude Code:
+/set-domain saas    # or: erp, ecommerce, healthcare, fintech, education, cms
+```
 
-Slash commands are immediately available. Here are the most useful ones to start with:
+Edit `CLAUDE.md` to match your project's tech stack, architecture, and conventions.
 
 ---
 
-## 🎯 Common Tasks (What You'll Actually Do)
+## Project Structure
 
-### Task 1: Set Up a GitHub Repository with CI/CD
-
-**What you type:**
 ```
-/github-setup "new repo for my Node.js API with CI/CD"
+devops-agent-hub/
+├── .claude/
+│   ├── agents/       # 18 agent definitions (1 orchestrator + 17 specialists)
+│   ├── commands/     # 23 slash commands
+│   ├── workflows/    # 6 workflow definitions
+│   ├── memory/       # 6 knowledge docs + 7 domain templates
+│   │   └── domains/  #   erp, ecommerce, saas, healthcare, fintech, education, cms
+│   ├── skills/       # 54 domain knowledge packs with code examples
+│   ├── rules/        # 12 guidelines across 7 categories
+│   │   ├── common/   #   coding-style, git-workflow, security, testing, performance
+│   │   ├── cicd/     #   CI/CD best practices
+│   │   ├── cloud/    #   Cloud infrastructure rules
+│   │   ├── docker/   #   Container best practices
+│   │   ├── kubernetes/ # K8s deployment rules
+│   │   ├── security/ #   Security hardening rules
+│   │   └── terraform/ #  IaC best practices
+│   ├── hooks/        # 13 safety and lifecycle hooks
+│   ├── status/       # Runtime: agent status, todos, errors, session history
+│   ├── tools/        # 4 tool references
+│   └── settings.json # Permissions and hook configuration
+├── scripts/
+│   ├── agent-dashboard.sh  # Live TUI and web dashboard
+│   ├── web/                # Web dashboard (HTML + Python server + Docker)
+│   ├── tests/              # Test suites
+│   └── validate-structure.js # Structure validator
+├── contexts/         # Mode switching (dev, deploy, incident, review)
+├── examples/         # Sample CLAUDE.md configs for real projects
+├── docs/             # Architecture reports and data models
+├── CLAUDE.md         # Project instructions (the brain)
+├── AGENTS.md         # Agent roster and orchestration rules
+├── docker-compose.yml # Dashboard containerization
+└── .mcp.json         # MCP server connections (MS365, filesystem)
 ```
-
-**What happens:** The AI will generate configuration files for you:
-1. Generate `.github/workflows/` CI/CD pipeline files (lint → test → build → deploy)
-2. Suggest branch protection rules to configure
-3. Generate dependabot configuration
-4. Create PR and issue templates
-5. You then review and commit these files to your repository
 
 ---
 
-### Task 2: Deploy a Laravel App via Forge
+## Commands Reference
 
-**What you type:**
+All 23 slash commands, grouped by function:
+
+### Development
+
+| Command | Description |
+|---------|-------------|
+| `/implement-feature` | End-to-end feature implementation with agent coordination |
+| `/fix-bug` | Investigate, fix, and verify a bug with regression tests |
+| `/refactor-module` | Refactor for improved quality, performance, or architecture |
+| `/write-tests` | Write comprehensive tests for a module or feature |
+| `/analyze-project` | Analyze project structure, dependencies, and health |
+
+### Deployment and Infrastructure
+
+| Command | Description |
+|---------|-------------|
+| `/deploy-staging` | Deploy current branch to staging |
+| `/deploy-production` | Deploy to production with safety checks and approval |
+| `/docker-build` | Build, optimize, and scan Docker images |
+| `/cicd-setup` | Generate CI/CD pipeline configuration |
+| `/github-setup` | Set up GitHub repo with branch protection and workflows |
+| `/infra-plan` | Plan and design cloud infrastructure architecture |
+| `/cost-review` | Analyze cloud spending and recommend optimizations |
+| `/acodax-deploy` | Deploy Acodax Property project to production |
+
+### Operations
+
+| Command | Description |
+|---------|-------------|
+| `/monitor-setup` | Set up monitoring, alerting, and dashboards |
+| `/monitor-system` | Check system health, review metrics, identify issues |
+| `/investigate-incident` | Structured incident triage and root cause analysis |
+| `/security-scan` | Security audit against CIS benchmarks and OWASP |
+
+### Content and Design
+
+| Command | Description |
+|---------|-------------|
+| `/create-content` | Content strategy, calendars, copywriting, SEO |
+| `/social-media` | Social campaigns, posts, analytics, community |
+| `/design-ui` | Wireframes, components, accessibility, design systems |
+| `/ai-prompt` | Prompt design, AI feature integration, LLM testing |
+
+### System
+
+| Command | Description |
+|---------|-------------|
+| `/agent-status` | Show status of all agents in the current session |
+| `/set-domain` | Switch domain knowledge (erp, ecommerce, saas, etc.) |
+
+### Usage
+
+Commands accept a quoted argument describing what you need:
+
 ```
-/forge-deploy "new site myapp.com on production server"
+/implement-feature "Add invoice PDF generation with email delivery"
+/fix-bug "Tax calculation returns wrong amount for exempt items"
+/deploy-staging
+/security-scan
+/set-domain healthcare
 ```
-
-**What happens:** The AI will:
-1. Guide you through creating a site on Laravel Forge
-2. Generate the deployment script
-3. Set up SSL with Let's Encrypt
-4. Configure queue workers
-5. Set up auto-deploy on git push
-
-**Prerequisites:** You need a [Laravel Forge](https://forge.laravel.com) account and API token.
 
 ---
 
-### Task 3: Provision Microsoft 365 Users
+## Agents and Departments
 
-**What you type:**
-```
-/ms365-provision "create user john@company.com with E3 license"
-```
+The orchestrator automatically routes your task to the right agents. You do not need to invoke agents manually.
 
-**What happens:** The AI will:
-1. Generate the Microsoft Graph API call or PowerShell script
-2. Assign the correct license
-3. Configure Teams membership
-4. Set up security policies (MFA)
+| Department | Agents | Handles |
+|------------|--------|---------|
+| **Product** | product-manager, ui-ux-designer | Requirements, user stories, wireframes, design systems |
+| **Engineering** | architecture-agent, backend-engineer, frontend-engineer, database-engineer, prompt-engineer | System design, APIs, UI, schemas, migrations, AI features |
+| **Quality** | qa-agent, security-agent | Test writing, security audits, compliance checks |
+| **Operations** | devops-engineer, monitoring-agent, performance-agent | CI/CD, deployments, observability, optimization |
+| **Marketing** | content-strategist, social-media-manager | Content planning, SEO, campaigns, community |
+| **Support** | support-agent, documentation-agent | Bug triage, docs, changelogs, ADRs |
+| **IT** | ms-it-admin | Microsoft 365, Entra ID, Teams, Exchange |
 
-**Prerequisites:** You need Microsoft 365 admin access and a Graph API token.
+### Auto-Routing
 
----
+The master orchestrator routes tasks automatically:
 
-### Task 4: Set Up Docker for Your App
+- **Feature request** → product-manager → architecture-agent → engineers → qa-agent
+- **Bug report** → support-agent → relevant engineer → qa-agent
+- **Deployment** → devops-engineer → monitoring-agent
+- **Security issue** → security-agent (immediate priority)
+- **Incident** → monitoring-agent → devops-engineer → engineers
 
-**What you type:**
-```
-/docker-build "create Dockerfile for a Node.js app"
-```
-
-**What happens:** The AI will:
-1. Create an optimized multi-stage Dockerfile
-2. Create a docker-compose.yml with database and cache
-3. Add a .dockerignore file
-4. Set up health checks
-5. Ensure security (non-root user, specific image tags)
+Independent tasks (e.g., backend + frontend after design) execute in parallel.
 
 ---
 
-### Task 5: Plan Cloud Infrastructure
+## Common Workflows
 
-**What you type:**
+### Implement a Feature
+
 ```
-/infra-plan "Three-tier web app on AWS with a database and Redis cache"
+/implement-feature "Add customer aging report with 30/60/90 day breakdowns"
 ```
 
-**What happens:** The AI will:
-1. Design the VPC layout (subnets, security groups)
-2. Choose appropriate AWS services
-3. Generate Terraform code
-4. Estimate monthly costs
-5. Document architecture decisions
+The orchestrator coordinates a full development cycle:
 
----
+1. **Requirements** — product-manager writes user stories and acceptance criteria
+2. **Design** — architecture-agent designs the solution, ui-ux-designer creates wireframes
+3. **Implementation** — backend-engineer builds the API, frontend-engineer builds the UI, database-engineer writes migrations
+4. **Testing** — qa-agent writes tests (80%+ coverage target)
+5. **Review** — security-agent audits for vulnerabilities
+6. **Delivery** — documentation-agent updates docs, devops-engineer prepares deployment
 
-### Task 6: Run a Security Audit
+### Fix a Bug
 
-**What you type:**
+```
+/fix-bug "Invoice total doesn't include tax for multi-currency orders"
+```
+
+1. **Triage** — Identify severity and affected scope
+2. **Investigate** — Trace root cause through code and data
+3. **Fix** — Implement the correction
+4. **Test** — Add regression test to prevent recurrence
+5. **Deploy** — Ship the fix through staging → production
+
+### Deploy to Production
+
+```
+/deploy-staging
+# Verify on staging, then:
+/deploy-production
+```
+
+Full safety gates: tests must pass, security scan clean, database backup taken, rollback plan documented.
+
+### Run a Security Audit
+
 ```
 /security-scan
 ```
 
-**What happens:** The AI will:
-1. Scan all infrastructure code for vulnerabilities
-2. Check for hardcoded secrets
-3. Verify encryption settings
-4. Review IAM permissions
-5. Generate a report with fixes
+Scans for: hardcoded secrets, encryption gaps, IAM over-permissions, OWASP vulnerabilities, CIS benchmark violations. Generates a report with prioritized fixes.
+
+### Handle a Production Incident
+
+```
+/investigate-incident "API returning 500 errors on /api/v1/invoices"
+```
+
+Structured process: severity triage → log/metric analysis → mitigation → root cause analysis → post-mortem document.
+
+### Plan Infrastructure
+
+```
+/infra-plan "Three-tier web app on AWS with PostgreSQL and Redis"
+```
+
+Produces: VPC layout, service selection, Terraform code, cost estimates, and architecture decision records.
 
 ---
 
-### Task 7: Monitor Agent Progress
+## Live Dashboard
 
-**What you type (in a second terminal):**
-```
-./scripts/agent-dashboard.sh
-```
+Monitor agent progress in real time from a second terminal.
 
-**What happens:** A live terminal dashboard shows:
-1. All running and completed agents grouped by department
-2. Per-agent task progress with progress bars
-3. Current workflow phase (Requirements → Design → Implementation → etc.)
-4. Error indicators for agents that hit issues
-5. Interactive navigation — press number keys for agent details, `[h]` for history, `[s]` for stats
+### Terminal Dashboard
 
-**Other modes:**
 ```bash
-./scripts/agent-dashboard.sh --sessions   # List all sessions, pick one
-./scripts/agent-dashboard.sh --session <id> # Open a specific session by ID
-./scripts/agent-dashboard.sh --history    # Past session history
-./scripts/agent-dashboard.sh --analytics  # Agent performance stats
-./scripts/agent-dashboard.sh --export     # Export as markdown
-./scripts/agent-dashboard.sh --web        # Web dashboard on :8686
-./scripts/agent-dashboard.sh --web-docker # Web dashboard via Docker
+./scripts/agent-dashboard.sh                # Live overview (1s refresh)
+./scripts/agent-dashboard.sh --sessions     # List all sessions, pick one
+./scripts/agent-dashboard.sh --session <id> # Jump to a specific session
+./scripts/agent-dashboard.sh --history      # Browse past sessions
+./scripts/agent-dashboard.sh --analytics    # Per-agent performance stats
+./scripts/agent-dashboard.sh --export       # Save snapshot as markdown
 ```
 
-**Docker option:**
+**Keyboard shortcuts:** number keys for agent detail, `[h]` history, `[s]` stats, `[l]` session list, `[m]` messages, `[c]` send command, `[q]` quit.
+
+### Web Dashboard
+
 ```bash
-docker compose up dashboard      # Start containerized dashboard on :8686
-docker compose logs -f dashboard # Follow logs
-docker compose down              # Stop
+./scripts/agent-dashboard.sh --web          # Web UI on http://localhost:8686
+./scripts/agent-dashboard.sh --web-docker   # Containerized via Docker Compose
+docker compose up dashboard                 # Alternative: run container directly
 ```
 
-**Multi-session:** If you have multiple sessions (active + past), press `[l]` in the dashboard to open the session list. Select a session by number to drill into it. The web dashboard has a session selector dropdown in the header.
+The web dashboard includes a session selector dropdown, agent detail panels, an interactive chat interface for messaging agents, and a cross-session analytics view at `/analytics.html`.
 
-You can also type `/agent-status` inside Claude Code for a quick status check.
+### Agent Messaging
+
+Send instructions or questions to agents while they work:
+
+- **Terminal:** Press `[m]` to view messages, `[c]` to send a command
+- **Web:** Click an agent to open the chat panel, or use the Commands tab
+
+Messages are delivered asynchronously via hooks. Agents acknowledge and respond automatically.
+
+### Quick Status Check
+
+Inside Claude Code, type `/agent-status` for a snapshot of all agent progress without leaving the session.
 
 ---
 
-### Task 8: Interact with Agents from Dashboard
+## Domain Configuration
 
-**Terminal dashboard:**
+The workspace ships with 7 domain templates. Each domain loads specialized business rules, entity definitions, and workflow patterns into the agents' knowledge base.
+
+| Domain | Use Case |
+|--------|----------|
+| `erp` | Accounting, inventory, sales, HR, procurement, manufacturing |
+| `ecommerce` | Products, carts, orders, payments, shipping, reviews |
+| `saas` | Subscriptions, tenants, billing, usage tracking, onboarding |
+| `healthcare` | Patients, appointments, records, prescriptions, compliance |
+| `fintech` | Accounts, transactions, KYC, compliance, risk scoring |
+| `education` | Courses, students, grades, enrollment, LMS |
+| `cms` | Content types, publishing, taxonomies, media, SEO |
+
+### Switching Domains
+
+```
+/set-domain fintech
+```
+
+This updates `.claude/memory/domain-knowledge.md` with the selected domain's rules and entities. All agents reference this file before making decisions.
+
+---
+
+## Skills and Knowledge Packs
+
+Skills are comprehensive reference documents that agents use for domain expertise. Each skill lives in `.claude/skills/<name>/SKILL.md` and contains best practices, code patterns, and step-by-step instructions.
+
+### By Category
+
+**Infrastructure and Cloud:**
+ansible-patterns, aws-patterns, terraform-patterns, kubernetes-patterns, docker-patterns, networking-patterns, nginx-patterns
+
+**CI/CD and Operations:**
+cicd-patterns, github-workflows, monitoring-patterns, log-management, incident-management, backup-disaster-recovery
+
+**Security:**
+security-hardening, secrets-management, ssl-tls-management
+
+**Backend Development:**
+laravel-patterns, api-design, authentication-patterns, multi-tenancy-patterns, postgresql-patterns, redis-patterns, database-ops
+
+**Frontend Development:**
+vue-patterns, frontend-patterns, typescript-patterns, design-systems, accessibility-patterns, wireframing-prototyping
+
+**AI and LLM:**
+prompt-design, llm-integration, conversational-ai, ai-evaluation
+
+**Content and Marketing:**
+content-strategy, copywriting-patterns, seo-optimization, email-marketing, social-media-strategy, analytics-reporting, paid-advertising, community-management
+
+**Product and UX:**
+product-management, ux-research
+
+**Testing and Quality:**
+testing-patterns, qa-testing-strategy, performance-optimization, cloud-cost-optimization
+
+**Documentation:**
+documentation-standards
+
+**Microsoft 365:**
+ms365-admin, entra-id-admin, exchange-online-admin, intune-device-mgmt
+
+You can read any skill directly for self-study:
+
 ```bash
-./scripts/agent-dashboard.sh
-# Press [m] to view all messages
-# Press [c] to send a command (to selected agent or orchestrator)
+cat .claude/skills/docker-patterns/SKILL.md
+cat .claude/skills/terraform-patterns/SKILL.md
 ```
 
-**Web dashboard:**
+---
+
+## Safety and Guardrails
+
+### Hooks (Automated Checks)
+
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `infra-safety-check` | Destructive infra commands | Warns before `terraform destroy`, `kubectl delete`, etc. |
+| `git-safety-check` | Git operations | Blocks force-push to protected branches |
+| `file-write-check` | File creation | Prevents writing secrets or sensitive data |
+| `migration-check` | Database migrations | Ensures rollback methods exist |
+| `ms365-audit-log` | Microsoft 365 operations | Logs all admin actions |
+| `message-check` | Agent tool calls | Delivers dashboard messages to agents |
+| `session-start` | Session initialization | Sets up workspace context |
+| `subagent-lifecycle` | Agent spawn/complete | Tracks agent status for dashboard |
+| `todo-tracker` | Todo updates | Syncs progress to dashboard |
+| `tool-failure` | Tool errors | Logs failures for debugging |
+| `notification` | Key events | Sends alerts on completions/errors |
+| `pre-compact` | Context compression | Saves state before memory trim |
+| `stop-validation` | Session end | Validates final state |
+
+### Enforced Rules
+
+These rules are always active and cannot be bypassed:
+
+- **Never** commit secrets, API keys, or passwords to code
+- **Never** force-push to protected branches (main, master, develop, production, staging)
+- **Never** run destructive infrastructure commands without confirmation
+- **Always** include `branch_id` on database tables for multi-tenant isolation
+- **Always** include rollback/down methods in database migrations
+- **Always** use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+
+---
+
+## Key Concepts
+
+### Infrastructure-as-Code (IaC)
+
+Instead of manually configuring servers through cloud consoles, you describe infrastructure in code (Terraform, CloudFormation, etc.). The tool provisions everything automatically, consistently, and repeatably. Changes are version-controlled and peer-reviewed like application code.
+
+### CI/CD (Continuous Integration / Continuous Deployment)
+
+**CI** automatically tests every code change on push. **CD** automatically deploys tested code through environments (staging → production). The pipeline catches bugs before they reach users.
+
+### Multi-Tenancy
+
+A single application instance serves multiple customers (tenants). Each tenant's data is isolated using a `branch_id` column on every table. Queries are automatically scoped so Tenant A never sees Tenant B's data.
+
+### Agent
+
+An agent is a specialized instruction set that tells Claude Code how to behave for a specific role. The `security-agent` knows how to run security audits. The `backend-engineer` knows Laravel patterns and API design. Agents reference shared knowledge (memory + skills) for consistency.
+
+### Skill
+
+A skill is a knowledge pack — a structured document containing best practices, code patterns, and step-by-step guides for a specific technology. For example, `terraform-patterns` covers module design, state management, and CI/CD integration.
+
+### Hook
+
+A hook is a shell script that runs automatically when certain events occur. The `infra-safety-check` hook intercepts destructive commands and requires confirmation. The `git-safety-check` hook prevents force-pushes to protected branches.
+
+### Workflow
+
+A workflow is a multi-phase process definition. The `feature-development` workflow runs: Requirements → Design → Implementation → Testing → Review → Deploy. The orchestrator follows these phases and assigns agents accordingly.
+
+---
+
+## Learning Path
+
+A suggested progression for teams new to DevOps and this toolkit.
+
+### Phase 1: Foundations (Week 1-2)
+
+| Step | Action | Skill |
+|------|--------|-------|
+| 1 | Learn containerization basics | `.claude/skills/docker-patterns/SKILL.md` |
+| 2 | Build your first Dockerfile | `/docker-build "Dockerfile for a Node.js API"` |
+| 3 | Understand CI/CD pipelines | `.claude/skills/github-workflows/SKILL.md` |
+| 4 | Set up your first pipeline | `/github-setup "CI/CD for my project"` |
+| 5 | Read the security rules | `.claude/rules/common/security.md` |
+
+### Phase 2: Cloud and Infrastructure (Week 3-4)
+
+| Step | Action | Skill |
+|------|--------|-------|
+| 1 | Understand cloud services | `.claude/skills/aws-patterns/SKILL.md` |
+| 2 | Learn Infrastructure-as-Code | `.claude/skills/terraform-patterns/SKILL.md` |
+| 3 | Design your first architecture | `/infra-plan "Web app on AWS with database"` |
+| 4 | Understand networking | `.claude/skills/networking-patterns/SKILL.md` |
+
+### Phase 3: Deployment and Operations (Week 5-6)
+
+| Step | Action | Skill |
+|------|--------|-------|
+| 1 | Learn server configuration | `.claude/skills/ansible-patterns/SKILL.md` |
+| 2 | Configure web servers | `.claude/skills/nginx-patterns/SKILL.md` |
+| 3 | Set up observability | `.claude/skills/monitoring-patterns/SKILL.md` |
+| 4 | Build monitoring dashboards | `/monitor-setup` |
+
+### Phase 4: Security and Scale (Week 7-8)
+
+| Step | Action | Skill |
+|------|--------|-------|
+| 1 | Harden your infrastructure | `.claude/skills/security-hardening/SKILL.md` |
+| 2 | Run a security audit | `/security-scan` |
+| 3 | Learn container orchestration | `.claude/skills/kubernetes-patterns/SKILL.md` |
+| 4 | Manage secrets properly | `.claude/skills/secrets-management/SKILL.md` |
+
+---
+
+## Troubleshooting
+
+### Commands not recognized
+
+Ensure you are running Claude Code from a directory containing the `.claude/` folder:
+
 ```bash
-./scripts/agent-dashboard.sh --web
-# Click an agent → use the chat panel to send messages
-# Click "Commands" tab → send orchestrator instructions
+ls .claude/commands/    # Should list 23 .md files
 ```
 
-**What happens:** Your message is written to `.claude/status/messages/{agent}.json`. On the agent's next tool use, a hook detects the pending message and notifies the agent. The agent reads the message, processes it, and writes a response that appears in the dashboard.
+### Agents not spawning
 
----
+Check that `.claude/settings.json` exists and has proper hook configuration. Run the structure validator:
 
-### Task 9: Handle a Production Incident
-
-**What you type:**
-```
-/investigate-incident "API is returning 500 errors"
+```bash
+npm test
 ```
 
-**What happens:** The AI will:
-1. Help you triage the severity
-2. Guide you through checking logs and metrics
-3. Suggest mitigation steps
-4. Help with root cause analysis
-5. Generate a post-mortem document
+### Dashboard shows no data
+
+Agent status files are written to `.claude/status/`. If empty, the session hasn't started agent work yet. Try running a command like `/implement-feature` first.
+
+### Dashboard web server won't start
+
+```bash
+# Check if port 8686 is in use
+lsof -i :8686
+
+# Use Docker instead
+docker compose up dashboard
+```
+
+### Tests failing
+
+```bash
+npm test                           # Run all tests (14 suites)
+node scripts/validate-structure.js # Validate project structure
+```
 
 ---
 
-## 📚 Learning Path (Recommended Order)
+## FAQ
 
-If you're brand new to DevOps, here's a suggested learning order:
+**Do I need all the cloud tools installed?**
+No. Install only what your project needs. Start with `git` and `docker`. Add `terraform`, `kubectl`, `aws`, etc. as your needs grow.
 
-### Week 1-2: Basics
-1. **Read** `.claude/skills/docker-patterns/SKILL.md` — Learn Docker basics
-2. **Try** `/docker-build` — Create your first Dockerfile
-3. **Read** `.claude/skills/github-workflows/SKILL.md` — Learn CI/CD basics
-4. **Try** `/github-setup` — Set up your first pipeline
+**Does this only work with AWS?**
+No. While AWS skills are the most detailed, the patterns apply to Azure, GCP, and DigitalOcean. Skills cover multi-cloud approaches.
 
-### Week 3-4: Cloud & Infrastructure
-1. **Read** `.claude/skills/aws-patterns/SKILL.md` — Understand cloud services
-2. **Read** `.claude/skills/terraform-patterns/SKILL.md` — Learn Infrastructure-as-Code
-3. **Try** `/infra-plan` — Design your first architecture
+**Can I use this for personal projects?**
+Yes. It works well for setting up CI/CD on personal repos, deploying side projects, and learning DevOps through guided practice.
 
-### Week 5-6: Deployment & Operations
-1. **Read** `.claude/skills/ansible-patterns/SKILL.md` — Server provisioning and config management
-2. **Read** `.claude/skills/nginx-patterns/SKILL.md` — Web server configuration
-3. **Read** `.claude/skills/monitoring-patterns/SKILL.md` — Learn observability
-4. **Try** `/monitor-setup` — Set up monitoring
+**What prevents mistakes?**
+13 hooks run automatically to catch common errors: blocking force-pushes to protected branches, warning before destructive infrastructure commands, checking for committed secrets, and validating database migrations have rollback methods.
 
-### Week 7-8: Security & Advanced
-1. **Read** `.claude/rules/common/security.md` — Security fundamentals
-2. **Try** `/security-scan` — Audit your infrastructure
-3. **Read** `.claude/skills/kubernetes-patterns/SKILL.md` — Container orchestration
-4. **Try** `/k8s-deploy` — Deploy to Kubernetes
+**How do I add a new agent, skill, or command?**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for step-by-step instructions on adding components. Each follows a frontmatter-based markdown format.
 
----
+**Where do I configure API tokens and credentials?**
+- **AWS:** IAM Console → Security Credentials, or `aws configure`
+- **GitHub:** Settings → Developer Settings → Personal Access Tokens
+- **Microsoft 365:** Azure Portal → App Registrations → Client Secret
+- **Docker Hub:** Account Settings → Security → Access Tokens
 
-## 🔑 Key Concepts Explained
+Never commit credentials to code. Use environment variables or a secrets manager.
 
-### What is Infrastructure-as-Code (IaC)?
-Instead of clicking buttons in cloud consoles, you write code (usually Terraform) that describes your servers, databases, and networks. The tool then creates everything automatically and consistently.
+**How do I validate that everything is set up correctly?**
+```bash
+npm test    # Runs 14 test suites with 1100+ checks
+```
 
-### What is CI/CD?
-**CI (Continuous Integration):** Automatically test every code change.
-**CD (Continuous Deployment):** Automatically deploy tested code to servers.
-
-### What is an Agent?
-An "agent" in this project is a set of instructions that tells the AI assistant how to behave for a specific task. For example, the `security-auditor` agent knows exactly what security checks to run.
-
-### What is a Skill?
-A "skill" is a knowledge pack — a document full of best practices, code examples, and step-by-step instructions for a specific technology (like Terraform or Docker).
-
-### What is a Hook?
-A "hook" is an automatic check that runs when certain actions happen. For example, if you try to run `terraform destroy`, a hook will warn you to double-check.
+**Where can I find example configurations?**
+The `examples/` directory contains complete `CLAUDE.md` templates for real-world projects:
+- `examples/CLAUDE.md` — General-purpose template
+- `examples/aws-terraform-CLAUDE.md` — AWS + Terraform infrastructure project
+- `examples/k8s-microservices-CLAUDE.md` — Kubernetes microservices
+- `examples/laravel-forge-CLAUDE.md` — Laravel + Forge deployment
 
 ---
 
-## 💡 Tips for Beginners
+## Next Steps
 
-1. **Start small** — Don't try to learn everything at once. Pick one area (e.g., Docker) and master it.
-2. **Read the skills** — The `.claude/skills/*/SKILL.md` files are goldmines of practical knowledge with real code examples.
-3. **Use commands freely** — The slash commands are safe to experiment with. They generate code/configs for you to review.
-4. **Check the examples** — The `examples/` folder has complete CLAUDE.md configs for real-world projects you can copy.
-5. **Follow the rules** — The `.claude/rules/` files contain critical best practices. Read `.claude/rules/common/security.md` first.
-6. **Don't fear mistakes, but be cautious** — Many IaC resources can be recreated, but **data is not reversible**. Deleting a database destroys its data permanently. Always work in dev/staging environments first, and never run destructive commands (like `terraform destroy`) on production without a backup.
-
----
-
-## ❓ FAQ
-
-**Q: Do I need all these tools installed?**
-No! Install only what you need. Start with `git` and `docker`. Add `terraform`, `kubectl`, etc. as you progress.
-
-**Q: Is this only for AWS?**
-No. While AWS examples are most detailed, the patterns apply to Azure, GCP, and DigitalOcean too. The skills cover multi-cloud approaches.
-
-**Q: Can I use this for my personal projects?**
-Absolutely! It's great for setting up CI/CD for personal repos, deploying side projects, or learning DevOps concepts.
-
-**Q: What if I break something?**
-The hooks and safety checks are designed to prevent mistakes. The `infra-safety-check` hook warns you before destructive operations. Always work in a dev/staging environment first.
-
-**Q: Where do I get API tokens for Forge/MS365/AWS?**
-- **Laravel Forge**: Dashboard → API Tokens
-- **Microsoft 365**: Azure Portal → App Registrations
-- **AWS**: IAM Console → Security Credentials
-- **GitHub**: Settings → Developer Settings → Personal Access Tokens
+- Read [CLAUDE.md](CLAUDE.md) for the full project reference
+- Read [AGENTS.md](AGENTS.md) for detailed agent routing and orchestration rules
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) to add your own agents, skills, or commands
+- Explore `.claude/skills/` to browse all 54 knowledge packs
+- Try `/analyze-project` on your own codebase to see the agents in action
