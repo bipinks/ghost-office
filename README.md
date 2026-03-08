@@ -202,10 +202,64 @@ Press a number key to see that agent's task list in real-time:
 
 ### Web dashboard — `--web`
 
-A dark-themed browser UI served locally on port 8686. Auto-refreshes every 2 seconds. No server setup — reads the same local JSON status files the terminal dashboard uses.
+Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:8686`. Auto-refreshes every 2 seconds. No server dependencies — reads the same local JSON status files the terminal dashboard uses.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  ◉ ○ ○   Agent Dashboard                    http://localhost:8686       │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   Agent Dashboard · Session a3f9b2 · 12:34:56 UTC                       │
+│                                                                          │
+│   ┌────────────┐   ┌────────────┐   ┌──────────────────┐   ┌─────────┐ │
+│   │Requirements│──▶│   Design   │──▶│ ■ Implementation │──▶│ Testing │ │
+│   │     ✓      │   │     ✓      │   │     active       │   │ pending │ │
+│   └────────────┘   └────────────┘   └──────────────────┘   └─────────┘ │
+│                                                                          │
+│   ┌─ Engineering ────────────────────────────────────────────────────┐   │
+│   │                                                                  │   │
+│   │  ┌─────────────────────────┐  ┌─────────────────────────┐       │   │
+│   │  │  backend-engineer    ●  │  │  frontend-engineer   ●  │       │   │
+│   │  │  RUNNING · 4m 23s      │  │  RUNNING · 3m 11s       │       │   │
+│   │  │  ██████████░░░░░  3/5  │  │  ████████░░░░░░░  2/4   │       │   │
+│   │  │                        │  │                          │       │   │
+│   │  │  ✓ Create migration    │  │  ✓ Invoice list page     │       │   │
+│   │  │  ✓ Build service       │  │  ✓ Form components       │       │   │
+│   │  │  ● PDF generation      │  │  ● PDF preview modal     │       │   │
+│   │  │  ○ Email delivery      │  │  ○ Email trigger UI      │       │   │
+│   │  │  ○ Unit tests          │  │                          │       │   │
+│   │  └─────────────────────────┘  └─────────────────────────┘       │   │
+│   │                                                                  │   │
+│   │  ┌─────────────────────────┐  ┌─────────────────────────┐       │   │
+│   │  │  architecture-agent  ✓  │  │  database-engineer   ○  │       │   │
+│   │  │  DONE · 1m 47s         │  │  IDLE                    │       │   │
+│   │  │  ██████████████████ 4/4 │  │  ░░░░░░░░░░░░░░░░░ 0/0 │       │   │
+│   │  └─────────────────────────┘  └─────────────────────────┘       │   │
+│   └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│   ┌─ Product ────────────────────┐  ┌─ Quality ─────────────────────┐   │
+│   │  ┌─────────────────────────┐ │  │  ┌────────────────────────┐   │   │
+│   │  │  product-manager     ✓  │ │  │  │  qa-agent           ○  │   │   │
+│   │  │  DONE · 2m 05s         │ │  │  │  IDLE                   │   │   │
+│   │  │  ██████████████████ 3/3 │ │  │  │  ░░░░░░░░░░░░░░░░ 0/0 │   │   │
+│   │  └─────────────────────────┘ │  │  └────────────────────────┘   │   │
+│   └──────────────────────────────┘  │  ┌────────────────────────┐   │   │
+│                                      │  │  security-agent     ○  │   │   │
+│                                      │  │  IDLE                   │   │   │
+│                                      │  └────────────────────────┘   │   │
+│                                      └──────────────────────────────┘   │
+│                                                                          │
+│   ┌──────────────────────────────────────────────────────────────────┐   │
+│   │  Active: 2  ·  Completed: 2  ·  Idle: 3  ·  Uptime: 6m 18s    │   │
+│   └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+<details>
+<summary>View HTML source of the web dashboard</summary>
 
 ```html
-<!-- http://localhost:8686  —  auto-refresh every 2s -->
+<!-- http://localhost:8686  —  auto-refresh every 2s, dark theme -->
 <div class="dashboard dark">
   <header>Agent Dashboard · Session a3f9b2 · 12:34:56 UTC</header>
 
@@ -222,13 +276,26 @@ A dark-themed browser UI served locally on port 8686. Auto-refreshes every 2 sec
     <div class="agent-card running">
       <div class="agent-name">backend-engineer</div>
       <div class="dept-badge">Engineering</div>
-      <div class="progress-bar"><div class="fill" style="width:40%"></div></div>
-      <div class="meta">2 / 5 tasks · 4m 23s</div>
+      <div class="progress-bar"><div class="fill" style="width:60%"></div></div>
+      <div class="task-list">
+        <div class="task done">✓ Create migration for invoices table</div>
+        <div class="task done">✓ Build InvoiceService with PDF generation</div>
+        <div class="task active">● Implement email delivery via Queue</div>
+        <div class="task pending">○ Add API resource transformer</div>
+        <div class="task pending">○ Write unit tests</div>
+      </div>
+      <div class="meta">3 / 5 tasks · 4m 23s</div>
     </div>
     <div class="agent-card running">
       <div class="agent-name">frontend-engineer</div>
       <div class="dept-badge">Engineering</div>
       <div class="progress-bar"><div class="fill" style="width:50%"></div></div>
+      <div class="task-list">
+        <div class="task done">✓ Invoice list page</div>
+        <div class="task done">✓ Form components</div>
+        <div class="task active">● PDF preview modal</div>
+        <div class="task pending">○ Email trigger UI</div>
+      </div>
       <div class="meta">2 / 4 tasks · 3m 11s</div>
     </div>
     <div class="agent-card done">
@@ -237,9 +304,27 @@ A dark-themed browser UI served locally on port 8686. Auto-refreshes every 2 sec
       <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
       <div class="meta">4 / 4 tasks · 1m 47s ✓</div>
     </div>
+    <div class="agent-card done">
+      <div class="agent-name">product-manager</div>
+      <div class="dept-badge">Product</div>
+      <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
+      <div class="meta">3 / 3 tasks · 2m 05s ✓</div>
+    </div>
+    <div class="agent-card idle">
+      <div class="agent-name">qa-agent</div>
+      <div class="dept-badge">Quality</div>
+    </div>
+    <div class="agent-card idle">
+      <div class="agent-name">security-agent</div>
+      <div class="dept-badge">Quality</div>
+    </div>
   </div>
+
+  <footer>Active: 2 · Completed: 2 · Idle: 3 · Uptime: 6m 18s</footer>
 </div>
 ```
+
+</details>
 
 ---
 
