@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Dashboard — Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px 12px 0 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 { font-size: 18px; font-weight: 600; color: #f0f6fc; }
+  .header .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot.green { background: #3fb950; box-shadow: 0 0 8px #3fb95066; }
+  .session-badge {
+    background: #1f2937;
+    border: 1px solid #30363d;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #8b949e;
+  }
+  .session-badge code { color: #79c0ff; }
+  .header-right { font-size: 13px; color: #8b949e; }
+
+  /* ── Workflow bar ── */
+  .workflow-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 16px 24px;
+    background: #161b22;
+    border-left: 1px solid #30363d;
+    border-right: 1px solid #30363d;
+  }
+  .workflow-step {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .workflow-step.done { background: #1a3a2a; color: #3fb950; border: 1px solid #238636; }
+  .workflow-step.active {
+    background: #1a2740;
+    color: #58a6ff;
+    border: 1px solid #1f6feb;
+    box-shadow: 0 0 12px #1f6feb33;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .workflow-step.pending { background: #1c1c1c; color: #484f58; border: 1px solid #21262d; }
+  .workflow-arrow { color: #30363d; margin: 0 6px; font-size: 16px; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 12px #1f6feb33; }
+    50% { box-shadow: 0 0 20px #1f6feb55; }
+  }
+
+  /* ── Main grid ── */
+  .main {
+    padding: 24px;
+    background: #0d1117;
+    border-left: 1px solid #30363d;
+    border-right: 1px solid #30363d;
+  }
+
+  .dept-section { margin-bottom: 24px; }
+  .dept-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8b949e;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+
+  /* ── Agent card ── */
+  .agent-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px 20px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .agent-card:hover {
+    border-color: #484f58;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .agent-card.running { border-left: 3px solid #1f6feb; }
+  .agent-card.done { border-left: 3px solid #3fb950; }
+  .agent-card.idle { border-left: 3px solid #30363d; opacity: 0.6; }
+  .agent-card.error { border-left: 3px solid #f85149; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .agent-name { font-size: 14px; font-weight: 600; color: #f0f6fc; }
+  .status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.running { background: #1a2740; color: #58a6ff; }
+  .status-badge.done { background: #1a3a2a; color: #3fb950; }
+  .status-badge.idle { background: #1c1c1c; color: #484f58; }
+  .status-badge.error { background: #3d1a1a; color: #f85149; }
+
+  .card-meta {
+    font-size: 12px;
+    color: #8b949e;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 16px;
+  }
+  .card-meta .timer { color: #79c0ff; font-variant-numeric: tabular-nums; }
+
+  /* ── Progress bar ── */
+  .progress-container { margin-bottom: 12px; }
+  .progress-track {
+    height: 6px;
+    background: #21262d;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .progress-fill.running { background: linear-gradient(90deg, #1f6feb, #58a6ff); }
+  .progress-fill.done { background: linear-gradient(90deg, #238636, #3fb950); }
+  .progress-label {
+    font-size: 11px;
+    color: #8b949e;
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* ── Task list ── */
+  .task-list { list-style: none; }
+  .task-list li {
+    font-size: 12px;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .task-icon { width: 14px; text-align: center; flex-shrink: 0; }
+  .task-icon.done { color: #3fb950; }
+  .task-icon.active { color: #58a6ff; }
+  .task-icon.pending { color: #30363d; }
+  .task-text.done { color: #8b949e; text-decoration: line-through; text-decoration-color: #30363d; }
+  .task-text.active { color: #c9d1d9; }
+  .task-text.pending { color: #484f58; }
+
+  /* ── Footer ── */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 0 0 12px 12px;
+    font-size: 13px;
+  }
+  .footer-stats { display: flex; gap: 24px; }
+  .stat-item { display: flex; align-items: center; gap: 6px; }
+  .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .stat-dot.active { background: #1f6feb; }
+  .stat-dot.completed { background: #3fb950; }
+  .stat-dot.idle-dot { background: #30363d; }
+  .stat-dot.errors { background: #f85149; }
+  .stat-value { color: #f0f6fc; font-weight: 600; }
+  .stat-label { color: #8b949e; }
+  .footer-uptime { color: #8b949e; }
+  .footer-uptime span { color: #79c0ff; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <span class="dot green"></span>
+    <h1>Agent Dashboard</h1>
+    <span class="session-badge">Session <code>a3f9b2</code></span>
+  </div>
+  <div class="header-right">12:34:56 UTC &middot; Auto-refresh 2s</div>
+</div>
+
+<!-- ── WORKFLOW BAR ── -->
+<div class="workflow-bar">
+  <span class="workflow-step done">&#10003; Requirements</span>
+  <span class="workflow-arrow">&#9654;</span>
+  <span class="workflow-step done">&#10003; Design</span>
+  <span class="workflow-arrow">&#9654;</span>
+  <span class="workflow-step active">&#9679; Implementation</span>
+  <span class="workflow-arrow">&#9654;</span>
+  <span class="workflow-step pending">Testing</span>
+  <span class="workflow-arrow">&#9654;</span>
+  <span class="workflow-step pending">Security</span>
+  <span class="workflow-arrow">&#9654;</span>
+  <span class="workflow-step pending">Deploy</span>
+</div>
+
+<!-- ── MAIN GRID ── -->
+<div class="main">
+
+  <!-- Engineering -->
+  <div class="dept-section">
+    <div class="dept-label">Engineering</div>
+    <div class="agent-grid">
+
+      <!-- backend-engineer: RUNNING -->
+      <div class="agent-card running">
+        <div class="card-header">
+          <span class="agent-name">backend-engineer</span>
+          <span class="status-badge running">Running</span>
+        </div>
+        <div class="card-meta">
+          <span>3 / 5 tasks</span>
+          <span class="timer">4m 23s</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill running" style="width:60%"></div>
+          </div>
+          <div class="progress-label">60%</div>
+        </div>
+        <ul class="task-list">
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Create migration for invoices table</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Build InvoiceService with CRUD</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Add PDF generation via Snappy</span></li>
+          <li><span class="task-icon active">&#9679;</span><span class="task-text active">Implement email delivery via Queue</span></li>
+          <li><span class="task-icon pending">&#9675;</span><span class="task-text pending">Write unit tests for InvoiceService</span></li>
+        </ul>
+      </div>
+
+      <!-- frontend-engineer: RUNNING -->
+      <div class="agent-card running">
+        <div class="card-header">
+          <span class="agent-name">frontend-engineer</span>
+          <span class="status-badge running">Running</span>
+        </div>
+        <div class="card-meta">
+          <span>2 / 4 tasks</span>
+          <span class="timer">3m 11s</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill running" style="width:50%"></div>
+          </div>
+          <div class="progress-label">50%</div>
+        </div>
+        <ul class="task-list">
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Invoice list page with DataTable</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Create/edit form components</span></li>
+          <li><span class="task-icon active">&#9679;</span><span class="task-text active">PDF preview modal with download</span></li>
+          <li><span class="task-icon pending">&#9675;</span><span class="task-text pending">Email trigger UI + confirmation</span></li>
+        </ul>
+      </div>
+
+      <!-- architecture-agent: DONE -->
+      <div class="agent-card done">
+        <div class="card-header">
+          <span class="agent-name">architecture-agent</span>
+          <span class="status-badge done">Done</span>
+        </div>
+        <div class="card-meta">
+          <span>4 / 4 tasks</span>
+          <span class="timer">1m 47s</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill done" style="width:100%"></div>
+          </div>
+          <div class="progress-label">100%</div>
+        </div>
+        <ul class="task-list">
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Design module architecture</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Define API contract &amp; endpoints</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Plan database schema changes</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Document integration points</span></li>
+        </ul>
+      </div>
+
+      <!-- database-engineer: IDLE -->
+      <div class="agent-card idle">
+        <div class="card-header">
+          <span class="agent-name">database-engineer</span>
+          <span class="status-badge idle">Idle</span>
+        </div>
+        <div class="card-meta">
+          <span>0 / 0 tasks</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Product -->
+  <div class="dept-section">
+    <div class="dept-label">Product</div>
+    <div class="agent-grid">
+
+      <!-- product-manager: DONE -->
+      <div class="agent-card done">
+        <div class="card-header">
+          <span class="agent-name">product-manager</span>
+          <span class="status-badge done">Done</span>
+        </div>
+        <div class="card-meta">
+          <span>3 / 3 tasks</span>
+          <span class="timer">2m 05s</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill done" style="width:100%"></div>
+          </div>
+          <div class="progress-label">100%</div>
+        </div>
+        <ul class="task-list">
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Write feature requirements</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Define acceptance criteria</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Prioritize implementation order</span></li>
+        </ul>
+      </div>
+
+      <!-- ui-ux-designer: DONE -->
+      <div class="agent-card done">
+        <div class="card-header">
+          <span class="agent-name">ui-ux-designer</span>
+          <span class="status-badge done">Done</span>
+        </div>
+        <div class="card-meta">
+          <span>2 / 2 tasks</span>
+          <span class="timer">1m 32s</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill done" style="width:100%"></div>
+          </div>
+          <div class="progress-label">100%</div>
+        </div>
+        <ul class="task-list">
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Design invoice page wireframe</span></li>
+          <li><span class="task-icon done">&#10003;</span><span class="task-text done">Specify PDF template layout</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Quality -->
+  <div class="dept-section">
+    <div class="dept-label">Quality</div>
+    <div class="agent-grid">
+
+      <!-- qa-agent: IDLE -->
+      <div class="agent-card idle">
+        <div class="card-header">
+          <span class="agent-name">qa-agent</span>
+          <span class="status-badge idle">Idle</span>
+        </div>
+        <div class="card-meta"><span>Waiting for implementation</span></div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- security-agent: IDLE -->
+      <div class="agent-card idle">
+        <div class="card-header">
+          <span class="agent-name">security-agent</span>
+          <span class="status-badge idle">Idle</span>
+        </div>
+        <div class="card-meta"><span>Waiting for implementation</span></div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Operations -->
+  <div class="dept-section">
+    <div class="dept-label">Operations</div>
+    <div class="agent-grid">
+
+      <!-- devops-engineer: IDLE -->
+      <div class="agent-card idle">
+        <div class="card-header">
+          <span class="agent-name">devops-engineer</span>
+          <span class="status-badge idle">Idle</span>
+        </div>
+        <div class="card-meta"><span>Waiting for deployment phase</span></div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- monitoring-agent: IDLE -->
+      <div class="agent-card idle">
+        <div class="card-header">
+          <span class="agent-name">monitoring-agent</span>
+          <span class="status-badge idle">Idle</span>
+        </div>
+        <div class="card-meta"><span>Waiting for deployment phase</span></div>
+        <div class="progress-container">
+          <div class="progress-track">
+            <div class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <div class="footer-stats">
+    <div class="stat-item">
+      <span class="stat-dot active"></span>
+      <span class="stat-value">2</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot completed"></span>
+      <span class="stat-value">4</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot idle-dot"></span>
+      <span class="stat-value">4</span>
+      <span class="stat-label">Idle</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot errors"></span>
+      <span class="stat-value">0</span>
+      <span class="stat-label">Errors</span>
+    </div>
+  </div>
+  <div class="footer-uptime">Uptime: <span>6m 18s</span></div>
+</div>
+
+</body>
+</html>
