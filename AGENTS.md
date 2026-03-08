@@ -1,149 +1,82 @@
 # Autonomous AI Software Company — Agent Instructions
 
-A **fully autonomous AI-driven software company** with 18 specialized agents (7 departments), 54 skills, 22 commands, 6 workflows, 11 hooks, 7 domain templates, and a persistent knowledge base for end-to-end product development, operations, and support.
+18 agents (7 departments), 54 skills, 22 commands, 6 workflows, 11 hooks, 7 domain templates.
 
-## Core Principles
+## Principles
+
 1. **Agent-First** — Delegate to specialized agents for domain tasks
-2. **Autonomous Operation** — Agents self-coordinate via the master orchestrator
-3. **Quality Gates** — Tests, security review, and approval before deployment
-4. **Knowledge-Driven** — All agents reference `.claude/memory/` for consistency
-5. **Parallel Execution** — Independent tasks run simultaneously for efficiency
-6. **Audit Everything** — Log all actions, decisions, and changes
-7. **Security-First** — Never compromise on security; validate all changes
+2. **Parallel Execution** — Independent tasks run simultaneously
+3. **Quality Gates** — Tests, security review, approval before deployment
+4. **Knowledge-Driven** — Agents reference `.claude/memory/` for consistency
+5. **Audit Everything** — Log all actions and decisions
+6. **Security-First** — Never compromise; validate all changes
 
 ## Agent Roster
 
-### Master Orchestrator
-| Agent | Purpose | When Active |
-|-------|---------|-------------|
-| master-orchestrator | Central coordinator of all agents | Every task — plans, assigns, tracks, delivers |
+**Master Orchestrator** — Plans, assigns, tracks, delivers (every task)
 
-### Department Agents
-| Agent | Department | Purpose | When to Use |
-|-------|------------|---------|-------------|
-| product-manager | Product | Requirements, specs, priorities | Feature planning, user stories, acceptance criteria |
-| ui-ux-designer | Product | Visual design, wireframes, accessibility | UI design, design systems, user research |
-| architecture-agent | Engineering | System design, tech decisions | New features, refactors, architecture reviews |
-| backend-engineer | Engineering | Server-side code, APIs, logic | Backend features, API endpoints, integrations |
-| frontend-engineer | Engineering | UI/UX implementation, client-side code | Frontend features, UI bugs, responsive design |
-| database-engineer | Engineering | Schema, queries, migrations | DB changes, migrations, query optimization |
-| prompt-engineer | Engineering | AI prompts, LLM integration | Prompt design, chatbots, AI features |
-| qa-agent | Quality | Testing, quality assurance | Test writing, bug verification, regression testing |
-| security-agent | Quality | Security audits, vulnerabilities | Security reviews, pen testing, compliance |
-| devops-engineer | Operations | CI/CD, infrastructure, SSH deployments | Pipeline setup, server config, deployments |
-| monitoring-agent | Operations | Observability, alerting, incidents | Monitoring setup, incident triage, RCA |
-| performance-agent | Operations | Optimization, profiling, cost | Performance issues, optimization, cost analysis |
-| content-strategist | Marketing | Content, SEO, email marketing | Content planning, copywriting, SEO audits |
-| social-media-manager | Marketing | Social media, ads, community | Social campaigns, community management |
-| support-agent | Support | User issues, triage, client admin | Bug reports, client setup, Acodax admin |
-| documentation-agent | Support | Tech docs, API docs, guides | Documentation, changelogs, ADRs |
-| ms-it-admin | IT | Microsoft 365 administration | User provisioning, licensing, Teams, Exchange |
+| Agent | Dept | When to Use |
+|-------|------|-------------|
+| product-manager | Product | Feature planning, user stories, acceptance criteria |
+| ui-ux-designer | Product | UI design, wireframes, design systems |
+| architecture-agent | Engineering | New features, refactors, architecture reviews |
+| backend-engineer | Engineering | Backend features, APIs, integrations |
+| frontend-engineer | Engineering | Frontend features, UI bugs, responsive design |
+| database-engineer | Engineering | DB changes, migrations, query optimization |
+| prompt-engineer | Engineering | Prompt design, chatbots, AI features |
+| qa-agent | Quality | Test writing, bug verification, regression testing |
+| security-agent | Quality | Security reviews, pen testing, compliance |
+| devops-engineer | Operations | Pipeline setup, server config, deployments |
+| monitoring-agent | Operations | Monitoring, incident triage, RCA |
+| performance-agent | Operations | Performance issues, optimization, cost analysis |
+| content-strategist | Marketing | Content planning, copywriting, SEO audits |
+| social-media-manager | Marketing | Social campaigns, community management |
+| support-agent | Support | Bug reports, client setup, admin tasks |
+| documentation-agent | Support | Documentation, changelogs, ADRs |
+| ms-it-admin | IT | Microsoft 365, Entra ID, Teams, Exchange |
 
-## Agent Orchestration
+## Orchestration
 
-### Automatic Assignment
-The master-orchestrator automatically routes tasks:
-- Feature requests → product-manager → architecture-agent → engineers → qa-agent
-- UI/UX design → ui-ux-designer → frontend-engineer
-- Bug reports → support-agent → relevant engineer → qa-agent
-- Deployments → devops-engineer → monitoring-agent
-- Security concerns → security-agent (immediate priority)
-- Incidents → monitoring-agent → devops-engineer → engineers
-- AI/LLM features → prompt-engineer → backend-engineer → qa-agent
-- Content/SEO → content-strategist
-- Social media/ads → social-media-manager
-- Documentation → documentation-agent
-- Performance issues → performance-agent
-- Microsoft 365 tasks → ms-it-admin
-- Acodax admin → support-agent
-- SSH deployments → devops-engineer
+**Auto-routing**: Feature → product-manager → architecture → engineers → qa. Bug → support → engineer → qa. Deploy → devops → monitoring. Security → security-agent (immediate). Incident → monitoring → devops → engineers.
 
-### Parallel Execution
-Launch multiple agents simultaneously for independent tasks:
-- Backend + frontend implementation (after design phase)
-- Security review + architecture review (post-implementation)
-- Documentation + deployment preparation
-- Multiple investigation tracks during incidents
+**Parallel execution**: Backend + frontend (after design). Security + architecture review (post-implementation). Docs + deployment prep.
 
 ## Workflows
 
-| Workflow | File | Phases |
-|----------|------|--------|
-| Feature Development | `.claude/workflows/feature-development.md` | Requirements → Design → Implement → Test → Review → Deploy |
-| Bug Fix | `.claude/workflows/bug-fix.md` | Triage → Investigate → Fix → Test → Deploy |
-| Release Process | `.claude/workflows/release-process.md` | Freeze → QA → Security → Staging → Approval → Production |
-| Production Incident | `.claude/workflows/production-incident.md` | Detect → Triage → Investigate → Mitigate → Resolve → Post-mortem |
-| Client Deployment | `.claude/workflows/client-deployment.md` | Requirements → Tenant → Config → Data → Deploy → Verify |
-| Content Campaign | `.claude/workflows/content-campaign.md` | Strategy → Create → Optimize → Publish → Analyze |
-
-## Knowledge Base
-
-All agents reference `.claude/memory/` before making decisions:
-| Document | Contents |
-|----------|----------|
-| `architecture.md` | System architecture, module structure, API design |
-| `coding-standards.md` | Laravel/PHP, Vue/TS conventions, git workflow |
-| `domain-knowledge.md` | Active domain expertise and business rules (set via `/set-domain`) |
-| `domains/*.md` | 7 switchable domain templates (erp, ecommerce, saas, healthcare, fintech, education, cms) |
-| `deployment-standards.md` | Environment setup, deployment checklists, rollback |
-| `devops-runbook.md` | Server management, backups, CI/CD, troubleshooting |
-| `performance-guidelines.md` | Performance targets, optimization rules, caching |
-
-## Security Guidelines
-**Before ANY change:**
-- No hardcoded secrets (API keys, passwords, tokens, certificates)
-- IAM follows least privilege principle
-- Encryption at rest enabled for all storage
-- Encryption in transit (TLS 1.2+) for all communication
-- Multi-tenant data isolation verified
-- Audit logging for all data changes
-- Container images scanned for vulnerabilities
-
-**If security issue found:** STOP → use security-agent → fix CRITICAL issues → rotate exposed credentials → review for similar issues.
-
-## Coding Style
-Reference `.claude/memory/coding-standards.md` for full details:
-- **PHP/Laravel**: PSR-12, thin controllers, service layer for business logic
-- **TypeScript/Vue**: Composition API, type-safe props, component-based architecture
-- **Database**: snake_case, branch_id for multi-tenant tables, soft deletes, audit columns
-- **API**: RESTful, versioned, consistent response envelope
-- **Git**: Conventional commits, feature branches, squash merge
+| Workflow | Phases |
+|----------|--------|
+| Feature Development | Requirements → Design → Implement → Test → Review → Deploy |
+| Bug Fix | Triage → Investigate → Fix → Test → Deploy |
+| Release Process | Freeze → QA → Security → Staging → Approval → Production |
+| Production Incident | Detect → Triage → Investigate → Mitigate → Resolve → Post-mortem |
+| Client Deployment | Requirements → Tenant → Config → Data → Deploy → Verify |
+| Content Campaign | Strategy → Create → Optimize → Publish → Analyze |
 
 ## Quality Requirements
-Every deliverable must meet:
-- [ ] Code follows coding standards
+
+- [ ] Code follows `.claude/memory/coding-standards.md`
 - [ ] Tests written and passing (80%+ coverage)
 - [ ] Security review passed
-- [ ] Multi-tenant isolation verified
+- [ ] Multi-tenant isolation verified (branch_id)
 - [ ] Documentation updated
 - [ ] Database migrations reversible
-- [ ] No breaking changes to existing APIs
+- [ ] No breaking API changes
+
+## Security
+
+Before any change: no hardcoded secrets, least-privilege IAM, encryption at rest + in transit, multi-tenant isolation verified, audit logging enabled. If security issue found: STOP → security-agent → fix → rotate credentials → review for similar issues.
 
 ## Project Structure
+
 ```
 .claude/
-  agents/         — 18 autonomous agents (7 departments)
-  commands/       — 22 slash commands
-  workflows/      — 6 workflow definitions
-  memory/         — 6 knowledge base documents
-  tools/          — 4 tool reference documents
-  skills/         — 54 domain knowledge packs
-  rules/          — 12 guidelines (7 categories)
-  hooks/          — 11 safety, audit, and lifecycle hook scripts
-  settings.json   — Hooks, permissions, and autonomous settings
-.mcp.json         — MCP server configurations (GitHub, AWS, MS365, etc.)
-scripts/          — Node.js utilities (ms365, acodax, validation)
-contexts/         — 4 dynamic context modes
-examples/         — CLAUDE.md templates for real projects
-docs/             — Architecture reports and documentation
+  agents/    — 18 agents (7 departments)
+  commands/  — 22 slash commands
+  workflows/ — 6 workflow definitions
+  memory/    — 6 knowledge docs + 7 domain templates
+  skills/    — 54 domain knowledge packs
+  rules/     — 12 guidelines (7 categories)
+  hooks/     — 11 safety/audit hooks
+  tools/     — 4 tool references
+  settings.json
 ```
-
-## Success Metrics
-- All changes go through agent-coordinated quality gates
-- No security vulnerabilities in deployed code
-- Zero secrets exposed in code or logs
-- Tests passing with 80%+ coverage
-- Multi-tenant data isolation verified for multi-tenant features
-- Deployment rollback available within 5 minutes
-- Mean Time To Recovery (MTTR) under 30 minutes for SEV1
-- Every feature has documentation and changelog entry
