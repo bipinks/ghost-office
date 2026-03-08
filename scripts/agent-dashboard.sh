@@ -2,18 +2,20 @@
 # Agent Dashboard — Live terminal UI for monitoring agent progress
 #
 # Usage:
-#   ./scripts/agent-dashboard.sh              # Interactive live dashboard
-#   ./scripts/agent-dashboard.sh --once       # Print once and exit
-#   ./scripts/agent-dashboard.sh --no-color   # Disable colors
-#   ./scripts/agent-dashboard.sh --history    # Show session history
-#   ./scripts/agent-dashboard.sh --analytics  # Show agent performance analytics
-#   ./scripts/agent-dashboard.sh --export     # Export current status as markdown
-#   ./scripts/agent-dashboard.sh --web        # Launch web dashboard (opens browser)
+#   ./scripts/agent-dashboard.sh                    # Interactive live dashboard
+#   ./scripts/agent-dashboard.sh --session <id>     # Open specific session by ID
+#   ./scripts/agent-dashboard.sh --sessions         # Show session list and pick one
+#   ./scripts/agent-dashboard.sh --once             # Print once and exit
+#   ./scripts/agent-dashboard.sh --no-color         # Disable colors
+#   ./scripts/agent-dashboard.sh --history          # Show session history
+#   ./scripts/agent-dashboard.sh --analytics        # Show agent performance analytics
+#   ./scripts/agent-dashboard.sh --export           # Export current status as markdown
+#   ./scripts/agent-dashboard.sh --web              # Launch web dashboard (opens browser)
 #
 # Interactive keys:
 #   [1-9] = agent detail  [b] = back  [h] = history  [s] = stats
 #   [e] = errors  [w] = workflow  [m] = messages  [c] = command
-#   [r] = reset  [q] = quit
+#   [l] = session list  [r] = reset  [q] = quit
 
 set -euo pipefail
 
@@ -33,14 +35,32 @@ WIDTH=64
 USE_COLOR=true
 RUN_ONCE=false
 MODE=""
-for arg in "$@"; do
-  case "$arg" in
-    --no-color) USE_COLOR=false ;;
-    --once)     RUN_ONCE=true ;;
-    --history)  MODE="history" ;;
+TARGET_SESSION=""
+SKIP_NEXT=false
+args=("$@")
+for i in "${!args[@]}"; do
+  if [ "$SKIP_NEXT" = true ]; then
+    SKIP_NEXT=false
+    continue
+  fi
+  case "${args[$i]}" in
+    --no-color)  USE_COLOR=false ;;
+    --once)      RUN_ONCE=true ;;
+    --history)   MODE="history" ;;
     --analytics) MODE="analytics" ;;
-    --export)   MODE="export" ;;
-    --web)      MODE="web" ;;
+    --export)    MODE="export" ;;
+    --web)       MODE="web" ;;
+    --sessions)  MODE="sessions" ;;
+    --session)
+      if [ -n "${args[$((i+1))]:-}" ]; then
+        TARGET_SESSION="${args[$((i+1))]}"
+        SKIP_NEXT=true
+      else
+        echo "Error: --session requires a session ID argument"
+        echo "Usage: $0 --session <session-id>"
+        exit 1
+      fi
+      ;;
   esac
 done
 
@@ -60,6 +80,105 @@ if ! command -v jq >/dev/null 2>&1; then
   echo "Error: jq is required. Install with: apt-get install jq / brew install jq"
   exit 1
 fi
+
+# --- Session management ---
+# When --session <id> is provided, resolve the session data source.
+# The current live session is in agents.json; past sessions are in history.json.
+VIEWING_HISTORY_SESSION=false
+
+resolve_session_target() {
+  if [ -z "$TARGET_SESSION" ]; then
+    return
+  fi
+
+  # Check if the active session matches
+  if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
+    local current_sid
+    current_sid="$(jq -r '.session_id // ""' "$AGENTS_FILE" 2>/dev/null)"
+    if [ -n "$current_sid" ]; then
+      # Match full ID or prefix
+      if [ "$current_sid" = "$TARGET_SESSION" ] || \
+         [[ "$current_sid" == "$TARGET_SESSION"* ]]; then
+        # Already viewing the active session, nothing special needed
+        return
+      fi
+    fi
+  fi
+
+  # Check history for the session
+  if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
+    local match
+    match="$(jq -r --arg sid "$TARGET_SESSION" '
+      .sessions[] | select(.session_id == $sid or (.session_id | startswith($sid))) |
+      .session_id
+    ' "$HISTORY_FILE" 2>/dev/null | head -1)"
+
+    if [ -n "$match" ]; then
+      TARGET_SESSION="$match"
+      VIEWING_HISTORY_SESSION=true
+      return
+    fi
+  fi
+
+  echo "Error: Session '$TARGET_SESSION' not found in active session or history."
+  echo ""
+  echo "Available sessions:"
+  if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
+    local active_sid
+    active_sid="$(jq -r '.session_id // ""' "$AGENTS_FILE" 2>/dev/null)"
+    [ -n "$active_sid" ] && echo "  [active] $active_sid"
+  fi
+  if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
+    jq -r '.sessions | reverse | .[0:10][] | "  [history] \(.session_id)  (\(.started_at // "?"))"' \
+      "$HISTORY_FILE" 2>/dev/null
+  fi
+  exit 1
+}
+
+# Count total available sessions (1 active + N historical)
+count_sessions() {
+  local count=0
+  if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
+    local has_agents
+    has_agents="$(jq '[.agents | to_entries[]] | length' "$AGENTS_FILE" 2>/dev/null)" || has_agents=0
+    [ "$has_agents" -gt 0 ] && count=$((count + 1))
+  fi
+  if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
+    local hist_count
+    hist_count="$(jq '.sessions | length' "$HISTORY_FILE" 2>/dev/null)" || hist_count=0
+    count=$((count + hist_count))
+  fi
+  echo "$count"
+}
+
+# Build a history session's agents.json-like structure from history data
+# This lets the existing render functions work with historical sessions
+build_history_agents_file() {
+  local session_id="$1"
+  local tmp_file="$STATUS_DIR/.history_view.json"
+
+  jq --arg sid "$session_id" '
+    .sessions[] | select(.session_id == $sid) |
+    {
+      session_id: .session_id,
+      started_at: .started_at,
+      agents: (
+        [.agents[] | {key: .name, value: {
+          status: "completed",
+          department: .department,
+          started_at: .started_at,
+          duration_seconds: .duration_seconds,
+          tokens: {total: (.tokens // 0)},
+          error_count: (.errors // 0)
+        }}] | from_entries
+      )
+    }
+  ' "$HISTORY_FILE" > "$tmp_file" 2>/dev/null
+
+  echo "$tmp_file"
+}
+
+resolve_session_target
 
 # --- Helper functions ---
 format_duration() {
@@ -165,6 +284,12 @@ get_token_info() {
 VIEW_MODE="overview"
 DETAIL_AGENT=""
 AGENT_INDEX_MAP=()
+SESSION_LIST_INDEX_MAP=()
+
+# If viewing a historical session, swap AGENTS_FILE to the temp view
+if [ "$VIEWING_HISTORY_SESSION" = true ]; then
+  AGENTS_FILE="$(build_history_agents_file "$TARGET_SESSION")"
+fi
 
 # ====================================================================
 # MODE: --export (print markdown and exit)
@@ -425,12 +550,69 @@ handle_web() {
   exit 0
 }
 
+# ====================================================================
+# MODE: --sessions (show session list and exit)
+# ====================================================================
+handle_sessions_list() {
+  printf "${BOLD}Available Sessions${RESET}\n\n"
+  separator
+
+  local idx=0
+
+  # Active session
+  if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
+    local active_sid active_count
+    active_sid="$(jq -r '.session_id // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
+    active_count="$(jq '[.agents | to_entries[]] | length' "$AGENTS_FILE" 2>/dev/null)" || active_count=0
+    if [ "$active_count" -gt 0 ]; then
+      local running_count completed_count
+      running_count="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$AGENTS_FILE" 2>/dev/null)" || running_count=0
+      completed_count="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$AGENTS_FILE" 2>/dev/null)" || completed_count=0
+
+      local phase
+      phase="$(infer_workflow_phase)"
+
+      idx=$((idx + 1))
+      printf '\n'
+      printf "  ${BOLD}${GREEN}[%d] %s${RESET}  ${GREEN}● ACTIVE${RESET}\n" "$idx" "${active_sid:0:20}"
+      printf "      Agents: ${CYAN}%d${RESET}  Running: ${YELLOW}%d${RESET}  Done: ${GREEN}%d${RESET}\n" \
+        "$active_count" "$running_count" "$completed_count"
+      [ -n "$phase" ] && printf "      %s\n" "$phase"
+    fi
+  fi
+
+  # Historical sessions
+  if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
+    jq -r '.sessions | reverse | .[0:9][] |
+      "\(.session_id)\t\(.started_at // "?")\t\(.total_duration // 0)\t\(.agents | length)"
+    ' "$HISTORY_FILE" 2>/dev/null | while IFS=$'\t' read -r sid started dur agents; do
+      idx=$((idx + 1))
+      local short_sid="${sid:0:20}"
+      local dur_str="$(format_duration "$dur")"
+      printf '\n'
+      printf "  ${DIM}[%d] %s${RESET}\n" "$idx" "$short_sid"
+      printf "      ${DIM}%s  agents:%s  duration:%s${RESET}\n" \
+        "${started:0:16}" "$agents" "$dur_str"
+    done
+  fi
+
+  if [ "$idx" -eq 0 ]; then
+    printf '\n  %sNo sessions found.%s\n' "${DIM}" "${RESET}"
+  fi
+
+  printf '\n'
+  separator
+  printf "  ${DIM}Use: $0 --session <id> to open a specific session${RESET}\n"
+  exit 0
+}
+
 # --- Handle non-interactive modes ---
 case "$MODE" in
   export)    handle_export ;;
   history)   handle_history ;;
   analytics) handle_analytics ;;
   web)       handle_web ;;
+  sessions)  handle_sessions_list ;;
 esac
 
 # ====================================================================
@@ -492,8 +674,13 @@ render_overview() {
   printf '\033[2J\033[H'
 
   # Header
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD                          $current_time"
-  printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Session: $short_session                    Refresh: ${REFRESH_INTERVAL}s"
+  if [ "$VIEWING_HISTORY_SESSION" = true ]; then
+    printf "${BOLD}${BG_RED}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD (HISTORY)                $current_time"
+    printf "${BG_RED}${WHITE}%-${WIDTH}s${RESET}\n" "  Session: $short_session                    [l] live"
+  else
+    printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD                          $current_time"
+    printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Session: $short_session                    Refresh: ${REFRESH_INTERVAL}s"
+  fi
   if [ -n "$phase" ]; then
     printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Workflow: $phase"
   fi
@@ -589,8 +776,8 @@ render_overview() {
   fi
 
   separator
-  printf "  ${DIM}[1-%d] detail  [h] history  [s] stats  [e] errors  [w] workflow${RESET}\n" "$idx"
-  printf "  ${DIM}[m] messages  [c] command  [q] quit${RESET}\n"
+  printf "  ${DIM}[1-%d] detail  [l] sessions  [h] history  [s] stats  [e] errors${RESET}\n" "$idx"
+  printf "  ${DIM}[w] workflow  [m] messages  [c] command  [q] quit${RESET}\n"
 }
 
 # --- Render detail view ---
@@ -910,6 +1097,84 @@ render_stats_interactive() {
   printf "  ${DIM}[b] back  │  [q] quit${RESET}\n"
 }
 
+# --- Render session list view (interactive) ---
+render_session_list() {
+  local current_time
+  current_time="$(date -u +"%H:%M:%S UTC")"
+  local now_epoch
+  now_epoch="$(date -u +%s 2>/dev/null)" || now_epoch=0
+
+  printf '\033[2J\033[H'
+  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  SESSION LIST                             $current_time"
+  separator
+
+  SESSION_LIST_INDEX_MAP=()
+  local idx=0
+
+  # Active session (from original agents.json, not the history view)
+  local orig_agents="$STATUS_DIR/agents.json"
+  if [ -f "$orig_agents" ] && jq empty "$orig_agents" 2>/dev/null; then
+    local active_sid active_count
+    active_sid="$(jq -r '.session_id // ""' "$orig_agents" 2>/dev/null)"
+    active_count="$(jq '[.agents | to_entries[]] | length' "$orig_agents" 2>/dev/null)" || active_count=0
+    if [ "$active_count" -gt 0 ] && [ -n "$active_sid" ]; then
+      idx=$((idx + 1))
+      SESSION_LIST_INDEX_MAP+=("active:$active_sid")
+
+      local running_count completed_count
+      running_count="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$orig_agents" 2>/dev/null)" || running_count=0
+      completed_count="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$orig_agents" 2>/dev/null)" || completed_count=0
+
+      # Session duration
+      local earliest_start session_dur_str="--"
+      earliest_start="$(jq -r '[.agents[].started_at] | sort | first // empty' "$orig_agents" 2>/dev/null)"
+      if [ -n "$earliest_start" ]; then
+        local s_epoch
+        s_epoch="$(date -d "$earliest_start" +%s 2>/dev/null)" || s_epoch=0
+        if [ "$s_epoch" -gt 0 ] && [ "$now_epoch" -gt 0 ]; then
+          session_dur_str="$(format_duration $((now_epoch - s_epoch)))"
+        fi
+      fi
+
+      # Progress bar
+      local total_tasks=$((running_count + completed_count))
+      local pbar
+      pbar="$(progress_bar "$completed_count" "$active_count" 8)"
+
+      printf '\n'
+      printf "  ${BOLD}[%d]${RESET} ${GREEN}●${RESET} ${BOLD}%-20s${RESET} %b ${GREEN}%d${RESET}/${CYAN}%d${RESET}\n" \
+        "$idx" "${active_sid:0:20}" "$pbar" "$completed_count" "$active_count"
+      printf "      Started %s ago · ${YELLOW}%d running${RESET}\n" "$session_dur_str" "$running_count"
+    fi
+  fi
+
+  # Historical sessions (use process substitution to avoid subshell)
+  if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
+    while IFS=$'\t' read -r sid started dur agents; do
+      [ -z "$sid" ] && continue
+      idx=$((idx + 1))
+      SESSION_LIST_INDEX_MAP+=("history:$sid")
+      local dur_str="$(format_duration "$dur")"
+
+      printf '\n'
+      printf "  ${DIM}[%d]${RESET} ${DIM}○${RESET} %-20s ${DIM}%b done${RESET}\n" \
+        "$idx" "${sid:0:20}" "$(progress_bar "$agents" "$agents" 8)"
+      printf "      ${DIM}%s · %s agents · %s${RESET}\n" \
+        "${started:0:16}" "$agents" "$dur_str"
+    done < <(jq -r '.sessions | reverse | .[0:8][] |
+      "\(.session_id)\t\(.started_at // "?")\t\(.total_duration // 0)\t\(.agents | length)"
+    ' "$HISTORY_FILE" 2>/dev/null)
+  fi
+
+  if [ "$idx" -eq 0 ]; then
+    printf '\n  %sNo sessions found. Start a multi-agent task to see activity.%s\n' "${DIM}" "${RESET}"
+  fi
+
+  printf '\n'
+  separator
+  printf "  ${DIM}[1-%d] select session  [h] history  [s] stats  [q] quit${RESET}\n" "$idx"
+}
+
 # --- Render messages view ---
 render_messages() {
   local current_time
@@ -1066,6 +1331,7 @@ while true; do
     history)   render_history_interactive ;;
     stats)     render_stats_interactive ;;
     messages)  render_messages ;;
+    sessions)  render_session_list ;;
   esac
 
   if [ "$RUN_ONCE" = "true" ]; then
@@ -1076,7 +1342,10 @@ while true; do
     case "$key" in
       q|Q) break ;;
       b|B)
-        if [ "$VIEW_MODE" != "overview" ]; then
+        if [ "$VIEW_MODE" = "overview" ] && [ "$VIEWING_HISTORY_SESSION" = true ]; then
+          # From historical overview, go back to session list
+          VIEW_MODE="sessions"
+        elif [ "$VIEW_MODE" != "overview" ]; then
           VIEW_MODE="overview"
         fi
         ;;
@@ -1085,6 +1354,7 @@ while true; do
       e|E) VIEW_MODE="errors" ;;
       w|W) VIEW_MODE="workflow" ;;
       m|M) VIEW_MODE="messages" ;;
+      l|L) VIEW_MODE="sessions" ;;
       c|C)
         if [ "$VIEW_MODE" = "detail" ] && [ -n "$DETAIL_AGENT" ]; then
           send_message "$DETAIL_AGENT"
@@ -1098,7 +1368,25 @@ while true; do
         fi
         ;;
       [1-9])
-        if [ "$VIEW_MODE" = "overview" ]; then
+        if [ "$VIEW_MODE" = "sessions" ]; then
+          local_idx=$((key - 1))
+          if [ "$local_idx" -lt "${#SESSION_LIST_INDEX_MAP[@]}" ]; then
+            local entry="${SESSION_LIST_INDEX_MAP[$local_idx]}"
+            local entry_type="${entry%%:*}"
+            local entry_sid="${entry#*:}"
+            if [ "$entry_type" = "active" ]; then
+              # Switch to live session view
+              AGENTS_FILE="$STATUS_DIR/agents.json"
+              VIEWING_HISTORY_SESSION=false
+            else
+              # Switch to historical session view
+              AGENTS_FILE="$(build_history_agents_file "$entry_sid")"
+              VIEWING_HISTORY_SESSION=true
+              TARGET_SESSION="$entry_sid"
+            fi
+            VIEW_MODE="overview"
+          fi
+        elif [ "$VIEW_MODE" = "overview" ]; then
           local_idx=$((key - 1))
           if [ "$local_idx" -lt "${#AGENT_INDEX_MAP[@]}" ]; then
             DETAIL_AGENT="${AGENT_INDEX_MAP[$local_idx]}"

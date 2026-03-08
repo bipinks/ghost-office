@@ -116,11 +116,15 @@ When you run `/implement-feature`, up to 9 agents work in parallel. The dashboar
 
 ```bash
 ./scripts/agent-dashboard.sh              # Live overview (1s refresh)
+./scripts/agent-dashboard.sh --sessions   # List all sessions, pick one
+./scripts/agent-dashboard.sh --session <id> # Jump to a specific session
 ./scripts/agent-dashboard.sh --history    # Browse past sessions
 ./scripts/agent-dashboard.sh --analytics  # Per-agent performance stats
 ./scripts/agent-dashboard.sh --export     # Save snapshot as markdown
 ./scripts/agent-dashboard.sh --web        # Web UI on http://localhost:8686
 ```
+
+**Multi-session:** Press `[l]` in the dashboard to switch between active and historical sessions. The web dashboard has a session selector dropdown.
 
 **Or stay in Claude Code:** type `/agent-status` for an instant status snapshot.
 

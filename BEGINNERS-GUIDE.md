@@ -217,11 +217,15 @@ Slash commands are immediately available. Here are the most useful ones to start
 
 **Other modes:**
 ```bash
+./scripts/agent-dashboard.sh --sessions   # List all sessions, pick one
+./scripts/agent-dashboard.sh --session <id> # Open a specific session by ID
 ./scripts/agent-dashboard.sh --history    # Past session history
 ./scripts/agent-dashboard.sh --analytics  # Agent performance stats
 ./scripts/agent-dashboard.sh --export     # Export as markdown
 ./scripts/agent-dashboard.sh --web        # Web dashboard on :8686
 ```
+
+**Multi-session:** If you have multiple sessions (active + past), press `[l]` in the dashboard to open the session list. Select a session by number to drill into it. The web dashboard has a session selector dropdown in the header.
 
 You can also type `/agent-status` inside Claude Code for a quick status check.
 

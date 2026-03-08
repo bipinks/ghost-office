@@ -50,10 +50,14 @@ Agents reference `.claude/memory/` before decisions:
 
 Monitor multi-agent sessions from a second terminal:
 - `./scripts/agent-dashboard.sh` — Live interactive TUI (overview, detail, errors, workflow, history, analytics)
+- `./scripts/agent-dashboard.sh --sessions` — List all sessions (active + history) and pick one
+- `./scripts/agent-dashboard.sh --session <id>` — Open a specific session by ID (supports prefix match)
 - `./scripts/agent-dashboard.sh --history` — Past session history
 - `./scripts/agent-dashboard.sh --analytics` — Per-agent performance stats
 - `./scripts/agent-dashboard.sh --export` — Export current status as markdown
-- `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686
+- `./scripts/agent-dashboard.sh --web` — Web dashboard on port 8686 (includes session selector dropdown)
+
+Multi-session support: press `[l]` in the terminal dashboard to see all sessions (active + historical). Select a session by number to view its agent data. When viewing a historical session, the header turns red with a HISTORY badge. Press `[b]` to return to session list.
 
 Interactive messaging: send commands/questions to agents from the dashboard.
 - Terminal: `[m]` messages view, `[c]` send command
