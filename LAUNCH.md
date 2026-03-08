@@ -283,7 +283,7 @@ One command kicks off an entire feature lifecycle:
 
 The workspace includes 54 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 12 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
 
-There's also a live agent dashboard — open a second terminal, run one script, and watch all agents work in parallel with real-time task progress bars, workflow phase tracking, and session history. A dark-themed web version runs on localhost:8686.
+There's also a live agent dashboard — open a second terminal, run one script, and watch all agents work in parallel with real-time task progress bars, workflow phase tracking, and session history. A dark-themed web version runs on localhost:8686 (or via `docker compose up dashboard`).
 
 It's MIT licensed and requires zero installation — just markdown, JSON, and shell scripts.
 

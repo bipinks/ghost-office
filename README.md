@@ -122,6 +122,8 @@ When you run `/implement-feature`, up to 9 agents work in parallel. The dashboar
 ./scripts/agent-dashboard.sh --analytics  # Per-agent performance stats
 ./scripts/agent-dashboard.sh --export     # Save snapshot as markdown
 ./scripts/agent-dashboard.sh --web        # Web UI on http://localhost:8686
+./scripts/agent-dashboard.sh --web-docker # Containerized web UI via Docker
+docker compose up dashboard              # Alternative: run dashboard container
 ```
 
 **Multi-session:** Press `[l]` in the dashboard to switch between active and historical sessions. The web dashboard has a session selector dropdown.

@@ -69,6 +69,7 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 - `scripts/web/dashboard.html` — Real-time agent monitoring with session selector
 - `scripts/web/analytics.html` — Cross-session analytics with Chart.js charts
 - `scripts/web/server.py` — Python HTTP server with JSON sync + SQLite analytics backend
+- `scripts/web/Dockerfile` + `docker-compose.yml` — Containerized deployment via Docker Compose
 
 ### SQLite Analytics Backend
 - Auto-created `data/dashboard.db` on first web server run
