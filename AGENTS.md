@@ -13,10 +13,9 @@
 
 ## Agent Roster
 
-**Master Orchestrator** — Plans, assigns, tracks, delivers (every task)
-
 | Agent | Dept | When to Use |
 |-------|------|-------------|
+| master-orchestrator | All | Plans, assigns, tracks, delivers (every task) |
 | product-manager | Product | Feature planning, user stories, acceptance criteria |
 | ui-ux-designer | Product | UI design, wireframes, design systems |
 | architecture-agent | Engineering | New features, refactors, architecture reviews |
