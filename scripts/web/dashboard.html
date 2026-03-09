@@ -3,990 +3,1113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Dashboard</title>
+<title>Ghost Office — Agent Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d1117; --surface: #161b22; --border: #30363d;
-    --text: #c9d1d9; --text-dim: #8b949e; --text-bright: #f0f6fc;
-    --green: #3fb950; --yellow: #d29922; --red: #f85149;
-    --blue: #58a6ff; --purple: #bc8cff; --cyan: #39d2c0;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace; background: var(--bg); color: var(--text); padding: 20px; }
-  .header { background: linear-gradient(135deg, #1a3a5c, #1a2744); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-  .header h1 { color: var(--text-bright); font-size: 1.4em; margin-bottom: 4px; }
-  .header .meta { color: var(--text-dim); font-size: 0.85em; }
-  .header .phase { color: var(--cyan); font-size: 0.95em; margin-top: 8px; font-weight: bold; }
-  .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; flex: 1; min-width: 120px; text-align: center; }
-  .stat-card .value { font-size: 1.8em; font-weight: bold; }
-  .stat-card .label { font-size: 0.75em; color: var(--text-dim); text-transform: uppercase; }
-  .stat-card.active .value { color: var(--yellow); }
-  .stat-card.done .value { color: var(--green); }
-  .stat-card.errors .value { color: var(--red); }
-  .stat-card.time .value { color: var(--blue); }
-  .dept-section { margin-bottom: 16px; }
-  .dept-header { color: var(--purple); font-weight: bold; font-size: 0.9em; padding: 8px 16px; border-bottom: 1px solid var(--border); }
-  .agent-row { display: flex; align-items: center; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin: 4px 0; cursor: pointer; transition: background 0.15s; }
-  .agent-row:hover { background: #1c2333; }
-  .agent-row.selected { border-color: var(--blue); background: rgba(88,166,255,0.05); }
-  .agent-row .indicator { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-  .agent-row .indicator.running { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); animation: pulse 1.5s infinite; }
-  .agent-row .indicator.completed { background: var(--green); }
-  .agent-row .indicator.idle { background: var(--border); }
-  .agent-row .name { flex: 1; font-weight: 600; color: var(--text-bright); }
-  .agent-row .status { font-size: 0.8em; padding: 2px 8px; border-radius: 4px; margin-right: 12px; }
-  .agent-row .status.running { background: rgba(210,153,34,0.2); color: var(--yellow); }
-  .agent-row .status.completed { background: rgba(63,185,80,0.2); color: var(--green); }
-  .agent-row .duration { color: var(--text-dim); font-size: 0.85em; min-width: 60px; text-align: right; margin-right: 12px; }
-  .agent-row .progress-bar { width: 80px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-right: 8px; }
-  .agent-row .progress-bar .fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
-  .agent-row .progress-text { font-size: 0.8em; color: var(--text-dim); min-width: 30px; }
-  .agent-row .error-badge { background: rgba(248,81,73,0.2); color: var(--red); font-size: 0.75em; padding: 1px 6px; border-radius: 4px; margin-left: 8px; }
-  .detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-top: 16px; display: none; }
-  .detail-panel.active { display: block; }
-  .detail-panel h3 { color: var(--text-bright); margin-bottom: 12px; }
-  .todo-item { padding: 6px 0; display: flex; align-items: center; gap: 8px; }
-  .todo-item .icon { width: 16px; text-align: center; }
-  .todo-item.completed .icon { color: var(--green); }
-  .todo-item.in_progress .icon { color: var(--yellow); font-weight: bold; }
-  .todo-item.pending .icon { color: var(--text-dim); }
-  .error-item { padding: 6px 0; font-size: 0.85em; border-bottom: 1px solid var(--border); }
-  .error-item .tool { color: var(--yellow); }
-  .error-item .time { color: var(--text-dim); }
-  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-  .tab { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-size: 0.85em; transition: all 0.15s; }
-  .tab:hover { color: var(--text); border-color: var(--blue); }
-  .tab.active { color: var(--blue); border-color: var(--blue); background: rgba(88,166,255,0.1); }
-  .history-section, .analytics-section, .commands-section { display: none; }
-  .history-section.active, .analytics-section.active, .commands-section.active { display: block; }
-  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; }
-  .session-card .sid { color: var(--cyan); font-size: 0.85em; }
-  .session-card .info { color: var(--text-dim); font-size: 0.8em; margin-top: 4px; }
-  .analytics-table { width: 100%; border-collapse: collapse; }
-  .analytics-table th { text-align: left; color: var(--text-dim); font-size: 0.8em; padding: 8px; border-bottom: 1px solid var(--border); }
-  .analytics-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
-  .refresh-note { text-align: center; color: var(--text-dim); font-size: 0.75em; margin-top: 20px; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  @keyframes task-pulse { 0%,100% { background: rgba(210,153,34,0.1); } 50% { background: rgba(210,153,34,0.25); } }
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a2e;
+  --bg-card: #16162a;
+  --bg-elevated: #222236;
+  --border-primary: #2a2a4a;
+  --border-accent: #3a3a5a;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-primary: #6366f1;
+  --accent-success: #22c55e;
+  --accent-warning: #eab308;
+  --accent-error: #ef4444;
+  --accent-info: #3b82f6;
+  --accent-purple: #a855f7;
+  --accent-cyan: #06b6d4;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --sidebar-width: 240px;
+  --topbar-height: 56px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
 
-  /* --- Workflow Progress Bar --- */
-  .workflow-bar { display: flex; align-items: center; gap: 0; margin-bottom: 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; }
-  .workflow-step { flex: 1; text-align: center; position: relative; min-width: 100px; }
-  .workflow-step .step-label { font-size: 0.7em; color: var(--text-dim); margin-top: 6px; white-space: nowrap; }
-  .workflow-step .step-dot { width: 18px; height: 18px; border-radius: 50%; margin: 0 auto; border: 2px solid var(--border); background: var(--bg); transition: all 0.3s; position: relative; z-index: 1; }
-  .workflow-step.done .step-dot { background: var(--green); border-color: var(--green); }
-  .workflow-step.active .step-dot { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 10px var(--yellow); animation: pulse 1.5s infinite; }
-  .workflow-step.pending .step-dot { background: var(--bg); border-color: var(--border); }
-  .workflow-step.done .step-label { color: var(--green); }
-  .workflow-step.active .step-label { color: var(--yellow); font-weight: 600; }
-  .workflow-step::after { content: ''; position: absolute; top: 9px; left: 50%; right: -50%; height: 2px; background: var(--border); z-index: 0; }
-  .workflow-step:last-child::after { display: none; }
-  .workflow-step.done::after { background: var(--green); }
-  .workflow-step.active::after { background: linear-gradient(to right, var(--yellow), var(--border)); }
+/* ── Topbar ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--topbar-height);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-primary);
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-logo {
+  font-size: 1.1rem; font-weight: 700; color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-logo span { color: var(--accent-primary); }
+.hamburger {
+  display: none; background: none; border: none; color: var(--text-secondary);
+  font-size: 1.4rem; cursor: pointer; padding: 4px 8px;
+}
+.topbar-center { display: flex; align-items: center; gap: 12px; }
+.session-select {
+  background: var(--bg-tertiary); border: 1px solid var(--border-primary);
+  color: var(--text-primary); padding: 6px 12px; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 0.8rem; cursor: pointer;
+  max-width: 260px;
+}
+.session-select:focus { outline: none; border-color: var(--accent-primary); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.refresh-toggle {
+  display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);
+  cursor: pointer; user-select: none;
+}
+.refresh-toggle input { accent-color: var(--accent-primary); }
+.last-updated { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
 
-  /* --- Active task highlight --- */
-  .todo-item.in_progress { animation: task-pulse 2s ease-in-out infinite; border-radius: 4px; padding: 6px 4px; }
-  .todo-item.in_progress .icon { font-size: 1.1em; }
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; top: var(--topbar-height); left: 0; bottom: 0;
+  width: var(--sidebar-width); background: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+  display: flex; flex-direction: column; z-index: 150;
+  transition: transform 0.3s ease;
+}
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: var(--radius-sm); color: var(--text-secondary);
+  cursor: pointer; font-size: 0.88rem; font-weight: 500;
+  transition: all 0.15s ease; text-decoration: none; border: none; background: none; width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.nav-item.active {
+  background: rgba(99,102,241,0.12); color: var(--accent-primary);
+  border-left: 3px solid var(--accent-primary); padding-left: 11px;
+}
+.nav-item .icon { font-size: 1.1rem; width: 22px; text-align: center; }
+.nav-divider { height: 1px; background: var(--border-primary); margin: 8px 0; }
+.sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border-primary); }
+.sidebar-footer a {
+  color: var(--text-muted); font-size: 0.78rem; text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.sidebar-footer a:hover { color: var(--accent-primary); }
 
-  /* --- Error timeline tab --- */
-  .errors-section { display: none; }
-  .errors-section.active { display: block; }
-  .error-timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85em; align-items: flex-start; }
-  .error-timeline-item .et-time { color: var(--text-dim); min-width: 60px; flex-shrink: 0; }
-  .error-timeline-item .et-agent { color: var(--purple); min-width: 140px; flex-shrink: 0; font-weight: 600; }
-  .error-timeline-item .et-tool { color: var(--yellow); min-width: 80px; flex-shrink: 0; }
-  .error-timeline-item .et-msg { color: var(--text); flex: 1; word-break: break-word; }
+/* ── Main Content ── */
+.main {
+  margin-left: var(--sidebar-width); margin-top: var(--topbar-height);
+  padding: 24px; min-height: calc(100vh - var(--topbar-height));
+}
 
-  /* --- Keyboard shortcut help overlay --- */
-  .kb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 200; }
-  .kb-overlay.active { display: flex; }
-  .kb-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; width: 90%; }
-  .kb-panel h3 { color: var(--text-bright); margin-bottom: 16px; }
-  .kb-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85em; }
-  .kb-row kbd { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; color: var(--cyan); font-family: inherit; }
+/* ── Tab Content ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-  /* --- Notification toggle --- */
-  .notif-toggle { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-family: inherit; font-size: 0.75em; cursor: pointer; transition: all 0.15s; }
-  .notif-toggle:hover { border-color: var(--blue); color: var(--blue); }
-  .notif-toggle.active { border-color: var(--green); color: var(--green); background: rgba(63,185,80,0.1); }
+/* ── Summary Cards ── */
+.summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 18px 20px;
+  position: relative; overflow: hidden; transition: border-color 0.2s;
+}
+.summary-card:hover { border-color: var(--border-accent); }
+.summary-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.summary-card.total::before { background: var(--accent-primary); }
+.summary-card.active-card::before { background: var(--accent-warning); }
+.summary-card.done::before { background: var(--accent-success); }
+.summary-card.errors::before { background: var(--accent-error); }
+.summary-card .card-icon {
+  font-size: 1.3rem; margin-bottom: 8px; display: block;
+}
+.summary-card .card-value {
+  font-size: 2rem; font-weight: 700; line-height: 1;
+  font-family: var(--font-mono);
+}
+.summary-card.total .card-value { color: var(--accent-primary); }
+.summary-card.active-card .card-value { color: var(--accent-warning); }
+.summary-card.done .card-value { color: var(--accent-success); }
+.summary-card.errors .card-value { color: var(--accent-error); }
+.summary-card .card-label {
+  font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-top: 4px;
+}
 
-  /* --- Responsive layout — Tablet (≤ 768px) --- */
-  @media (max-width: 768px) {
-    body { padding: 10px; }
+/* ── Workflow Phase ── */
+.workflow-stepper {
+  display: flex; align-items: center; gap: 0; margin-bottom: 28px;
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px 20px; overflow-x: auto;
+}
+.workflow-step {
+  display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+  border-radius: 20px; font-size: 0.82rem; color: var(--text-muted);
+  white-space: nowrap; flex-shrink: 0;
+}
+.workflow-step.current {
+  background: rgba(99,102,241,0.15); color: var(--accent-primary);
+  font-weight: 600;
+}
+.workflow-step.completed { color: var(--accent-success); }
+.workflow-step .step-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text-muted); flex-shrink: 0;
+}
+.workflow-step.current .step-dot { background: var(--accent-primary); box-shadow: 0 0 6px var(--accent-primary); }
+.workflow-step.completed .step-dot { background: var(--accent-success); }
+.workflow-arrow { color: var(--text-muted); margin: 0 4px; font-size: 0.7rem; flex-shrink: 0; }
 
-    /* Header: stack title and controls vertically */
-    .header > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 8px; }
-    .header > div:first-child > div { width: 100%; justify-content: flex-start; }
-    .header h1 { font-size: 1.1em; }
-    .header #session-selector { flex: 1; min-width: 0; }
+/* ── Agent Grid ── */
+.section-title {
+  font-size: 0.95rem; font-weight: 600; margin-bottom: 16px;
+  color: var(--text-primary); display: flex; align-items: center; gap: 8px;
+}
+.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-bottom: 32px; }
+.agent-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px 18px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.agent-card:hover { border-color: var(--accent-primary); transform: translateY(-1px); }
+.agent-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.agent-name-row { display: flex; align-items: center; gap: 8px; }
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.status-dot.active { background: var(--accent-warning); box-shadow: 0 0 6px var(--accent-warning); }
+.status-dot.done { background: var(--accent-success); }
+.status-dot.error { background: var(--accent-error); box-shadow: 0 0 6px var(--accent-error); }
+.status-dot.idle { background: var(--text-muted); }
+.agent-name { font-weight: 600; font-size: 0.9rem; }
+.dept-badge {
+  font-size: 0.68rem; padding: 2px 8px; border-radius: 10px;
+  background: rgba(99,102,241,0.1); color: var(--accent-primary);
+  font-weight: 500; white-space: nowrap;
+}
+.dept-Engineering { background: rgba(99,102,241,0.1); color: var(--accent-primary); }
+.dept-Product { background: rgba(168,85,247,0.1); color: var(--accent-purple); }
+.dept-Quality { background: rgba(6,182,212,0.1); color: var(--accent-cyan); }
+.dept-Operations { background: rgba(59,130,246,0.1); color: var(--accent-info); }
+.dept-Marketing { background: rgba(234,179,8,0.1); color: var(--accent-warning); }
+.dept-Support { background: rgba(34,197,94,0.1); color: var(--accent-success); }
+.dept-IT { background: rgba(239,68,68,0.1); color: var(--accent-error); }
+.agent-task {
+  font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 2.4em;
+}
+.agent-progress { display: flex; align-items: center; gap: 10px; }
+.progress-bar {
+  flex: 1; height: 4px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 2px; transition: width 0.4s ease;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-purple));
+}
+.progress-text { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); white-space: nowrap; }
+.agent-footer { display: flex; justify-content: space-between; margin-top: 8px; }
+.agent-duration { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
+.agent-tokens { font-size: 0.72rem; color: var(--text-muted); }
 
-    /* Stats bar */
-    .stats-bar { gap: 8px; }
-    .stat-card { min-width: 70px; padding: 8px 10px; }
-    .stat-card .value { font-size: 1.3em; }
-    .stat-card .label { font-size: 0.65em; }
+/* ── Detail Panel ── */
+.overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 300; backdrop-filter: blur(2px);
+}
+.overlay.open { display: block; }
+.detail-panel {
+  position: fixed; top: 0; right: -480px; bottom: 0; width: 460px;
+  background: var(--bg-secondary); border-left: 1px solid var(--border-primary);
+  z-index: 301; transition: right 0.3s ease; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.detail-panel.open { right: 0; }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px; border-bottom: 1px solid var(--border-primary);
+  position: sticky; top: 0; background: var(--bg-secondary); z-index: 1;
+}
+.panel-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.panel-close {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 1.3rem; padding: 4px; transition: color 0.15s;
+}
+.panel-close:hover { color: var(--text-primary); }
+.panel-body { flex: 1; padding: 20px; }
+.panel-section { margin-bottom: 20px; }
+.panel-section-title {
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.panel-field { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; }
+.panel-field .label { color: var(--text-secondary); }
+.panel-field .value { color: var(--text-primary); font-family: var(--font-mono); }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+  border-radius: 12px; font-size: 0.78rem; font-weight: 500;
+}
+.status-badge.active { background: rgba(234,179,8,0.12); color: var(--accent-warning); }
+.status-badge.done { background: rgba(34,197,94,0.12); color: var(--accent-success); }
+.status-badge.error { background: rgba(239,68,68,0.12); color: var(--accent-error); }
+.status-badge.idle { background: rgba(100,116,139,0.12); color: var(--text-muted); }
+.todo-list { list-style: none; }
+.todo-item {
+  display: flex; align-items: flex-start; gap: 8px; padding: 6px 0;
+  font-size: 0.84rem; border-bottom: 1px solid rgba(42,42,74,0.5);
+}
+.todo-item:last-child { border-bottom: none; }
+.todo-icon { flex-shrink: 0; margin-top: 2px; }
+.todo-icon.completed { color: var(--accent-success); }
+.todo-icon.in_progress { color: var(--accent-warning); }
+.todo-icon.pending { color: var(--text-muted); }
+.error-block {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem;
+  font-family: var(--font-mono); color: var(--accent-error); white-space: pre-wrap;
+  word-break: break-word;
+}
 
-    /* Tabs: scrollable row */
-    .tabs { flex-wrap: nowrap; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 8px 12px; font-size: 0.8em; white-space: nowrap; flex-shrink: 0; }
+/* ── Chat / Messages ── */
+.chat-section {
+  border-top: 1px solid var(--border-primary);
+  padding: 16px 20px; margin-top: auto;
+}
+.chat-messages {
+  max-height: 200px; overflow-y: auto; margin-bottom: 10px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.chat-msg {
+  font-size: 0.8rem; padding: 8px 12px; border-radius: var(--radius-sm);
+  max-width: 85%;
+}
+.chat-msg.user { background: rgba(99,102,241,0.15); color: var(--accent-primary); align-self: flex-end; }
+.chat-msg.agent { background: var(--bg-tertiary); color: var(--text-secondary); align-self: flex-start; }
+.chat-msg .msg-time { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input {
+  flex: 1; padding: 8px 12px; background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-size: 0.84rem; font-family: var(--font-sans);
+}
+.chat-input:focus { outline: none; border-color: var(--accent-primary); }
+.chat-send {
+  padding: 8px 16px; background: var(--accent-primary); border: none;
+  border-radius: var(--radius-sm); color: white; font-weight: 600;
+  font-size: 0.84rem; cursor: pointer; transition: opacity 0.15s;
+}
+.chat-send:hover { opacity: 0.85; }
 
-    /* Workflow bar */
-    .workflow-bar { padding: 8px; }
-    .workflow-step { min-width: 60px; }
-    .workflow-step .step-label { font-size: 0.6em; }
+/* ── Errors Tab ── */
+.error-list { display: flex; flex-direction: column; gap: 12px; }
+.error-card {
+  background: var(--bg-card); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-md); padding: 16px; border-left: 3px solid var(--accent-error);
+}
+.error-card .error-agent { font-weight: 600; color: var(--accent-error); font-size: 0.9rem; margin-bottom: 4px; }
+.error-card .error-time { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
+.error-card .error-msg {
+  font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary);
+  white-space: pre-wrap; word-break: break-word;
+}
 
-    /* Agent rows: wrap into a 2-row card layout */
-    .agent-row { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
-    .agent-row .name { flex-basis: calc(100% - 30px); font-size: 0.9em; }
-    .agent-row .status { order: 5; }
-    .agent-row .duration { min-width: 40px; font-size: 0.75em; }
-    .agent-row .progress-bar { width: 60px; }
-    .agent-row .error-badge { margin-left: 0; }
+/* ── Messages Tab ── */
+.messages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.msg-agent-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px;
+}
+.msg-agent-name { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.msg-count { font-size: 0.72rem; background: var(--accent-primary); color: white; padding: 1px 7px; border-radius: 8px; }
+.msg-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.msg-item { font-size: 0.8rem; padding: 8px; background: var(--bg-tertiary); border-radius: var(--radius-sm); }
+.msg-item .msg-content { color: var(--text-secondary); }
+.msg-item .msg-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* Detail panel */
-    .detail-panel { padding: 12px; }
+/* ── Analytics Section ── */
+.analytics-section { text-align: center; padding: 60px 20px; }
+.analytics-section h2 { font-size: 1.4rem; margin-bottom: 12px; }
+.analytics-section p { color: var(--text-secondary); margin-bottom: 24px; }
+.analytics-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; background: var(--accent-primary);
+  color: white; border-radius: var(--radius-sm);
+  text-decoration: none; font-weight: 600; transition: opacity 0.15s;
+}
+.analytics-link:hover { opacity: 0.85; }
 
-    /* Message input: stack type selector above text input */
-    .msg-input { flex-wrap: wrap; }
-    .msg-input select { width: 100%; min-height: 36px; }
-    .msg-input input { min-height: 36px; }
-    .msg-input button { min-height: 36px; padding: 8px 20px; }
+/* ── Empty State ── */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state h3 { color: var(--text-secondary); margin-bottom: 8px; }
 
-    /* Message bubbles */
-    .msg-bubble { max-width: 95%; }
+/* ── Loading Skeleton ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skeleton-card { height: 120px; border-radius: var(--radius-md); }
+.skeleton-line { height: 14px; margin-bottom: 8px; width: 80%; }
+.skeleton-line.short { width: 40%; }
 
-    /* Error timeline: wrap columns */
-    .error-timeline-item { flex-wrap: wrap; gap: 4px 12px; }
-    .error-timeline-item .et-agent { min-width: auto; }
-    .error-timeline-item .et-tool { min-width: auto; }
-    .error-timeline-item .et-msg { flex-basis: 100%; margin-top: 2px; }
+/* ── Value Update Animation ── */
+.value-updated { animation: valuePulse 0.6s ease; }
+@keyframes valuePulse {
+  0% { color: var(--accent-primary); transform: scale(1.08); }
+  100% { color: inherit; transform: scale(1); }
+}
 
-    /* Analytics table */
-    .analytics-table { font-size: 0.75em; }
-    .analytics-table td, .analytics-table th { padding: 6px 4px; }
-
-    /* Commands */
-    .cmd-panel { padding: 14px; }
-    .cmd-btn { padding: 10px 14px; font-size: 0.8em; }
-
-    /* KB overlay */
-    .kb-panel { padding: 16px; }
-    .kb-row { font-size: 0.8em; }
-  }
-
-  /* --- Responsive layout — Phone (≤ 480px) --- */
-  @media (max-width: 480px) {
-    body { padding: 6px; }
-
-    /* Header: minimal */
-    .header { padding: 12px; border-radius: 6px; }
-    .header h1 { font-size: 1em; }
-    .header .meta { font-size: 0.75em; }
-    .header .phase { font-size: 0.8em; }
-    .header #session-selector { font-size: 0.75em; padding: 4px 6px; }
-    .notif-toggle { font-size: 0.7em; padding: 3px 8px; }
-
-    /* Stats bar: 2x2 grid */
-    .stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .stat-card { min-width: unset; padding: 8px; }
-    .stat-card .value { font-size: 1.2em; }
-
-    /* Tabs: compact scrollable */
-    .tab { padding: 6px 10px; font-size: 0.75em; border-radius: 4px; }
-
-    /* Workflow bar: horizontal scroll with smaller dots */
-    .workflow-bar { padding: 6px 8px; border-radius: 6px; gap: 0; }
-    .workflow-step { min-width: 50px; }
-    .workflow-step .step-dot { width: 14px; height: 14px; }
-    .workflow-step .step-label { font-size: 0.55em; }
-    .workflow-step::after { top: 7px; }
-
-    /* Agent rows: full card layout */
-    .agent-row { padding: 10px; border-radius: 8px; gap: 4px 8px; }
-    .agent-row .indicator { width: 8px; height: 8px; margin-right: 8px; }
-    .agent-row .name { font-size: 0.85em; flex-basis: calc(100% - 24px); }
-    .agent-row .status { font-size: 0.7em; padding: 2px 6px; }
-    .agent-row .duration { font-size: 0.7em; min-width: 36px; }
-    .agent-row .progress-bar { width: 50px; height: 4px; }
-    .agent-row .progress-text { font-size: 0.7em; }
-    .agent-row .error-badge { font-size: 0.65em; }
-
-    /* Dept headers */
-    .dept-header { font-size: 0.8em; padding: 6px 10px; }
-
-    /* Detail panel */
-    .detail-panel { padding: 10px; border-radius: 6px; margin-top: 10px; }
-    .detail-panel h3 { font-size: 1em; }
-    .todo-item { font-size: 0.85em; padding: 4px 0; }
-    .error-item { font-size: 0.8em; }
-
-    /* Messages: full width bubbles */
-    .msg-section h4 { font-size: 0.85em; }
-    .msg-bubble { max-width: 100%; font-size: 0.8em; }
-    .msg-bubble .msg-meta { font-size: 0.65em; flex-wrap: wrap; }
-    .msg-log { max-height: 200px; }
-    .msg-input { gap: 6px; }
-    .msg-input select { font-size: 0.75em; min-height: 40px; }
-    .msg-input input { font-size: 0.8em; min-height: 40px; padding: 8px; }
-    .msg-input button { font-size: 0.8em; min-height: 40px; padding: 8px 14px; }
-
-    /* Error timeline: fully stacked */
-    .error-timeline-item { flex-direction: column; gap: 2px; padding: 8px 0; font-size: 0.8em; }
-    .error-timeline-item .et-time { min-width: auto; }
-    .error-timeline-item .et-agent { min-width: auto; }
-    .error-timeline-item .et-tool { min-width: auto; }
-
-    /* Analytics table: scrollable container */
-    .analytics-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .analytics-table { min-width: 400px; font-size: 0.7em; }
-    .analytics-table td, .analytics-table th { padding: 4px 3px; white-space: nowrap; }
-
-    /* Session cards */
-    .session-card { padding: 10px; }
-    .session-card .sid { font-size: 0.8em; }
-    .session-card .info { font-size: 0.75em; }
-
-    /* Commands */
-    .cmd-panel { padding: 10px; }
-    .cmd-panel h3 { font-size: 1em; }
-    .cmd-quick-actions { gap: 6px; }
-    .cmd-btn { padding: 10px 12px; font-size: 0.75em; flex: 1; min-width: 0; text-align: center; }
-
-    /* Toast */
-    .msg-toast { bottom: 10px; right: 10px; left: 10px; text-align: center; font-size: 0.8em; }
-
-    /* Refresh note */
-    .refresh-note { font-size: 0.65em; margin-top: 12px; }
-
-    /* KB overlay */
-    .kb-panel { padding: 14px; max-width: 95%; }
-    .kb-panel h3 { font-size: 1em; }
-    .kb-row { font-size: 0.75em; padding: 4px 0; }
-  }
-
-  /* --- Touch-friendly: ensure minimum tap targets --- */
-  @media (pointer: coarse) {
-    .agent-row { min-height: 48px; }
-    .tab { min-height: 44px; display: flex; align-items: center; justify-content: center; }
-    .cmd-btn { min-height: 44px; display: flex; align-items: center; justify-content: center; }
-    .msg-input button { min-height: 44px; }
-    .msg-input select { min-height: 44px; }
-    .msg-input input { min-height: 44px; }
-    .notif-toggle { min-height: 36px; padding: 6px 12px; }
-    .session-card { padding: 14px; }
-  }
-
-  /* --- Message / Chat styles --- */
-  .msg-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
-  .msg-section h4 { color: var(--cyan); font-size: 0.9em; margin-bottom: 12px; }
-  .msg-log { max-height: 300px; overflow-y: auto; margin-bottom: 12px; padding-right: 4px; }
-  .msg-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85em; max-width: 85%; }
-  .msg-bubble.user { background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.3); margin-left: auto; text-align: right; }
-  .msg-bubble.agent { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.2); margin-right: auto; }
-  .msg-bubble .msg-meta { font-size: 0.75em; color: var(--text-dim); margin-top: 4px; display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
-  .msg-bubble.agent .msg-meta { justify-content: flex-start; }
-  .msg-status { font-size: 0.7em; padding: 1px 6px; border-radius: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .msg-status.pending { background: rgba(210,153,34,0.2); color: var(--yellow); }
-  .msg-status.delivered { background: rgba(88,166,255,0.2); color: var(--blue); }
-  .msg-status.acknowledged { background: rgba(63,185,80,0.2); color: var(--green); }
-  .msg-type-badge { font-size: 0.7em; padding: 1px 6px; border-radius: 10px; background: rgba(188,140,255,0.15); color: var(--purple); }
-  .msg-input { display: flex; gap: 8px; align-items: center; }
-  .msg-input select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-family: inherit; font-size: 0.8em; }
-  .msg-input input { flex: 1; background: var(--bg); color: var(--text-bright); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: inherit; font-size: 0.85em; outline: none; }
-  .msg-input input:focus { border-color: var(--blue); }
-  .msg-input input::placeholder { color: var(--text-dim); }
-  .msg-input button { background: var(--blue); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: inherit; font-size: 0.85em; font-weight: 600; transition: opacity 0.15s; }
-  .msg-input button:hover { opacity: 0.85; }
-  .msg-input button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .msg-toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 0.85em; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
-  .msg-toast.show { opacity: 1; }
-
-  /* --- Commands tab --- */
-  .cmd-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
-  .cmd-panel h3 { color: var(--text-bright); margin-bottom: 16px; font-size: 1.1em; }
-  .cmd-quick-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .cmd-btn { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: inherit; font-size: 0.85em; transition: all 0.15s; }
-  .cmd-btn:hover { border-color: var(--cyan); color: var(--cyan); }
-  .cmd-btn.danger { border-color: rgba(248,81,73,0.3); }
-  .cmd-btn.danger:hover { border-color: var(--red); color: var(--red); }
-  .cmd-log { margin-top: 16px; }
-  .cmd-log h4 { color: var(--text-dim); font-size: 0.85em; margin-bottom: 8px; }
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: block; }
+}
+@media (max-width: 768px) {
+  .summary-row { grid-template-columns: repeat(2, 1fr); }
+  .agent-grid { grid-template-columns: 1fr; }
+  .detail-panel { width: 100%; right: -100%; }
+  .topbar-center { display: none; }
+  .workflow-stepper { padding: 12px; }
+}
+@media (max-width: 480px) {
+  .summary-row { grid-template-columns: 1fr; }
+  .main { padding: 16px; }
+  .topbar { padding: 0 12px; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-    <h1>Agent Dashboard</h1>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="notif-toggle" id="notif-toggle" onclick="toggleNotifications()" title="Enable browser notifications">Notify</button>
-      <select id="session-selector" onchange="switchSession(this.value)"
-        style="background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:0.8em;cursor:pointer;">
-        <option value="current">Current Session</option>
-      </select>
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+    <div class="topbar-logo"><span>&#9670;</span> Ghost Office</div>
+  </div>
+  <div class="topbar-center">
+    <select class="session-select" id="session-select" onchange="switchSession(this.value)">
+      <option value="">Current Session</option>
+    </select>
+  </div>
+  <div class="topbar-right">
+    <label class="refresh-toggle" id="refresh-toggle">
+      <input type="checkbox" checked onchange="toggleRefresh(this.checked)"> Auto-refresh
+    </label>
+    <span class="last-updated" id="last-updated">--</span>
+  </div>
+</div>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-nav">
+    <button class="nav-item active" data-tab="dashboard" onclick="showTab('dashboard')">
+      <span class="icon">&#9632;</span> Dashboard
+    </button>
+    <button class="nav-item" data-tab="agents" onclick="showTab('agents')">
+      <span class="icon">&#9654;</span> Agents
+    </button>
+    <button class="nav-item" data-tab="workflow" onclick="showTab('workflow')">
+      <span class="icon">&#8634;</span> Workflow
+    </button>
+    <button class="nav-item" data-tab="errors" onclick="showTab('errors')">
+      <span class="icon">&#9888;</span> Errors
+    </button>
+    <button class="nav-item" data-tab="messages" onclick="showTab('messages')">
+      <span class="icon">&#9993;</span> Messages
+    </button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" data-tab="analytics" onclick="showTab('analytics')">
+      <span class="icon">&#9733;</span> Analytics Dashboard
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <a href="analytics.html">&#8599; Full Analytics Dashboard</a>
+  </div>
+</nav>
+
+<!-- ── Overlay ── -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<!-- ── Detail Panel ── -->
+<div class="detail-panel" id="detail-panel">
+  <div class="panel-header">
+    <div class="panel-title" id="panel-agent-name">Agent</div>
+    <button class="panel-close" onclick="closePanel()">&#10005;</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="chat-section" id="panel-chat"></div>
+</div>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+  <!-- Dashboard Tab -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="summary-row">
+      <div class="summary-card total">
+        <span class="card-icon">&#9635;</span>
+        <div class="card-value" id="stat-total">-</div>
+        <div class="card-label">Total Agents</div>
+      </div>
+      <div class="summary-card active-card">
+        <span class="card-icon">&#9658;</span>
+        <div class="card-value" id="stat-active">-</div>
+        <div class="card-label">Active</div>
+      </div>
+      <div class="summary-card done">
+        <span class="card-icon">&#10003;</span>
+        <div class="card-value" id="stat-done">-</div>
+        <div class="card-label">Completed</div>
+      </div>
+      <div class="summary-card errors">
+        <span class="card-icon">&#9888;</span>
+        <div class="card-value" id="stat-errors">-</div>
+        <div class="card-label">Errors</div>
+      </div>
     </div>
+
+    <div class="workflow-stepper" id="workflow-stepper">
+      <div class="workflow-step"><span class="step-dot"></span> Loading...</div>
+    </div>
+
+    <div class="section-title">&#9654; Active Agents</div>
+    <div class="agent-grid" id="agent-grid-active"></div>
+
+    <div class="section-title">&#10003; Completed</div>
+    <div class="agent-grid" id="agent-grid-done"></div>
   </div>
-  <div class="meta">
-    <span id="session-id">Session: --</span> &nbsp;|&nbsp;
-    <span id="last-updated">Updated: --</span>
-    <span id="history-badge" style="display:none;margin-left:8px;background:rgba(248,81,73,0.2);color:var(--red);padding:2px 8px;border-radius:4px;font-size:0.8em;">HISTORY</span>
-    &nbsp;|&nbsp; <a href="/analytics.html" style="color:var(--cyan);text-decoration:none;font-size:0.85em;" title="Open full analytics dashboard">Analytics Dashboard</a>
+
+  <!-- Agents Tab -->
+  <div class="tab-content" id="tab-agents">
+    <div class="section-title">All Agents</div>
+    <div class="agent-grid" id="agent-grid-all"></div>
   </div>
-  <div class="phase" id="workflow-phase"></div>
-</div>
 
-<div class="stats-bar">
-  <div class="stat-card active"><div class="value" id="active-count">0</div><div class="label">Active</div></div>
-  <div class="stat-card done"><div class="value" id="completed-count">0</div><div class="label">Completed</div></div>
-  <div class="stat-card errors"><div class="value" id="error-count">0</div><div class="label">Errors</div></div>
-  <div class="stat-card time"><div class="value" id="session-time">--</div><div class="label">Session</div></div>
-</div>
-
-<div id="workflow-bar" class="workflow-bar" style="display:none;"></div>
-
-<div class="tabs">
-  <div class="tab active" onclick="showTab('agents')">Agents</div>
-  <div class="tab" onclick="showTab('commands')">Commands</div>
-  <div class="tab" onclick="showTab('errors')">Errors</div>
-  <div class="tab" onclick="showTab('history')">History</div>
-  <div class="tab" onclick="showTab('analytics')">Analytics</div>
-</div>
-
-<div id="agents-section">
-  <div id="agents-container"></div>
-  <div class="detail-panel" id="detail-panel"></div>
-</div>
-
-<div class="commands-section" id="commands-section"></div>
-<div class="errors-section" id="errors-section"></div>
-<div class="history-section" id="history-section"></div>
-<div class="analytics-section" id="analytics-section"></div>
-
-<div class="msg-toast" id="msg-toast"></div>
-
-<div class="kb-overlay" id="kb-overlay" onclick="if(event.target===this)this.classList.remove('active')">
-  <div class="kb-panel">
-    <h3>Keyboard Shortcuts</h3>
-    <div class="kb-row"><span>Select agent 1-9</span><kbd>1</kbd> - <kbd>9</kbd></div>
-    <div class="kb-row"><span>Deselect agent</span><kbd>Esc</kbd></div>
-    <div class="kb-row"><span>Agents tab</span><kbd>a</kbd></div>
-    <div class="kb-row"><span>Commands tab</span><kbd>c</kbd></div>
-    <div class="kb-row"><span>Errors tab</span><kbd>e</kbd></div>
-    <div class="kb-row"><span>History tab</span><kbd>h</kbd></div>
-    <div class="kb-row"><span>Stats/Analytics tab</span><kbd>s</kbd></div>
-    <div class="kb-row"><span>Show this help</span><kbd>?</kbd></div>
-    <div style="text-align:center;margin-top:16px;color:var(--text-dim);font-size:0.8em;">Press <kbd>Esc</kbd> or click outside to close</div>
+  <!-- Workflow Tab -->
+  <div class="tab-content" id="tab-workflow">
+    <div class="section-title">&#8634; Workflow Progress</div>
+    <div class="workflow-stepper" id="workflow-stepper-full" style="margin-bottom:24px"></div>
+    <div class="section-title">Agent Timeline</div>
+    <div id="workflow-timeline"></div>
   </div>
-</div>
 
-<div class="refresh-note">Auto-refreshes every 3 seconds &nbsp;|&nbsp; Served by agent-dashboard.sh --web &nbsp;|&nbsp; Press <kbd style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.9em;">?</kbd> for shortcuts</div>
+  <!-- Errors Tab -->
+  <div class="tab-content" id="tab-errors">
+    <div class="section-title">&#9888; Error Log</div>
+    <div class="error-list" id="error-list"></div>
+  </div>
+
+  <!-- Messages Tab -->
+  <div class="tab-content" id="tab-messages">
+    <div class="section-title">&#9993; Agent Messages</div>
+    <div class="messages-grid" id="messages-grid"></div>
+  </div>
+
+  <!-- Analytics Tab -->
+  <div class="tab-content analytics-section" id="tab-analytics">
+    <h2>&#9733; Analytics Dashboard</h2>
+    <p>Cross-session analytics, agent performance metrics, and trend analysis</p>
+    <a href="analytics.html" class="analytics-link">&#8599; Full Analytics Dashboard</a>
+  </div>
+
+</div>
 
 <script>
-const DEPT_ORDER = ['Orchestrator','Product','Engineering','Quality','Operations','Marketing','Support','IT','Other'];
-const DATA_BASE = 'data';
-const API_BASE = '/api/messages';
+// ── State ──
+let prevData = null;
+let refreshTimer = null;
+let refreshInterval = 2000;
+let currentTab = 'dashboard';
+let openAgentName = null;
+let sessionId = '';
 
-// Workflow phase definitions with agent mappings
-const WORKFLOW_PHASES = [
-  { label: 'Requirements', agents: ['product-manager'] },
-  { label: 'Design', agents: ['architecture-agent', 'ui-ux-designer'] },
-  { label: 'Implementation', agents: ['backend-engineer', 'frontend-engineer', 'database-engineer', 'prompt-engineer'] },
-  { label: 'Testing', agents: ['qa-agent'] },
-  { label: 'Security', agents: ['security-agent'] },
-  { label: 'Deploy', agents: ['devops-engineer', 'documentation-agent', 'monitoring-agent'] }
-];
-
-function formatDuration(s) {
-  if (!s || s <= 0) return '--';
-  if (s < 60) return s + 's';
-  if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's';
-  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
-}
-
-function inferPhase(agents) {
-  const running = Object.entries(agents).filter(([,v]) => v.status === 'running').map(([k]) => k);
-  const completed = Object.entries(agents).filter(([,v]) => v.status === 'completed').map(([k]) => k);
-  if (running.includes('product-manager')) return 'Phase 1: Requirements';
-  if (running.includes('architecture-agent')) return 'Phase 2: Design';
-  if (running.some(a => ['backend-engineer','frontend-engineer','database-engineer'].includes(a))) return 'Phase 3: Implementation';
-  if (running.includes('qa-agent')) return 'Phase 4: Testing';
-  if (running.includes('security-agent')) return 'Phase 5: Security Review';
-  if (running.some(a => ['devops-engineer','documentation-agent'].includes(a))) return 'Phase 6: Deploy & Docs';
-  if (running.includes('master-orchestrator')) return 'Orchestrating...';
-  const total = Object.keys(agents).length;
-  if (total > 0 && completed.length === total) return 'All Complete';
-  if (total > 0) return 'In Progress';
-  return '';
-}
-
-function escapeHtml(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
-}
-
-async function fetchJSON(url) {
-  try { const r = await fetch(url + '?t=' + Date.now()); if (!r.ok) return null; return await r.json(); } catch { return null; }
-}
-
-function showToast(msg) {
-  const el = document.getElementById('msg-toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-// --- Workflow Progress Bar (#2) ---
-
-function renderWorkflowBar(agents) {
-  const bar = document.getElementById('workflow-bar');
-  const entries = Object.entries(agents);
-  if (entries.length === 0) { bar.style.display = 'none'; return; }
-  bar.style.display = 'flex';
-
-  const running = entries.filter(([,v]) => v.status === 'running').map(([k]) => k);
-  const completed = entries.filter(([,v]) => v.status === 'completed').map(([k]) => k);
-
-  let html = '';
-  for (const phase of WORKFLOW_PHASES) {
-    const phaseRunning = phase.agents.some(a => running.includes(a));
-    const phaseCompleted = phase.agents.some(a => completed.includes(a));
-    let state = 'pending';
-    if (phaseRunning) state = 'active';
-    else if (phaseCompleted) state = 'done';
-    html += '<div class="workflow-step ' + state + '">'
-      + '<div class="step-dot"></div>'
-      + '<div class="step-label">' + phase.label + '</div>'
-      + '</div>';
+// ── Differential Update Helper ──
+function updateText(el, newVal) {
+  if (!el) return;
+  const s = String(newVal);
+  if (el.textContent !== s) {
+    el.textContent = s;
+    el.classList.remove('value-updated');
+    void el.offsetWidth;
+    el.classList.add('value-updated');
   }
-  bar.innerHTML = html;
 }
 
-// --- Desktop Notifications (#4) ---
+function updateById(id, newVal) {
+  updateText(document.getElementById(id), newVal);
+}
 
-let notificationsEnabled = false;
-let prevAgentStatuses = {};
+// ── Sidebar Toggle ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
 
-function toggleNotifications() {
-  const btn = document.getElementById('notif-toggle');
-  if (!notificationsEnabled) {
-    if (!('Notification' in window)) {
-      showToast('Browser does not support notifications');
-      return;
-    }
-    if (Notification.permission === 'granted') {
-      notificationsEnabled = true;
-      btn.classList.add('active');
-      btn.textContent = 'Notify ON';
-      showToast('Notifications enabled');
-    } else if (Notification.permission === 'denied') {
-      showToast('Notifications blocked by browser');
-    } else {
-      Notification.requestPermission().then(p => {
-        if (p === 'granted') {
-          notificationsEnabled = true;
-          btn.classList.add('active');
-          btn.textContent = 'Notify ON';
-          showToast('Notifications enabled');
-        } else {
-          showToast('Notification permission denied');
-        }
+// ── Tab Navigation ──
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('active');
+  const navEl = document.querySelector(`[data-tab="${tab}"]`);
+  if (navEl) navEl.classList.add('active');
+  // Close sidebar on mobile
+  if (window.innerWidth <= 1024) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  // Refresh data for the new tab
+  fetchData();
+}
+
+// ── Session Switching ──
+function switchSession(id) {
+  sessionId = id;
+  prevData = null;
+  fetchData();
+}
+
+// ── Refresh Toggle ──
+function toggleRefresh(on) {
+  if (on) {
+    startRefresh();
+  } else {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+
+function startRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(fetchData, refreshInterval);
+}
+
+// ── Data Fetching ──
+async function fetchData() {
+  try {
+    let url = '/data/agents.json';
+    if (sessionId) url += '?session=' + encodeURIComponent(sessionId);
+    const resp = await fetch(url, { cache: 'no-store' });
+    if (!resp.ok) return;
+    const data = await resp.json();
+    updateDashboard(data);
+    prevData = data;
+    updateTimestamp();
+  } catch (e) {
+    // Silently ignore fetch errors
+  }
+}
+
+async function fetchSessions() {
+  try {
+    const resp = await fetch('/api/sessions');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const sel = document.getElementById('session-select');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Current Session</option>';
+    if (data.sessions) {
+      data.sessions.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id || s.session_id || '';
+        const label = (opt.value || '').substring(0, 12);
+        const time = s.started_at ? new Date(s.started_at).toLocaleTimeString() : '';
+        opt.textContent = label + (time ? ' - ' + time : '');
+        sel.appendChild(opt);
       });
     }
-  } else {
-    notificationsEnabled = false;
-    btn.classList.remove('active');
-    btn.textContent = 'Notify';
-    showToast('Notifications disabled');
+    sel.value = current;
+  } catch (e) {}
+}
+
+function updateTimestamp() {
+  const el = document.getElementById('last-updated');
+  if (el) el.textContent = new Date().toLocaleTimeString();
+}
+
+// ── Main Update ──
+function updateDashboard(data) {
+  const agents = data.agents || {};
+  const list = Object.values(agents);
+
+  const total = list.length;
+  const active = list.filter(a => a.status === 'active').length;
+  const done = list.filter(a => a.status === 'done').length;
+  const errors = list.filter(a => a.status === 'error').length;
+
+  // Update summary cards (differential)
+  updateById('stat-total', total);
+  updateById('stat-active', active);
+  updateById('stat-done', done);
+  updateById('stat-errors', errors);
+
+  // Update workflow stepper
+  updateWorkflow(data.workflow);
+
+  // Update agent grids based on current tab
+  if (currentTab === 'dashboard') {
+    updateAgentGrid('agent-grid-active', list.filter(a => a.status === 'active' || a.status === 'idle'));
+    updateAgentGrid('agent-grid-done', list.filter(a => a.status === 'done' || a.status === 'error'));
+  }
+  if (currentTab === 'agents') {
+    updateAgentGrid('agent-grid-all', list);
+  }
+  if (currentTab === 'errors') {
+    updateErrors(list);
+  }
+  if (currentTab === 'messages') {
+    updateMessages(list);
+  }
+  if (currentTab === 'workflow') {
+    updateWorkflowFull(data.workflow, list);
+  }
+
+  // Update detail panel if open
+  if (openAgentName && agents[openAgentName]) {
+    updatePanel(agents[openAgentName]);
   }
 }
 
-function checkNotifications(agents) {
-  if (!notificationsEnabled) { prevAgentStatuses = {}; return; }
-  const entries = Object.entries(agents);
-  for (const [name, info] of entries) {
-    const prev = prevAgentStatuses[name];
-    if (prev === 'running' && info.status === 'completed') {
-      new Notification('Agent Completed', { body: name + ' has finished', icon: undefined });
+// ── Workflow Stepper ──
+const PHASES = ['Requirements', 'Design', 'Implementation', 'Testing', 'Review', 'Deploy'];
+
+function updateWorkflow(wf) {
+  const phase = (wf && wf.phase) || '';
+  const container = document.getElementById('workflow-stepper');
+  if (!container) return;
+
+  // Only rebuild if phase changed
+  if (container.dataset.phase === phase) return;
+  container.dataset.phase = phase;
+
+  const phaseIdx = PHASES.findIndex(p => p.toLowerCase() === phase.toLowerCase());
+  let html = '';
+  PHASES.forEach((p, i) => {
+    if (i > 0) html += '<span class="workflow-arrow">&#9654;</span>';
+    let cls = 'workflow-step';
+    if (i === phaseIdx) cls += ' current';
+    else if (i < phaseIdx) cls += ' completed';
+    html += `<div class="${cls}"><span class="step-dot"></span> ${p}</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateWorkflowFull(wf, list) {
+  const container = document.getElementById('workflow-stepper-full');
+  if (container) {
+    const phase = (wf && wf.phase) || '';
+    if (container.dataset.phase !== phase) {
+      container.dataset.phase = phase;
+      const phaseIdx = PHASES.findIndex(p => p.toLowerCase() === phase.toLowerCase());
+      let html = '';
+      PHASES.forEach((p, i) => {
+        if (i > 0) html += '<span class="workflow-arrow">&#9654;</span>';
+        let cls = 'workflow-step';
+        if (i === phaseIdx) cls += ' current';
+        else if (i < phaseIdx) cls += ' completed';
+        html += `<div class="${cls}"><span class="step-dot"></span> ${p}</div>`;
+      });
+      container.innerHTML = html;
     }
   }
-  // Check all complete
-  const allComplete = entries.length > 0 && entries.every(([,v]) => v.status === 'completed');
-  const prevAnyRunning = Object.values(prevAgentStatuses).some(s => s === 'running');
-  if (allComplete && prevAnyRunning) {
-    new Notification('All Agents Complete', { body: entries.length + ' agents finished successfully' });
+  // Timeline
+  const timeline = document.getElementById('workflow-timeline');
+  if (timeline) {
+    updateAgentGrid('workflow-timeline', list.sort((a, b) => {
+      const order = { active: 0, idle: 1, error: 2, done: 3 };
+      return (order[a.status] || 9) - (order[b.status] || 9);
+    }));
   }
-  // Check new errors
-  const totalErrors = entries.reduce((s,[,v]) => s + (v.error_count || 0), 0);
-  const prevTotalErrors = Object.values(prevAgentStatuses).reduce((s, v) => s + ((typeof v === 'object' ? v : 0)), 0);
-  // Store current statuses
-  prevAgentStatuses = {};
-  for (const [name, info] of entries) prevAgentStatuses[name] = info.status;
 }
 
-// --- Smooth Timer (#8) ---
+// ── Agent Grid (Differential) ──
+function updateAgentGrid(containerId, agents) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-let sessionEarliestStart = null;
-let timerInterval = null;
-
-function startSmoothTimer() {
-  if (timerInterval) return;
-  timerInterval = setInterval(() => {
-    if (sessionEarliestStart) {
-      const elapsed = Math.floor(Date.now() / 1000 - sessionEarliestStart);
-      document.getElementById('session-time').textContent = formatDuration(elapsed);
+  if (agents.length === 0) {
+    if (!container.querySelector('.empty-state')) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><h3>No agents yet</h3><p>Agents will appear here when work begins</p></div>';
     }
-  }, 1000);
+    return;
+  }
+
+  // Build a map of current cards by agent name
+  const existingCards = {};
+  container.querySelectorAll('.agent-card').forEach(card => {
+    existingCards[card.dataset.agent] = card;
+  });
+
+  // Track which agents should be in this grid
+  const agentNames = new Set(agents.map(a => a.name));
+
+  // Remove cards for agents no longer in this list
+  Object.keys(existingCards).forEach(name => {
+    if (!agentNames.has(name)) {
+      existingCards[name].remove();
+      delete existingCards[name];
+    }
+  });
+
+  // Remove empty state if it exists
+  const emptyState = container.querySelector('.empty-state');
+  if (emptyState) emptyState.remove();
+
+  // Update or create cards
+  agents.forEach(agent => {
+    const name = agent.name;
+    if (existingCards[name]) {
+      // Differential update existing card
+      updateAgentCard(existingCards[name], agent);
+    } else {
+      // Create new card
+      const card = createAgentCard(agent);
+      container.appendChild(card);
+    }
+  });
 }
 
-// --- Message API ---
+function createAgentCard(agent) {
+  const card = document.createElement('div');
+  card.className = 'agent-card';
+  card.dataset.agent = agent.name;
+  card.onclick = () => openPanel(agent.name);
+  card.innerHTML = renderAgentCardInner(agent);
+  return card;
+}
 
-async function sendMessage(agent, type, content) {
-  if (!content.trim()) return;
+function renderAgentCardInner(agent) {
+  const status = agent.status || 'idle';
+  const dept = agent.department || 'Unknown';
+  const task = agent.task || 'Waiting...';
+  const duration = agent.duration || '--';
+  const todos = agent.todos || { total: 0, done: 0 };
+  const pct = todos.total > 0 ? Math.round((todos.done / todos.total) * 100) : 0;
+  const tokens = agent.tokens || {};
+  const tokenStr = formatTokens(tokens);
+
+  return `
+    <div class="agent-card-header">
+      <div class="agent-name-row">
+        <span class="status-dot ${status}"></span>
+        <span class="agent-name" data-field="name">${agent.name}</span>
+      </div>
+      <span class="dept-badge dept-${dept}">${dept}</span>
+    </div>
+    <div class="agent-task" data-field="task">${escHtml(task)}</div>
+    <div class="agent-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%" data-field="progress"></div></div>
+      <span class="progress-text" data-field="progress-text">${todos.done}/${todos.total}</span>
+    </div>
+    <div class="agent-footer">
+      <span class="agent-duration" data-field="duration">${duration}</span>
+      <span class="agent-tokens" data-field="tokens">${tokenStr}</span>
+    </div>
+  `;
+}
+
+function updateAgentCard(card, agent) {
+  const status = agent.status || 'idle';
+  const task = agent.task || 'Waiting...';
+  const duration = agent.duration || '--';
+  const todos = agent.todos || { total: 0, done: 0 };
+  const pct = todos.total > 0 ? Math.round((todos.done / todos.total) * 100) : 0;
+  const tokens = agent.tokens || {};
+  const tokenStr = formatTokens(tokens);
+  const dept = agent.department || 'Unknown';
+
+  // Update status dot
+  const dot = card.querySelector('.status-dot');
+  if (dot && dot.className !== 'status-dot ' + status) {
+    dot.className = 'status-dot ' + status;
+  }
+
+  // Update department badge
+  const badge = card.querySelector('.dept-badge');
+  if (badge) {
+    const newCls = 'dept-badge dept-' + dept;
+    if (badge.className !== newCls) badge.className = newCls;
+    updateText(badge, dept);
+  }
+
+  // Update task
+  const taskEl = card.querySelector('.agent-task');
+  if (taskEl) {
+    const escaped = escHtml(task);
+    if (taskEl.innerHTML !== escaped) {
+      taskEl.innerHTML = escaped;
+      taskEl.classList.remove('value-updated');
+      void taskEl.offsetWidth;
+      taskEl.classList.add('value-updated');
+    }
+  }
+
+  // Update progress
+  const fill = card.querySelector('.progress-fill');
+  if (fill) fill.style.width = pct + '%';
+  updateText(card.querySelector('.progress-text'), todos.done + '/' + todos.total);
+
+  // Update duration & tokens
+  updateText(card.querySelector('.agent-duration'), duration);
+  updateText(card.querySelector('.agent-tokens'), tokenStr);
+}
+
+// ── Detail Panel ──
+function openPanel(agentName) {
+  openAgentName = agentName;
+  if (prevData && prevData.agents && prevData.agents[agentName]) {
+    updatePanel(prevData.agents[agentName]);
+  }
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detail-panel').classList.add('open');
+  loadMessages(agentName);
+}
+
+function closePanel() {
+  openAgentName = null;
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+function updatePanel(agent) {
+  const title = document.getElementById('panel-agent-name');
+  if (title) title.innerHTML = `<span class="status-dot ${agent.status || 'idle'}"></span> ${agent.name}`;
+
+  const body = document.getElementById('panel-body');
+  if (!body) return;
+
+  const status = agent.status || 'idle';
+  const dept = agent.department || '-';
+  const task = agent.task || '-';
+  const duration = agent.duration || '-';
+  const tokens = agent.tokens || {};
+  const todos = agent.todos || {};
+  const todoItems = todos.items || [];
+  const error = agent.error || null;
+
+  let html = `
+    <div class="panel-section">
+      <div class="panel-field"><span class="label">Status</span><span class="status-badge ${status}"><span class="status-dot ${status}"></span> ${status}</span></div>
+      <div class="panel-field"><span class="label">Department</span><span class="value">${dept}</span></div>
+      <div class="panel-field"><span class="label">Duration</span><span class="value">${duration}</span></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">&#9998; Current Task</div>
+      <div style="font-size:0.88rem;color:var(--text-secondary)">${escHtml(task)}</div>
+    </div>`;
+
+  if (tokens && (tokens.input || tokens.output)) {
+    html += `
+    <div class="panel-section">
+      <div class="panel-section-title">&#9889; Token Usage</div>
+      <div class="panel-field"><span class="label">Input</span><span class="value">${fmtNum(tokens.input)}</span></div>
+      <div class="panel-field"><span class="label">Output</span><span class="value">${fmtNum(tokens.output)}</span></div>
+      <div class="panel-field"><span class="label">Cache Read</span><span class="value">${fmtNum(tokens.cache_read)}</span></div>
+      <div class="panel-field"><span class="label">Cache Write</span><span class="value">${fmtNum(tokens.cache_write)}</span></div>
+    </div>`;
+  }
+
+  if (todoItems.length > 0) {
+    html += `<div class="panel-section"><div class="panel-section-title">&#9745; Tasks (${todos.done || 0}/${todos.total || 0})</div><ul class="todo-list">`;
+    todoItems.forEach(t => {
+      const st = t.status || 'pending';
+      const icon = st === 'completed' ? '&#10003;' : st === 'in_progress' ? '&#9654;' : '&#9675;';
+      html += `<li class="todo-item"><span class="todo-icon ${st}">${icon}</span><span>${escHtml(t.content || t.task || '')}</span></li>`;
+    });
+    html += '</ul></div>';
+  }
+
+  if (error) {
+    html += `<div class="panel-section"><div class="panel-section-title">&#9888; Error</div><div class="error-block">${escHtml(typeof error === 'string' ? error : JSON.stringify(error, null, 2))}</div></div>`;
+  }
+
+  body.innerHTML = html;
+}
+
+// ── Messages ──
+async function loadMessages(agentName) {
+  const chatSection = document.getElementById('panel-chat');
+  if (!chatSection) return;
+  chatSection.innerHTML = `
+    <div class="panel-section-title">&#128172; Messages</div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="Send a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="chat-send" onclick="sendMessage()">Send</button>
+    </div>
+  `;
   try {
-    const r = await fetch(API_BASE + '/' + agent, {
+    const resp = await fetch('/api/messages/' + encodeURIComponent(agentName));
+    if (resp.ok) {
+      const data = await resp.json();
+      renderChatMessages(data.messages || []);
+    }
+  } catch (e) {}
+}
+
+function renderChatMessages(messages) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  if (messages.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.8rem;padding:20px">No messages yet</div>';
+    return;
+  }
+  container.innerHTML = messages.map(m => {
+    const cls = m.from === 'user' ? 'user' : 'agent';
+    const time = m.created_at ? new Date(m.created_at).toLocaleTimeString() : '';
+    return `<div class="chat-msg ${cls}"><div class="msg-content">${escHtml(m.content)}</div><div class="msg-time">${time}</div></div>`;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage() {
+  if (!openAgentName) return;
+  const input = document.getElementById('chat-input');
+  if (!input || !input.value.trim()) return;
+  const content = input.value.trim();
+  input.value = '';
+  try {
+    await fetch('/api/messages/' + encodeURIComponent(openAgentName) + '/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: type, content: content.trim() })
+      body: JSON.stringify({ content: content, type: 'instruction', priority: 'normal' })
     });
-    if (r.ok) {
-      showToast('Message sent to ' + agent);
-      refresh();
+    loadMessages(openAgentName);
+  } catch (e) {}
+}
+
+// ── Errors Tab ──
+function updateErrors(agents) {
+  const container = document.getElementById('error-list');
+  if (!container) return;
+  const errorAgents = agents.filter(a => a.error || a.status === 'error');
+  if (errorAgents.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#10003;</div><h3>No errors</h3><p>All agents running smoothly</p></div>';
+    return;
+  }
+  container.innerHTML = errorAgents.map(a => `
+    <div class="error-card">
+      <div class="error-agent">${a.name}</div>
+      <div class="error-time">${a.updated_at || ''}</div>
+      <div class="error-msg">${escHtml(typeof a.error === 'string' ? a.error : JSON.stringify(a.error || 'Unknown error', null, 2))}</div>
+    </div>
+  `).join('');
+}
+
+// ── Messages Tab ──
+function updateMessages(agents) {
+  const container = document.getElementById('messages-grid');
+  if (!container) return;
+  let html = '';
+  agents.forEach(agent => {
+    html += `
+    <div class="msg-agent-card">
+      <div class="msg-agent-name">
+        <span class="status-dot ${agent.status || 'idle'}"></span>
+        ${agent.name}
+      </div>
+      <div class="msg-list" id="msg-list-${agent.name}">
+        <div style="text-align:center;color:var(--text-muted);font-size:0.75rem;padding:8px">
+          Click to load messages
+        </div>
+      </div>
+      <div class="chat-input-row" style="margin-top:8px">
+        <input class="chat-input" id="msg-input-${agent.name}" placeholder="Message ${agent.name}..." onkeydown="if(event.key==='Enter')sendMsgFromTab('${agent.name}')">
+        <button class="chat-send" onclick="sendMsgFromTab('${agent.name}')">&#10148;</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">&#9993;</div><h3>No agents</h3></div>';
+  // Load messages for each
+  agents.forEach(a => loadMsgForTab(a.name));
+}
+
+async function loadMsgForTab(agentName) {
+  try {
+    const resp = await fetch('/api/messages/' + encodeURIComponent(agentName));
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const container = document.getElementById('msg-list-' + agentName);
+    if (!container) return;
+    const msgs = data.messages || [];
+    if (msgs.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.75rem;padding:8px">No messages</div>';
     } else {
-      const err = await r.json();
-      showToast('Error: ' + (err.error || 'Failed'));
+      container.innerHTML = msgs.slice(-5).map(m => `
+        <div class="msg-item">
+          <div class="msg-content">${escHtml(m.content)}</div>
+          <div class="msg-meta">${m.type || 'message'} &middot; ${m.status || ''} &middot; ${m.created_at ? new Date(m.created_at).toLocaleTimeString() : ''}</div>
+        </div>
+      `).join('');
     }
-  } catch (e) {
-    showToast('Network error');
-  }
+  } catch (e) {}
 }
 
-function renderMessages(messages) {
-  if (!messages || messages.length === 0) {
-    return '<div style="color:var(--text-dim);font-size:0.85em;padding:8px 0;">No messages yet. Send one below.</div>';
-  }
-  let html = '';
-  for (const m of messages) {
-    const isUser = m.from === 'user';
-    const time = (m.created_at || '').substring(11, 19);
-    html += '<div class="msg-bubble ' + (isUser ? 'user' : 'agent') + '">';
-    html += '<div>' + escapeHtml(m.content) + '</div>';
-    html += '<div class="msg-meta">';
-    html += '<span class="msg-type-badge">' + m.type + '</span>';
-    html += '<span class="msg-status ' + m.status + '">' + m.status + '</span>';
-    html += '<span>' + time + '</span>';
-    html += '</div>';
-    if (m.response) {
-      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--green);font-size:0.85em;">';
-      html += '<strong>Response:</strong> ' + escapeHtml(m.response);
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-  return html;
+async function sendMsgFromTab(agentName) {
+  const input = document.getElementById('msg-input-' + agentName);
+  if (!input || !input.value.trim()) return;
+  const content = input.value.trim();
+  input.value = '';
+  try {
+    await fetch('/api/messages/' + encodeURIComponent(agentName) + '/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: content, type: 'instruction', priority: 'normal' })
+    });
+    setTimeout(() => loadMsgForTab(agentName), 500);
+  } catch (e) {}
 }
 
-function buildMessageInput(agent) {
-  const types = agent === 'master-orchestrator'
-    ? ['instruction','question','reprioritize','pause-workflow','resume-workflow','note']
-    : ['instruction','question','priority','note','pause','cancel'];
-
-  let opts = '';
-  for (const t of types) opts += '<option value="' + t + '">' + t + '</option>';
-
-  return '<div class="msg-input">'
-    + '<select id="msg-type-' + agent + '">' + opts + '</select>'
-    + '<input id="msg-input-' + agent + '" placeholder="Type a message to ' + agent + '..." '
-    + 'onkeydown="if(event.key===\'Enter\')document.getElementById(\'msg-send-' + agent + '\').click()">'
-    + '<button id="msg-send-' + agent + '" onclick="'
-    + 'sendMessage(\'' + agent + '\','
-    + 'document.getElementById(\'msg-type-' + agent + '\').value,'
-    + 'document.getElementById(\'msg-input-' + agent + '\').value);'
-    + 'document.getElementById(\'msg-input-' + agent + '\').value=\'\';">Send</button>'
-    + '</div>';
+// ── Utilities ──
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// --- Session management ---
-
-let viewingSession = 'current';
-let sessionSelectorPopulated = false;
-
-function switchSession(value) {
-  viewingSession = value;
-  selectedAgent = null;
-  document.getElementById('detail-panel').classList.remove('active');
-  document.getElementById('history-badge').style.display = value === 'current' ? 'none' : 'inline';
-  refresh();
+function fmtNum(n) {
+  if (!n && n !== 0) return '-';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return String(n);
 }
 
-async function populateSessionSelector() {
-  const sel = document.getElementById('session-selector');
-  const history = await fetchJSON(DATA_BASE + '/history.json');
-  if (!history || !history.sessions || history.sessions.length === 0) return;
-
-  while (sel.options.length > 1) sel.remove(1);
-
-  const sessions = history.sessions.slice().reverse().slice(0, 10);
-  for (const s of sessions) {
-    const opt = document.createElement('option');
-    opt.value = s.session_id;
-    const shortId = (s.session_id || '').substring(0, 16);
-    const agentCount = s.agents ? s.agents.length : 0;
-    const dur = formatDuration(s.total_duration || 0);
-    opt.textContent = shortId + ' (' + agentCount + ' agents, ' + dur + ')';
-    sel.appendChild(opt);
-  }
-  sessionSelectorPopulated = true;
+function formatTokens(t) {
+  if (!t) return '';
+  const inp = t.input || 0;
+  const out = t.output || 0;
+  if (inp === 0 && out === 0) return '';
+  return fmtNum(inp) + ' in / ' + fmtNum(out) + ' out';
 }
 
-function buildHistoryAgentsData(history, sessionId) {
-  const session = history.sessions.find(s => s.session_id === sessionId);
-  if (!session) return null;
-  const agents = {};
-  for (const a of (session.agents || [])) {
-    agents[a.name] = {
-      status: 'completed',
-      department: a.department,
-      started_at: a.started_at,
-      duration_seconds: a.duration_seconds,
-      tokens: { total: a.tokens || 0 },
-      error_count: a.errors || 0
-    };
-  }
-  return { session_id: session.session_id, started_at: session.started_at, agents };
-}
-
-// --- Main refresh ---
-
-let selectedAgent = null;
-let agentNamesList = []; // for keyboard shortcuts
-
-async function refresh() {
-  if (!sessionSelectorPopulated) populateSessionSelector();
-
-  let data;
-  if (viewingSession === 'current') {
-    data = await fetchJSON(DATA_BASE + '/agents.json');
-  } else {
-    const history = await fetchJSON(DATA_BASE + '/history.json');
-    data = history ? buildHistoryAgentsData(history, viewingSession) : null;
-  }
-
-  if (!data || !data.agents) {
-    document.getElementById('agents-container').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;">No active session data. Waiting for agents...</div>';
-    document.getElementById('workflow-bar').style.display = 'none';
-    return;
-  }
-
-  document.getElementById('session-id').textContent = 'Session: ' + (data.session_id || '--').substring(0, 16);
-  document.getElementById('last-updated').textContent = 'Updated: ' + (data.updated_at || new Date().toISOString()).substring(11, 19) + ' UTC';
-
-  const agents = data.agents;
-  const phase = inferPhase(agents);
-  document.getElementById('workflow-phase').textContent = phase;
-
-  // Render workflow bar (#2)
-  renderWorkflowBar(agents);
-
-  // Check notifications (#4)
-  checkNotifications(agents);
-
-  const entries = Object.entries(agents);
-  const active = entries.filter(([,v]) => v.status === 'running').length;
-  const completed = entries.filter(([,v]) => v.status === 'completed').length;
-  const totalErrors = entries.reduce((s,[,v]) => s + (v.error_count || 0), 0);
-
-  document.getElementById('active-count').textContent = active;
-  document.getElementById('completed-count').textContent = completed;
-  document.getElementById('error-count').textContent = totalErrors;
-
-  // Smooth timer (#8)
-  const now = Date.now() / 1000;
-  const starts = entries.map(([,v]) => v.started_at ? new Date(v.started_at).getTime()/1000 : Infinity);
-  const earliest = Math.min(...starts);
-  if (earliest < Infinity) {
-    sessionEarliestStart = earliest;
-    startSmoothTimer();
-  }
-  document.getElementById('session-time').textContent = earliest < Infinity ? formatDuration(Math.floor(now - earliest)) : '--';
-
-  // Group by department
-  const byDept = {};
-  for (const [name, info] of entries) {
-    const dept = info.department || 'Other';
-    if (!byDept[dept]) byDept[dept] = [];
-    byDept[dept].push({ name, ...info });
-  }
-
-  // Load todos
-  const todos = {};
-  for (const [name] of entries) {
-    const td = await fetchJSON(DATA_BASE + '/todos/' + name + '.json');
-    if (td) todos[name] = td;
-  }
-
-  // Build agent names list for keyboard nav (#6)
-  agentNamesList = [];
-  let html = '';
-  for (const dept of DEPT_ORDER) {
-    if (!byDept[dept]) continue;
-    html += '<div class="dept-section"><div class="dept-header">' + dept + '</div>';
-    for (const agent of byDept[dept]) {
-      agentNamesList.push(agent.name);
-      const dur = agent.status === 'running' && agent.started_at
-        ? Math.floor(now - new Date(agent.started_at).getTime()/1000)
-        : (agent.duration_seconds || 0);
-      const durStr = dur > 0 ? formatDuration(dur) : '--';
-
-      let progressHTML = '';
-      const td = todos[agent.name];
-      if (td && td.progress && td.progress.total > 0) {
-        const pct = Math.floor((td.progress.completed / td.progress.total) * 100);
-        progressHTML = '<div class="progress-bar"><div class="fill" style="width:' + pct + '%"></div></div><span class="progress-text">' + td.progress.completed + '/' + td.progress.total + '</span>';
-      }
-
-      let errorHTML = '';
-      if (agent.error_count > 0) errorHTML = '<span class="error-badge">' + agent.error_count + ' err</span>';
-
-      const sel = selectedAgent === agent.name ? ' selected' : '';
-      html += '<div class="agent-row' + sel + '" onclick="toggleDetail(\'' + agent.name + '\')">'
-        + '<div class="indicator ' + agent.status + '"></div>'
-        + '<span class="name">' + agent.name + '</span>'
-        + '<span class="status ' + agent.status + '">' + (agent.status === 'running' ? 'RUNNING' : agent.status === 'completed' ? 'DONE' : 'IDLE') + '</span>'
-        + '<span class="duration">' + durStr + '</span>'
-        + progressHTML + errorHTML
-        + '</div>';
-    }
-    html += '</div>';
-  }
-  document.getElementById('agents-container').innerHTML = html;
-
-  // Detail panel with messages + active task highlight (#3)
-  if (selectedAgent && agents[selectedAgent]) {
-    const dp = document.getElementById('detail-panel');
-    dp.classList.add('active');
-    let dhtml = '<h3>' + selectedAgent + '</h3>';
-    const td = todos[selectedAgent];
-    if (td && td.todos) {
-      dhtml += '<div><strong>Tasks:</strong></div>';
-      for (const t of td.todos) {
-        const icon = t.status === 'completed' ? '&#10003;' : t.status === 'in_progress' ? '&#9679;' : '&#9675;';
-        // Show activeForm for in_progress tasks (#3)
-        const label = (t.status === 'in_progress' && t.activeForm) ? t.activeForm : t.content;
-        dhtml += '<div class="todo-item ' + t.status + '"><span class="icon">' + icon + '</span><span>' + escapeHtml(label) + '</span></div>';
-      }
-    }
-    // Errors
-    const errData = await fetchJSON(DATA_BASE + '/errors/' + selectedAgent + '.json');
-    if (errData && errData.errors && errData.errors.length > 0) {
-      dhtml += '<div style="margin-top:16px"><strong style="color:var(--red)">Recent Errors:</strong></div>';
-      for (const e of errData.errors.slice(-5).reverse()) {
-        dhtml += '<div class="error-item"><span class="time">' + (e.timestamp||'').substring(11,19) + '</span> <span class="tool">' + escapeHtml(e.tool||'') + '</span>: ' + escapeHtml((e.message||'').substring(0,80)) + '</div>';
-      }
-    }
-    // Messages (chat)
-    const msgData = await fetchJSON(API_BASE + '/' + selectedAgent);
-    dhtml += '<div class="msg-section">';
-    dhtml += '<h4>Messages</h4>';
-    dhtml += '<div class="msg-log">' + renderMessages(msgData ? msgData.messages : []) + '</div>';
-    dhtml += buildMessageInput(selectedAgent);
-    dhtml += '</div>';
-    dp.innerHTML = dhtml;
-  } else {
-    document.getElementById('detail-panel').classList.remove('active');
-  }
-}
-
-function toggleDetail(name) {
-  selectedAgent = selectedAgent === name ? null : name;
-  refresh();
-}
-
-// --- Commands tab ---
-
-async function loadCommands() {
-  const el = document.getElementById('commands-section');
-  const msgData = await fetchJSON(API_BASE + '/master-orchestrator');
-  const messages = msgData ? msgData.messages : [];
-
-  let html = '<div class="cmd-panel">';
-  html += '<h3>Orchestrator Commands</h3>';
-  html += '<p style="color:var(--text-dim);font-size:0.85em;margin-bottom:16px;">Send instructions to the master orchestrator. Commands are delivered asynchronously via the message queue.</p>';
-
-  html += '<div class="cmd-quick-actions">';
-  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'reprioritize\',\'Reprioritize remaining tasks based on current progress\')">Reprioritize</div>';
-  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'question\',\'What is the current status and what blockers exist?\')">Status Report</div>';
-  html += '<div class="cmd-btn danger" onclick="sendMessage(\'master-orchestrator\',\'pause-workflow\',\'Pause workflow after current agent completes\')">Pause Workflow</div>';
-  html += '<div class="cmd-btn" onclick="sendMessage(\'master-orchestrator\',\'resume-workflow\',\'Resume workflow execution\')">Resume Workflow</div>';
-  html += '</div>';
-
-  html += buildMessageInput('master-orchestrator');
-
-  if (messages.length > 0) {
-    html += '<div class="cmd-log"><h4>Command History</h4>';
-    html += '<div class="msg-log">' + renderMessages(messages) + '</div>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-  el.innerHTML = html;
-}
-
-// --- Error Timeline Tab (#5) ---
-
-async function loadErrors() {
-  const el = document.getElementById('errors-section');
-  const data = await fetchJSON(DATA_BASE + '/agents.json');
-  if (!data || !data.agents) {
-    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No agent data available.</div>';
-    return;
-  }
-
-  const allErrors = [];
-  const agentNames = Object.keys(data.agents);
-  for (const name of agentNames) {
-    const errData = await fetchJSON(DATA_BASE + '/errors/' + name + '.json');
-    if (errData && errData.errors) {
-      for (const e of errData.errors) {
-        allErrors.push({ agent: name, ...e });
-      }
-    }
-  }
-
-  if (allErrors.length === 0) {
-    el.innerHTML = '<div style="padding:20px;"><h3 style="color:var(--text-bright);margin-bottom:12px;">Error Timeline</h3><div style="color:var(--green);font-size:0.9em;">No errors recorded. All clear!</div></div>';
-    return;
-  }
-
-  // Sort by timestamp descending
-  allErrors.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-
-  let html = '<h3 style="color:var(--text-bright);margin-bottom:12px;">Error Timeline <span style="color:var(--red);font-size:0.8em;">(' + allErrors.length + ' total)</span></h3>';
-  for (const e of allErrors.slice(0, 50)) {
-    const time = (e.timestamp || '').substring(11, 19);
-    html += '<div class="error-timeline-item">'
-      + '<span class="et-time">' + time + '</span>'
-      + '<span class="et-agent">' + escapeHtml(e.agent) + '</span>'
-      + '<span class="et-tool">' + escapeHtml(e.tool || '--') + '</span>'
-      + '<span class="et-msg">' + escapeHtml((e.message || '').substring(0, 200)) + '</span>'
-      + '</div>';
-  }
-  el.innerHTML = html;
-}
-
-// --- History & Analytics ---
-
-async function loadHistory() {
-  const data = await fetchJSON(DATA_BASE + '/history.json');
-  const el = document.getElementById('history-section');
-  if (!data || !data.sessions || data.sessions.length === 0) {
-    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No session history.</div>';
-    return;
-  }
-  let html = '<h3 style="margin-bottom:12px;color:var(--text-bright)">' + data.sessions.length + ' Sessions</h3>';
-  for (const s of [...data.sessions].reverse().slice(0, 20)) {
-    html += '<div class="session-card"><div class="sid">' + (s.session_id||'--').substring(0,20) + '</div>'
-      + '<div class="info">Started: ' + (s.started_at||'--') + ' | Agents: ' + (s.agents||[]).length + ' | Duration: ' + formatDuration(s.total_duration||0) + '</div>';
-    if (s.agents) {
-      html += '<div style="margin-top:4px;font-size:0.8em;color:var(--text-dim)">' + s.agents.map(a => a.name).join(', ') + '</div>';
-    }
-    html += '</div>';
-  }
-  el.innerHTML = html;
-}
-
-async function loadAnalytics() {
-  const data = await fetchJSON(DATA_BASE + '/history.json');
-  const el = document.getElementById('analytics-section');
-  if (!data || !data.sessions || data.sessions.length === 0) {
-    el.innerHTML = '<div style="color:var(--text-dim);padding:20px;">No data for analytics.</div>';
-    return;
-  }
-  const allAgents = data.sessions.flatMap(s => s.agents || []);
-  const byName = {};
-  for (const a of allAgents) {
-    if (!byName[a.name]) byName[a.name] = [];
-    byName[a.name].push(a);
-  }
-  let html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
-  html += '<h3 style="color:var(--text-bright)">Agent Performance</h3>';
-  html += '<a href="/analytics.html" style="color:var(--cyan);text-decoration:none;font-size:0.85em;padding:6px 14px;border:1px solid var(--cyan);border-radius:6px;">Full Analytics Dashboard &rarr;</a>';
-  html += '</div>';
-  html += '<table class="analytics-table"><tr><th>Agent</th><th>Runs</th><th>Avg Duration</th><th>Min</th><th>Max</th></tr>';
-  for (const [name, runs] of Object.entries(byName).sort((a,b) => a[0].localeCompare(b[0]))) {
-    const durations = runs.map(r => r.duration_seconds || 0);
-    const avg = Math.floor(durations.reduce((a,b)=>a+b,0) / durations.length);
-    html += '<tr><td>' + name + '</td><td>' + runs.length + '</td><td>' + formatDuration(avg)
-      + '</td><td>' + formatDuration(Math.min(...durations))
-      + '</td><td>' + formatDuration(Math.max(...durations)) + '</td></tr>';
-  }
-  html += '</table>';
-  el.innerHTML = html;
-}
-
-function showTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('agents-section').style.display = tab === 'agents' ? 'block' : 'none';
-  document.getElementById('commands-section').classList.toggle('active', tab === 'commands');
-  document.getElementById('errors-section').classList.toggle('active', tab === 'errors');
-  document.getElementById('history-section').classList.toggle('active', tab === 'history');
-  document.getElementById('analytics-section').classList.toggle('active', tab === 'analytics');
-  // Find the clicked tab element
-  const tabs = document.querySelectorAll('.tab');
-  const tabNames = ['agents', 'commands', 'errors', 'history', 'analytics'];
-  const idx = tabNames.indexOf(tab);
-  if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
-  if (tab === 'commands') loadCommands();
-  if (tab === 'errors') loadErrors();
-  if (tab === 'history') loadHistory();
-  if (tab === 'analytics') loadAnalytics();
-}
-
-// --- Keyboard Shortcuts (#6) ---
-
-document.addEventListener('keydown', function(e) {
-  // Don't capture when typing in an input/select/textarea
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
-
-  const overlay = document.getElementById('kb-overlay');
-
-  if (e.key === '?') {
-    overlay.classList.toggle('active');
-    e.preventDefault();
-    return;
-  }
-  if (e.key === 'Escape') {
-    if (overlay.classList.contains('active')) {
-      overlay.classList.remove('active');
-    } else if (selectedAgent) {
-      selectedAgent = null;
-      refresh();
-    }
-    e.preventDefault();
-    return;
-  }
-  // Number keys 1-9 select agents
-  const num = parseInt(e.key);
-  if (num >= 1 && num <= 9 && agentNamesList.length >= num) {
-    const name = agentNamesList[num - 1];
-    selectedAgent = selectedAgent === name ? null : name;
-    refresh();
-    e.preventDefault();
-    return;
-  }
-  // Tab shortcuts
-  if (e.key === 'a') { showTab('agents'); e.preventDefault(); }
-  if (e.key === 'c') { showTab('commands'); e.preventDefault(); }
-  if (e.key === 'e') { showTab('errors'); e.preventDefault(); }
-  if (e.key === 'h') { showTab('history'); e.preventDefault(); }
-  if (e.key === 's') { showTab('analytics'); e.preventDefault(); }
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  fetchData();
+  fetchSessions();
+  startRefresh();
+  // Refresh session list every 30s
+  setInterval(fetchSessions, 30000);
 });
-
-refresh();
-startSmoothTimer();
-setInterval(refresh, 3000);
 </script>
 </body>
 </html>
