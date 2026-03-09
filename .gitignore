@@ -7,6 +7,7 @@ node_modules/
 .claude/settings.local.json
 .claude/logs/
 .claude/status/agents.json
+.claude/status/agents/
 .claude/status/todos/*.json
 .claude/status/errors/*.json
 .claude/status/messages/*.json
