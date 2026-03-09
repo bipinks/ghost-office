@@ -17,6 +17,10 @@
 - Architecture Decision Records (ADRs) for significant choices
 - Runbooks for operational procedures
 
+## Generated Output
+- **Never write generated files to the project root** — module code, specs, summaries, and any generated output must go inside `modules/` or `specs/`, never in the root directory
+- Ghost Office is a framework repo; generated output is gitignored and belongs in the target project or in designated subdirectories
+
 ## Code Quality
 - Lint all configuration files (terraform fmt, yamllint, shellcheck)
 - Validate before applying (terraform validate, kubeval)
