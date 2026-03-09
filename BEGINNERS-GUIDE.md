@@ -1,4 +1,8 @@
+<div align="center">
+<img src="assets/logo.svg" alt="Ghost Office" width="80" height="80">
+
 # Beginner's Guide
+</div>
 
 A practical introduction to Ghost Office — what it is, how it works, and how to start using it.
 

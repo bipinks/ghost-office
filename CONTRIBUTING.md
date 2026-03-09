@@ -1,4 +1,8 @@
+<div align="center">
+<img src="assets/logo.svg" alt="Ghost Office" width="64" height="64">
+
 # Contributing to Ghost Office
+</div>
 
 ## Getting Started
 

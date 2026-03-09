@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghost Office — Agent Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -57,8 +58,9 @@ body {
 .topbar-logo {
   font-size: 1.1rem; font-weight: 700; color: var(--text-primary);
   display: flex; align-items: center; gap: 8px;
+  text-decoration: none;
 }
-.topbar-logo span { color: var(--accent-primary); }
+.topbar-logo svg { width: 28px; height: 28px; flex-shrink: 0; }
 .hamburger {
   display: none; background: none; border: none; color: var(--text-secondary);
   font-size: 1.4rem; cursor: pointer; padding: 4px 8px;
@@ -406,7 +408,7 @@ body {
 <div class="topbar">
   <div class="topbar-left">
     <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
-    <div class="topbar-logo"><span>&#9670;</span> Ghost Office</div>
+    <a href="/" class="topbar-logo"><svg viewBox="0 0 120 120" fill="none"><defs><linearGradient id="tl" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><rect width="120" height="120" rx="28" fill="url(#tl)"/><path d="M60 22c-18.8 0-34 14.3-34 32v30c0 2 1.2 3.8 3 4.6 1.8.8 4 .4 5.4-1l5.6-5.6 5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L57 82l5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L74 82l5.6 5.6c1.4 1.4 3.6 1.8 5.4 1 1.8-.8 3-2.6 3-4.6V54c0-17.7-15.2-32-34-32z" fill="#fff" opacity=".95"/><ellipse cx="47" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="73" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="49" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/><ellipse cx="75" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/></svg> Ghost Office</a>
   </div>
   <div class="topbar-center">
     <select class="session-select" id="session-select" onchange="switchSession(this.value)">

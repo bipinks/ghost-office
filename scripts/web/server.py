@@ -37,6 +37,7 @@ WEB_DIR = SCRIPT_DIR
 STATUS_DIR = Path(os.environ.get("STATUS_DIR", str(SCRIPT_DIR.parent.parent / ".claude" / "status")))
 DATA_DIR = WEB_DIR / "data"
 MESSAGES_DIR = STATUS_DIR / "messages"
+ASSETS_DIR = SCRIPT_DIR.parent.parent / "assets"
 DB_PATH = DATA_DIR / "dashboard.db"
 
 
@@ -699,6 +700,24 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 self._json_response(200, handler(date_from=date_from, date_to=date_to))
             else:
                 self._json_response(404, {"error": f"Unknown analytics route: {route}"})
+            return
+
+        # Serve assets from project root assets/ directory
+        if self.path.startswith("/assets/"):
+            rel = self.path[len("/assets/"):]
+            asset_path = ASSETS_DIR / rel
+            if asset_path.is_file() and ASSETS_DIR in asset_path.resolve().parents or asset_path.resolve() == ASSETS_DIR:
+                ext = asset_path.suffix.lower()
+                ct = {".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon"}.get(ext, "application/octet-stream")
+                self.send_response(200)
+                self.send_header("Content-Type", ct)
+                self.send_header("Cache-Control", "public, max-age=86400")
+                data = asset_path.read_bytes()
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            else:
+                self.send_error(404)
             return
 
         # Sync status files before serving data
