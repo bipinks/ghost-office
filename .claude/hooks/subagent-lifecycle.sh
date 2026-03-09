@@ -1,21 +1,24 @@
 #!/bin/bash
 # Hook: SubagentStart / SubagentStop — Subagent Lifecycle Tracking
-# Logs when subagents are spawned and completed for orchestration visibility.
-# Writes structured JSON status to .claude/status/agents.json for dashboard.
+# Writes per-agent JSON files to .claude/status/agents/ for lock-free concurrency.
+# A lightweight assembler merges them into agents.json after each write.
 # Logs session history to .claude/status/history.json on completion.
 # Sends desktop notification when all agents complete.
-# Attempts to capture token usage from hook data (best-effort).
 # Exit 0 = allow (log only, never block)
 
 INPUT_JSON="$(cat)"
-EVENT_TYPE="${HOOK_EVENT:-unknown}"
 AGENT_NAME=""
 SESSION_ID=""
+EVENT_TYPE=""
 
 if command -v jq >/dev/null 2>&1; then
-  AGENT_NAME="$(printf '%s' "$INPUT_JSON" | jq -r '.agent_name // .tool_input.subagent_type // empty' 2>/dev/null)"
+  AGENT_NAME="$(printf '%s' "$INPUT_JSON" | jq -r '.agent_type // .agent_name // .tool_input.subagent_type // empty' 2>/dev/null)"
   SESSION_ID="$(printf '%s' "$INPUT_JSON" | jq -r '.session_id // "unknown"' 2>/dev/null)"
+  EVENT_TYPE="$(printf '%s' "$INPUT_JSON" | jq -r '.hook_event_name // empty' 2>/dev/null)"
 fi
+
+# Fallback to env var if JSON field not available
+EVENT_TYPE="${EVENT_TYPE:-${HOOK_EVENT:-unknown}}"
 
 if [ -z "$AGENT_NAME" ]; then
   exit 0
@@ -46,17 +49,11 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 0
 fi
 
-# Source file locking helper
-HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$HOOK_DIR/lib/filelock.sh" ]; then
-  . "$HOOK_DIR/lib/filelock.sh"
-fi
-
 STATUS_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/status"
-mkdir -p "$STATUS_DIR" 2>/dev/null
+AGENTS_DIR="$STATUS_DIR/agents"
+mkdir -p "$AGENTS_DIR" 2>/dev/null
 STATUS_FILE="$STATUS_DIR/agents.json"
 HISTORY_FILE="$STATUS_DIR/history.json"
-ERRORS_DIR="$STATUS_DIR/errors"
 
 # Department lookup
 get_department() {
@@ -75,43 +72,41 @@ get_department() {
 
 DEPARTMENT="$(get_department "$AGENT_NAME")"
 
-# Initialize status file if missing or invalid
-if [ ! -f "$STATUS_FILE" ] || ! jq empty "$STATUS_FILE" 2>/dev/null; then
-  printf '{"session_id":"%s","updated_at":"%s","agents":{}}' "$SESSION_ID" "$TIMESTAMP" > "$STATUS_FILE"
-fi
+# --- Per-agent file (atomic write, no locking needed) ---
+AGENT_FILE="$AGENTS_DIR/${AGENT_NAME}.json"
 
-TMPFILE="$(mktemp "${STATUS_FILE}.XXXXXX" 2>/dev/null)" || exit 0
-
-# --- Best-effort token usage capture ---
-# Claude Code may include usage data in future hook versions
-TOTAL_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.total_tokens // .usage.total_tokens // .tool_response.total_tokens // 0' 2>/dev/null)" || TOTAL_TOKENS=0
-INPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.input_tokens // .usage.input_tokens // .tool_response.input_tokens // 0' 2>/dev/null)" || INPUT_TOKENS=0
-OUTPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.output_tokens // .usage.output_tokens // .tool_response.output_tokens // 0' 2>/dev/null)" || OUTPUT_TOKENS=0
-TOOL_USES="$(printf '%s' "$INPUT_JSON" | jq -r '.tool_uses // .usage.tool_uses // .tool_response.tool_uses // 0' 2>/dev/null)" || TOOL_USES=0
+# Best-effort token usage capture
+TOTAL_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.total_tokens // .usage.total_tokens // 0' 2>/dev/null)" || TOTAL_TOKENS=0
+INPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.input_tokens // .usage.input_tokens // 0' 2>/dev/null)" || INPUT_TOKENS=0
+OUTPUT_TOKENS="$(printf '%s' "$INPUT_JSON" | jq -r '.output_tokens // .usage.output_tokens // 0' 2>/dev/null)" || OUTPUT_TOKENS=0
+TOOL_USES="$(printf '%s' "$INPUT_JSON" | jq -r '.tool_uses // .usage.tool_uses // 0' 2>/dev/null)" || TOOL_USES=0
 
 case "$EVENT_TYPE" in
   SubagentStart)
-    if type acquire_lock >/dev/null 2>&1; then acquire_lock "$STATUS_FILE"; fi
-    jq --arg agent "$AGENT_NAME" \
-       --arg ts "$TIMESTAMP" \
-       --arg dept "$DEPARTMENT" \
-       --arg sid "$SESSION_ID" \
-       '.session_id = $sid |
-        .updated_at = $ts |
-        .agents[$agent] = {
-          "status": "running",
-          "started_at": $ts,
-          "department": $dept,
-          "error_count": 0
-        }' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
-    if type release_lock >/dev/null 2>&1; then release_lock "$STATUS_FILE"; fi
+    # Write per-agent file atomically (write to temp, then mv)
+    TMPFILE="$(mktemp "$AGENT_FILE.XXXXXX" 2>/dev/null)" || exit 0
+    cat > "$TMPFILE" <<AGENTJSON
+{
+  "status": "running",
+  "started_at": "$TIMESTAMP",
+  "department": "$DEPARTMENT",
+  "error_count": 0
+}
+AGENTJSON
+    mv "$TMPFILE" "$AGENT_FILE" 2>/dev/null
     ;;
   SubagentStop)
-    if type acquire_lock >/dev/null 2>&1; then acquire_lock "$STATUS_FILE"; fi
-    # Compute duration if started_at exists
-    STARTED_AT="$(jq -r --arg agent "$AGENT_NAME" '.agents[$agent].started_at // empty' "$STATUS_FILE" 2>/dev/null)"
+    # Read started_at from existing agent file
+    STARTED_AT=""
+    if [ -f "$AGENT_FILE" ]; then
+      STARTED_AT="$(jq -r '.started_at // empty' "$AGENT_FILE" 2>/dev/null)"
+      EXISTING_ERRORS="$(jq -r '.error_count // 0' "$AGENT_FILE" 2>/dev/null)" || EXISTING_ERRORS=0
+    fi
+
+    # Compute duration
     DURATION=0
     if [ -n "$STARTED_AT" ] && command -v date >/dev/null 2>&1; then
+      START_EPOCH="$(TZ=UTC date -jf "%Y-%m-%dT%H:%M:%SZ" "$STARTED_AT" +%s 2>/dev/null)" || \
       START_EPOCH="$(date -d "$STARTED_AT" +%s 2>/dev/null)" || START_EPOCH=0
       NOW_EPOCH="$(date -u +%s 2>/dev/null)" || NOW_EPOCH=0
       if [ "$START_EPOCH" -gt 0 ] 2>/dev/null && [ "$NOW_EPOCH" -gt 0 ] 2>/dev/null; then
@@ -119,110 +114,91 @@ case "$EVENT_TYPE" in
       fi
     fi
 
-    # Preserve error_count from running state
-    EXISTING_ERRORS="$(jq -r --arg agent "$AGENT_NAME" '.agents[$agent].error_count // 0' "$STATUS_FILE" 2>/dev/null)" || EXISTING_ERRORS=0
+    # Write completed agent file atomically
+    TMPFILE="$(mktemp "$AGENT_FILE.XXXXXX" 2>/dev/null)" || exit 0
+    cat > "$TMPFILE" <<AGENTJSON
+{
+  "status": "completed",
+  "started_at": "${STARTED_AT:-$TIMESTAMP}",
+  "completed_at": "$TIMESTAMP",
+  "department": "$DEPARTMENT",
+  "error_count": ${EXISTING_ERRORS:-0},
+  "duration_seconds": $DURATION,
+  "tokens": {
+    "total": $TOTAL_TOKENS,
+    "input": $INPUT_TOKENS,
+    "output": $OUTPUT_TOKENS,
+    "tool_uses": $TOOL_USES
+  }
+}
+AGENTJSON
+    mv "$TMPFILE" "$AGENT_FILE" 2>/dev/null
 
-    jq --arg agent "$AGENT_NAME" \
-       --arg ts "$TIMESTAMP" \
-       --arg dept "$DEPARTMENT" \
-       --arg sid "$SESSION_ID" \
-       --argjson dur "$DURATION" \
-       --argjson errors "$EXISTING_ERRORS" \
-       --argjson tokens "$TOTAL_TOKENS" \
-       --argjson input_tok "$INPUT_TOKENS" \
-       --argjson output_tok "$OUTPUT_TOKENS" \
-       --argjson tools "$TOOL_USES" \
-       '.session_id = $sid |
-        .updated_at = $ts |
-        .agents[$agent].status = "completed" |
-        .agents[$agent].completed_at = $ts |
-        .agents[$agent].duration_seconds = $dur |
-        .agents[$agent].error_count = $errors |
-        .agents[$agent].tokens = {
-          "total": $tokens,
-          "input": $input_tok,
-          "output": $output_tok,
-          "tool_uses": $tools
-        } |
-        .agents[$agent].department = (
-          if .agents[$agent].department then .agents[$agent].department else $dept end
-        )' "$STATUS_FILE" > "$TMPFILE" 2>/dev/null && mv "$TMPFILE" "$STATUS_FILE"
-    if type release_lock >/dev/null 2>&1; then release_lock "$STATUS_FILE"; fi
-
-    # --- Session history: log completed agent to history ---
+    # --- Session history (best-effort, non-critical) ---
     if [ ! -f "$HISTORY_FILE" ] || ! jq empty "$HISTORY_FILE" 2>/dev/null; then
       printf '{"sessions":[]}' > "$HISTORY_FILE"
     fi
-
     HIST_TMP="$(mktemp "${HISTORY_FILE}.XXXXXX" 2>/dev/null)"
     if [ -n "$HIST_TMP" ]; then
       jq --arg sid "$SESSION_ID" \
          --arg agent "$AGENT_NAME" \
          --arg dept "$DEPARTMENT" \
          --arg ts "$TIMESTAMP" \
-         --arg started "$STARTED_AT" \
+         --arg started "${STARTED_AT:-$TIMESTAMP}" \
          --argjson dur "$DURATION" \
          --argjson tokens "$TOTAL_TOKENS" \
-         '
-         # Find or create session entry
-         (.sessions |= (
+         '(.sessions |= (
            if any(.session_id == $sid) then
              map(if .session_id == $sid then
-               .agents += [{
-                 "name": $agent,
-                 "department": $dept,
-                 "started_at": $started,
-                 "completed_at": $ts,
-                 "duration_seconds": $dur,
-                 "tokens": $tokens
-               }] |
+               .agents += [{"name": $agent, "department": $dept, "started_at": $started, "completed_at": $ts, "duration_seconds": $dur, "tokens": $tokens}] |
                .updated_at = $ts |
                .total_duration = ([.agents[].duration_seconds] | add) |
                .total_tokens = ([.agents[].tokens] | add)
              else . end)
            else
-             . + [{
-               "session_id": $sid,
-               "started_at": $started,
-               "updated_at": $ts,
-               "total_duration": $dur,
-               "total_tokens": $tokens,
-               "agents": [{
-                 "name": $agent,
-                 "department": $dept,
-                 "started_at": $started,
-                 "completed_at": $ts,
-                 "duration_seconds": $dur,
-                 "tokens": $tokens
-               }]
-             }]
+             . + [{"session_id": $sid, "started_at": $started, "updated_at": $ts, "total_duration": $dur, "total_tokens": $tokens,
+               "agents": [{"name": $agent, "department": $dept, "started_at": $started, "completed_at": $ts, "duration_seconds": $dur, "tokens": $tokens}]}]
            end
-         )) |
-         # Keep only last 50 sessions
-         .sessions = (.sessions | .[-50:])
-         ' "$HISTORY_FILE" > "$HIST_TMP" 2>/dev/null && mv "$HIST_TMP" "$HISTORY_FILE"
+         )) | .sessions = (.sessions | .[-50:])' "$HISTORY_FILE" > "$HIST_TMP" 2>/dev/null && mv "$HIST_TMP" "$HISTORY_FILE"
       rm -f "$HIST_TMP" 2>/dev/null
-    fi
-
-    # --- Notification: check if all agents are completed ---
-    STILL_RUNNING="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$STATUS_FILE" 2>/dev/null)" || STILL_RUNNING=1
-    TOTAL_AGENTS="$(jq '[.agents | to_entries[]] | length' "$STATUS_FILE" 2>/dev/null)" || TOTAL_AGENTS=0
-
-    if [ "$STILL_RUNNING" -eq 0 ] && [ "$TOTAL_AGENTS" -gt 0 ]; then
-      COMPLETED_COUNT="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$STATUS_FILE" 2>/dev/null)" || COMPLETED_COUNT=0
-      NOTIFY_MSG="All $COMPLETED_COUNT agents completed"
-
-      # Send desktop notification (cross-platform)
-      if command -v notify-send >/dev/null 2>&1; then
-        notify-send "Agent Dashboard" "$NOTIFY_MSG" --urgency=normal 2>/dev/null
-      elif command -v osascript >/dev/null 2>&1; then
-        osascript -e "display notification \"$NOTIFY_MSG\" with title \"Agent Dashboard\"" 2>/dev/null
-      fi
     fi
     ;;
 esac
 
-# Clean up temp file if mv failed
-rm -f "$TMPFILE" 2>/dev/null
+# --- Assemble agents.json from per-agent files ---
+# This is fast and can tolerate concurrent runs (last writer wins, but all agents are included)
+ASSEMBLED='{"session_id":"'"$SESSION_ID"'","updated_at":"'"$TIMESTAMP"'","agents":{}}'
+for agent_file in "$AGENTS_DIR"/*.json; do
+  [ -f "$agent_file" ] || continue
+  agent_basename="$(basename "$agent_file" .json)"
+  agent_data="$(cat "$agent_file" 2>/dev/null)" || continue
+  ASSEMBLED="$(printf '%s' "$ASSEMBLED" | jq --arg name "$agent_basename" --argjson data "$agent_data" '.agents[$name] = $data' 2>/dev/null)" || continue
+done
+ASSEMBLE_TMP="$(mktemp "${STATUS_FILE}.XXXXXX" 2>/dev/null)"
+if [ -n "$ASSEMBLE_TMP" ]; then
+  printf '%s' "$ASSEMBLED" > "$ASSEMBLE_TMP" && mv "$ASSEMBLE_TMP" "$STATUS_FILE" 2>/dev/null
+  rm -f "$ASSEMBLE_TMP" 2>/dev/null
+fi
+
+# --- Notification: check if all agents are completed ---
+if [ "$EVENT_TYPE" = "SubagentStop" ]; then
+  STILL_RUNNING=0
+  TOTAL_AGENTS=0
+  for agent_file in "$AGENTS_DIR"/*.json; do
+    [ -f "$agent_file" ] || continue
+    TOTAL_AGENTS=$((TOTAL_AGENTS + 1))
+    status="$(jq -r '.status' "$agent_file" 2>/dev/null)"
+    [ "$status" = "running" ] && STILL_RUNNING=$((STILL_RUNNING + 1))
+  done
+
+  if [ "$STILL_RUNNING" -eq 0 ] && [ "$TOTAL_AGENTS" -gt 0 ]; then
+    NOTIFY_MSG="All $TOTAL_AGENTS agents completed"
+    if command -v osascript >/dev/null 2>&1; then
+      osascript -e "display notification \"$NOTIFY_MSG\" with title \"Agent Dashboard\"" 2>/dev/null
+    elif command -v notify-send >/dev/null 2>&1; then
+      notify-send "Agent Dashboard" "$NOTIFY_MSG" --urgency=normal 2>/dev/null
+    fi
+  fi
+fi
 
 exit 0

@@ -20,6 +20,11 @@ if [ "$EVENT_TYPE" = "startup" ]; then
     # Remove stale lock directories (older than 1 minute)
     find "$STATUS_DIR" -name "*.lock" -type d -mmin +1 -exec rm -rf {} + 2>/dev/null
 
+    # Clear per-agent status files from previous session
+    if [ -d "$STATUS_DIR/agents" ]; then
+      find "$STATUS_DIR/agents" -name "*.json" -type f -delete 2>/dev/null
+    fi
+
     # Clear per-agent files from previous session (keep .gitkeep)
     for subdir in todos errors messages; do
       if [ -d "$STATUS_DIR/$subdir" ]; then
