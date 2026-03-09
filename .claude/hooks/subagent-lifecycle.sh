@@ -24,6 +24,12 @@ if [ -z "$AGENT_NAME" ]; then
   exit 0
 fi
 
+# --- Source file locking helper ---
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$HOOK_DIR/lib/filelock.sh" ]; then
+  . "$HOOK_DIR/lib/filelock.sh"
+fi
+
 # --- Determine log directory ---
 LOG_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/logs"
 mkdir -p -m 0700 "$LOG_DIR" 2>/dev/null
@@ -165,8 +171,8 @@ AGENTJSON
     ;;
 esac
 
-# --- Assemble agents.json from per-agent files ---
-# This is fast and can tolerate concurrent runs (last writer wins, but all agents are included)
+# --- Assemble agents.json from per-agent files (with lock for concurrent safety) ---
+if type acquire_lock >/dev/null 2>&1; then acquire_lock "$STATUS_FILE"; fi
 ASSEMBLED='{"session_id":"'"$SESSION_ID"'","updated_at":"'"$TIMESTAMP"'","agents":{}}'
 for agent_file in "$AGENTS_DIR"/*.json; do
   [ -f "$agent_file" ] || continue
@@ -179,6 +185,7 @@ if [ -n "$ASSEMBLE_TMP" ]; then
   printf '%s' "$ASSEMBLED" > "$ASSEMBLE_TMP" && mv "$ASSEMBLE_TMP" "$STATUS_FILE" 2>/dev/null
   rm -f "$ASSEMBLE_TMP" 2>/dev/null
 fi
+if type release_lock >/dev/null 2>&1; then release_lock "$STATUS_FILE"; fi
 
 # --- Notification: check if all agents are completed ---
 if [ "$EVENT_TYPE" = "SubagentStop" ]; then
