@@ -19,12 +19,23 @@ hooks:
 ## Overview
 Acodax Office ERP administration via REST API. Manage users, roles, branches, and system configuration using the CLI tool at `scripts/acodax.mjs`.
 
+## Environment Setup
+
+The CLI requires these environment variables (defined in `~/.zshrc`):
+- `ACODAX_OFFICE_LINK` — Base URL (e.g., `https://office.acodax.com`)
+- `ACODAX_OFFICE_USERNAME` — Admin username
+- `ACODAX_OFFICE_PASSWORD` — Admin password
+
+**IMPORTANT:** Always `source ~/.zshrc` before running commands, as the Bash tool runs a non-interactive shell that does not auto-load user profile variables.
+
 ## CLI Reference
+
+All commands below assume you have sourced the environment first. Prefix every Bash call with `source ~/.zshrc 2>/dev/null;`.
 
 ### User Management
 ```bash
 # List all users or search
-node scripts/acodax.mjs list-users
+source ~/.zshrc 2>/dev/null; node scripts/acodax.mjs list-users
 node scripts/acodax.mjs list-users "search-term"
 
 # Get user details

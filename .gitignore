@@ -38,6 +38,12 @@ scripts/web/data/
 .DS_Store
 Thumbs.db
 
+# Generated project output
+modules/
+specs/
+INVOICE-MODULE-SUMMARY.md
+SPECS-INDEX.md
+
 # Build artifacts
 dist/
 build/
