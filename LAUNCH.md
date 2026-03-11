@@ -322,6 +322,58 @@ Would love feedback! What agents or skills would be most useful to add?
 
 ---
 
+## Screenshot Guide
+
+Attach these screenshots from `assets/screenshots/` when posting. Don't attach all of them — use the right one for each platform and post.
+
+### X (Twitter) — 1 image per tweet max
+
+| Tweet | Screenshot | Why |
+|-------|-----------|-----|
+| Tweet 1 (hook) | `landing-page.png` | Clean hero — grabs attention in the timeline |
+| Tweet 4 (what's inside) | `dashboard-organization.png` | Visualizes "18 agents, 7 departments" |
+| Tweet 5 (dashboard) | `dashboard-overview.png` | Matches the live dashboard content |
+| Tweets 2, 3, 6 | None | Text-only tweets perform fine in threads |
+
+### Reddit — 1 in post, save others for comments
+
+| Where | Screenshot | Why |
+|-------|-----------|-----|
+| r/ClaudeAI main post | `dashboard-overview.png` | Hero shot — replaces the ASCII mockup |
+| r/ClaudeAI follow-up comment | `analytics-overview.png` | Drives engagement ("here's the analytics view") |
+| r/ChatGPTCoding main post | `dashboard-overview.png` | Single strongest image |
+
+### Hacker News
+
+No images — HN is text-only. The README screenshots sell when people click through to the repo.
+
+### LinkedIn — carousel (3 images)
+
+| Slide | Screenshot | Why |
+|-------|-----------|-----|
+| 1st | `landing-page.png` | Professional opener |
+| 2nd | `dashboard-overview.png` | Product in action |
+| 3rd | `analytics-overview.png` | Data/charts appeal to LinkedIn audience |
+
+LinkedIn's algorithm boosts carousel posts over single-image posts.
+
+### Discord — 1 image, share more if asked
+
+| Where | Screenshot | Why |
+|-------|-----------|-----|
+| Main post | `dashboard-overview.png` | One strong image, don't overwhelm chat |
+| If asked "what agents?" | `dashboard-organization.png` | Shows the full org structure |
+
+### Skip everywhere
+
+| Screenshot | Reason |
+|-----------|--------|
+| `dashboard-errors.png` | Shows "No errors" empty state — not compelling |
+| `dashboard-agents.png` | Redundant with overview |
+| `dashboard-workflow.png` | Too similar to overview |
+
+---
+
 ## Tips for Posting
 
 1. **Timing**: Post on Tuesday-Thursday between 9-11 AM EST for maximum visibility

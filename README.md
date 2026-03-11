@@ -134,308 +134,46 @@ docker compose up dashboard              # Alternative: run dashboard container
 
 ---
 
-### Overview — all agents, live
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  AGENT DASHBOARD        Session: a3f9b2       12:34:56 UTC      ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  Workflow: Requirements ──▶ Design ──▶ [Implementation] ──▶ ... ║
-║                                                                  ║
-║  ENGINEERING                                                     ║
-║  [1] ● backend-engineer    RUNNING   4m 23s  ████████░░  3/5    ║
-║  [2] ● frontend-engineer   RUNNING   3m 11s  ██████░░░░  2/4    ║
-║  [3] ✓ architecture-agent  DONE      1m 47s  ██████████  4/4    ║
-║      ○ database-engineer   IDLE                                  ║
-║                                                                  ║
-║  QUALITY                                                         ║
-║      ○ qa-agent            IDLE                                  ║
-║      ○ security-agent      IDLE                                  ║
-║                                                                  ║
-║  PRODUCT                                                         ║
-║  [4] ✓ product-manager     DONE      2m 05s  ██████████  3/3    ║
-║                                                                  ║
-╠══════════════════════════════════════════════════════════════════╣
-║  Active: 2  │  Completed: 2  │  Idle: 3  │  Uptime: 6m 18s    ║
-╚══════════════════════════════════════════════════════════════════╝
-  [1-4] detail  [l] sessions  [h] history  [s] stats  [e] errors
-  [w] workflow  [m] messages  [c] command  [q] quit
-```
+<div align="center">
+<img src="assets/screenshots/dashboard-overview.png" alt="Agent Dashboard — live overview with workflow progress, active and completed agents" width="800">
+<p><i>Live dashboard — workflow progress, agent status, task tracking, all in real time</i></p>
+</div>
 
 ---
 
-### Session list — `[l]` or `--sessions`
+### Organization — 18 agents, 7 departments
 
-Switch between active and historical sessions:
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  SESSION LIST                                    12:34:56 UTC    ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  [1] ● a3f9b2c8d1e4f5a7  ████████░░  2/4  (ACTIVE)            ║
-║        Started 6m ago · 2 running                                ║
-║                                                                  ║
-║  [2] ○ 7c2d1e9a3b5f8c0d  ██████████  done                     ║
-║        Mar 08 09:14 · 8 agents · 12m 44s                        ║
-║                                                                  ║
-║  [3] ○ f81a3c7e2b9d4f6a  ██████████  done                     ║
-║        Mar 07 16:52 · 6 agents · 8m 30s                         ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
-  [1-3] select session  [h] history  [s] stats  [q] quit
-```
-
-When viewing a historical session, the header turns red with a **HISTORY** badge:
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  AGENT DASHBOARD (HISTORY)                       12:34:56 UTC    ║
-║  Session: 7c2d1e9a                                [l] live       ║
-╠══════════════════════════════════════════════════════════════════╣
-```
-
-Press `[b]` to return to the session list, or `[l]` to switch sessions.
-
----
-
-### Detail view — drill into any agent
-
-Press a number key to see that agent's task list in real-time:
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  backend-engineer                     Engineering  ●  RUNNING   ║
-║  Running for 4m 23s                                              ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  Tasks:                                                          ║
-║  ✓  Create migration for invoices table (branch_id scoped)      ║
-║  ✓  Build InvoiceService with PDF generation                     ║
-║  ●  Implement email delivery via Laravel Queue                   ║
-║  ○  Add API resource transformer                                 ║
-║  ○  Write unit tests for InvoiceService                          ║
-║                                                                  ║
-║  Progress: ████████████░░░░░░░░  2/5 tasks done (40%)           ║
-║                                                                  ║
-║  Errors: 0                                                       ║
-╚══════════════════════════════════════════════════════════════════╝
-  [b] back to overview  │  [q] quit
-```
+<div align="center">
+<img src="assets/screenshots/dashboard-organization.png" alt="Organization view — master orchestrator coordinating 18 agents across 7 departments" width="800">
+<p><i>Master orchestrator coordinates specialists across Product, Engineering, Quality, Operations, Marketing, Support, and IT</i></p>
+</div>
 
 ---
 
 ### Interactive messaging — talk to agents live
 
-Send instructions, questions, and commands to agents from the dashboard. Messages are delivered asynchronously via the `message-check` hook.
+Send instructions, questions, and commands to agents while they work. Messages are delivered asynchronously via the `message-check` hook.
 
-**Web dashboard** (recommended):
-```
-Click an agent → detail panel opens → type message → Send
-```
-
-**Terminal dashboard**:
-```
-Press [m] to view all messages
-Press [c] to send a command to the orchestrator
-```
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  backend-engineer — Messages                                     ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  ┌─────────────────────────────────────────────────────┐  YOU   ║
-║  │  Focus on REST API endpoints first, skip admin.     │ 10:30  ║
-║  │  [instruction]              ✓ acknowledged           │        ║
-║  └─────────────────────────────────────────────────────┘        ║
-║                                                                  ║
-║  AGENT  ┌──────────────────────────────────────────────┐        ║
-║  10:31  │  Understood. Prioritizing /api/v1/invoices   │        ║
-║         │  and /api/v1/customers.                      │        ║
-║         └──────────────────────────────────────────────┘        ║
-║                                                                  ║
-║  ┌─────────────────────────────────────────────────────┐  YOU   ║
-║  │  How's the progress on invoice endpoints?           │ 10:45  ║
-║  │  [question]                 ● delivered              │        ║
-║  └─────────────────────────────────────────────────────┘        ║
-║                                                                  ║
-║  ┌──────────────────────────────────────────────────────────┐   ║
-║  │ [instruction ▾]  Type a message...            [ Send ]   │   ║
-║  └──────────────────────────────────────────────────────────┘   ║
-╚══════════════════════════════════════════════════════════════════╝
-```
+<div align="center">
+<img src="assets/screenshots/dashboard-messages.png" alt="Agent messaging — send instructions and questions to agents from the dashboard" width="800">
+<p><i>Send instructions, ask questions, adjust priorities — agents acknowledge and respond automatically</i></p>
+</div>
 
 Message types: `instruction`, `question`, `priority`, `note`, `pause`, `cancel`
 Status flow: **pending** → **delivered** (hook notifies agent) → **acknowledged** (agent responds)
 
 ---
 
-### Session history — `--history`
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  SESSION HISTORY                            Last 50 sessions     ║
-╠═══════════╦══════════════════╦══════════╦═════════╦═════════════╣
-║  Session  ║  Started         ║  Duration║  Agents ║  Status     ║
-╠═══════════╬══════════════════╬══════════╬═════════╬═════════════╣
-║  a3f9b2   ║  Mar 08  12:28   ║  6m 18s  ║    4    ║  running    ║
-║  7c2d1e   ║  Mar 08  09:14   ║  12m 44s ║    8    ║  completed  ║
-║  f81a3c   ║  Mar 07  16:52   ║  8m 30s  ║    6    ║  completed  ║
-║  b4e29a   ║  Mar 07  11:07   ║  15m 02s ║    9    ║  completed  ║
-╚═══════════╩══════════════════╩══════════╩═════════╩═════════════╝
-  [b] back  │  [q] quit
-```
-
-Tip: Use `[l]` from the overview to open the interactive session list, or `--session <id>` to jump directly.
-
----
-
-### Web dashboard — `--web`
-
-Launch with `./scripts/agent-dashboard.sh --web` — opens `http://localhost:8686`. Auto-refreshes every 2 seconds. No server dependencies — reads the same local JSON status files the terminal dashboard uses.
-
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  ◉ ○ ○   Agent Dashboard                    http://localhost:8686       │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│   Agent Dashboard                          [Current Session ▾]          │
-│   Session: a3f9b2 · 12:34:56 UTC                                        │
-│                                                                          │
-│   ┌────────────┐   ┌────────────┐   ┌──────────────────┐   ┌─────────┐ │
-│   │Requirements│──▶│   Design   │──▶│ ■ Implementation │──▶│ Testing │ │
-│   │     ✓      │   │     ✓      │   │     active       │   │ pending │ │
-│   └────────────┘   └────────────┘   └──────────────────┘   └─────────┘ │
-│                                                                          │
-│   ┌─ Engineering ────────────────────────────────────────────────────┐   │
-│   │                                                                  │   │
-│   │  ┌─────────────────────────┐  ┌─────────────────────────┐       │   │
-│   │  │  backend-engineer    ●  │  │  frontend-engineer   ●  │       │   │
-│   │  │  RUNNING · 4m 23s      │  │  RUNNING · 3m 11s       │       │   │
-│   │  │  ██████████░░░░░  3/5  │  │  ████████░░░░░░░  2/4   │       │   │
-│   │  │                        │  │                          │       │   │
-│   │  │  ✓ Create migration    │  │  ✓ Invoice list page     │       │   │
-│   │  │  ✓ Build service       │  │  ✓ Form components       │       │   │
-│   │  │  ● PDF generation      │  │  ● PDF preview modal     │       │   │
-│   │  │  ○ Email delivery      │  │  ○ Email trigger UI      │       │   │
-│   │  │  ○ Unit tests          │  │                          │       │   │
-│   │  └─────────────────────────┘  └─────────────────────────┘       │   │
-│   │                                                                  │   │
-│   │  ┌─────────────────────────┐  ┌─────────────────────────┐       │   │
-│   │  │  architecture-agent  ✓  │  │  database-engineer   ○  │       │   │
-│   │  │  DONE · 1m 47s         │  │  IDLE                    │       │   │
-│   │  │  ██████████████████ 4/4 │  │  ░░░░░░░░░░░░░░░░░ 0/0 │       │   │
-│   │  └─────────────────────────┘  └─────────────────────────┘       │   │
-│   └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│   ┌─ Product ────────────────────┐  ┌─ Quality ─────────────────────┐   │
-│   │  ┌─────────────────────────┐ │  │  ┌────────────────────────┐   │   │
-│   │  │  product-manager     ✓  │ │  │  │  qa-agent           ○  │   │   │
-│   │  │  DONE · 2m 05s         │ │  │  │  IDLE                   │   │   │
-│   │  │  ██████████████████ 3/3 │ │  │  │  ░░░░░░░░░░░░░░░░ 0/0 │   │   │
-│   │  └─────────────────────────┘ │  │  └────────────────────────┘   │   │
-│   └──────────────────────────────┘  │  ┌────────────────────────┐   │   │
-│                                      │  │  security-agent     ○  │   │   │
-│                                      │  │  IDLE                   │   │   │
-│                                      │  └────────────────────────┘   │   │
-│                                      └──────────────────────────────┘   │
-│                                                                          │
-│   ┌──────────────────────────────────────────────────────────────────┐   │
-│   │  Active: 2  ·  Completed: 2  ·  Idle: 3  ·  Uptime: 6m 18s    │   │
-│   └──────────────────────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
-<details>
-<summary>View HTML source of the web dashboard</summary>
-
-```html
-<!-- http://localhost:8686  —  auto-refresh every 2s, dark theme -->
-<div class="dashboard dark">
-  <header>
-    Agent Dashboard
-    <select id="session-selector">
-      <option value="current">Current Session</option>
-      <option>7c2d1e (8 agents, 12m 44s)</option>
-    </select>
-  </header>
-  <div class="meta">Session: a3f9b2 · 12:34:56 UTC</div>
-
-  <div class="workflow-bar">
-    <span class="done">Requirements</span> ▶
-    <span class="done">Design</span> ▶
-    <span class="active">Implementation</span> ▶
-    <span class="pending">Testing</span> ▶
-    <span class="pending">Security</span> ▶
-    <span class="pending">Deploy</span>
-  </div>
-
-  <div class="agent-grid">
-    <div class="agent-card running">
-      <div class="agent-name">backend-engineer</div>
-      <div class="dept-badge">Engineering</div>
-      <div class="progress-bar"><div class="fill" style="width:60%"></div></div>
-      <div class="task-list">
-        <div class="task done">✓ Create migration for invoices table</div>
-        <div class="task done">✓ Build InvoiceService with PDF generation</div>
-        <div class="task active">● Implement email delivery via Queue</div>
-        <div class="task pending">○ Add API resource transformer</div>
-        <div class="task pending">○ Write unit tests</div>
-      </div>
-      <div class="meta">3 / 5 tasks · 4m 23s</div>
-    </div>
-    <div class="agent-card running">
-      <div class="agent-name">frontend-engineer</div>
-      <div class="dept-badge">Engineering</div>
-      <div class="progress-bar"><div class="fill" style="width:50%"></div></div>
-      <div class="task-list">
-        <div class="task done">✓ Invoice list page</div>
-        <div class="task done">✓ Form components</div>
-        <div class="task active">● PDF preview modal</div>
-        <div class="task pending">○ Email trigger UI</div>
-      </div>
-      <div class="meta">2 / 4 tasks · 3m 11s</div>
-    </div>
-    <div class="agent-card done">
-      <div class="agent-name">architecture-agent</div>
-      <div class="dept-badge">Engineering</div>
-      <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
-      <div class="meta">4 / 4 tasks · 1m 47s ✓</div>
-    </div>
-    <div class="agent-card done">
-      <div class="agent-name">product-manager</div>
-      <div class="dept-badge">Product</div>
-      <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
-      <div class="meta">3 / 3 tasks · 2m 05s ✓</div>
-    </div>
-    <div class="agent-card idle">
-      <div class="agent-name">qa-agent</div>
-      <div class="dept-badge">Quality</div>
-    </div>
-    <div class="agent-card idle">
-      <div class="agent-name">security-agent</div>
-      <div class="dept-badge">Quality</div>
-    </div>
-  </div>
-
-  <footer>Active: 2 · Completed: 2 · Idle: 3 · Uptime: 6m 18s</footer>
-</div>
-```
-
-</details>
-
----
-
 ### Analytics dashboard
 
-The web server includes a full analytics dashboard at `http://localhost:8686/analytics.html` with cross-session charts and insights powered by SQLite and Chart.js.
+Cross-session analytics at `http://localhost:8686/analytics.html` — powered by SQLite and Chart.js.
 
-- **Summary cards**: Total sessions, agent runs, errors, tokens, avg duration
-- **8 interactive charts**: Session trends, agent performance, department breakdown, error analysis, token usage, workflow bottlenecks, message activity
-- **Sortable tables**: Agent performance details, recent errors
-- **Auto-created**: SQLite database (`data/dashboard.db`) syncs from JSON on each request — no setup needed
+<div align="center">
+<img src="assets/screenshots/analytics-overview.png" alt="Analytics dashboard — session trends, agent performance, department breakdown, token usage" width="800">
+<p><i>Session trends, agent performance, department breakdown, error analysis, token usage, and workflow bottlenecks</i></p>
+</div>
+
+- **Auto-created**: SQLite database syncs from JSON on each request — no setup needed
 - **API endpoints**: `GET /api/analytics/{summary,agent-performance,department-performance,session-trends,workflow-bottlenecks,error-breakdown,token-usage,message-stats}`
 
 See [docs/dashboard-data-model.md](docs/dashboard-data-model.md) for the full data model and schema.
