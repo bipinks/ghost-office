@@ -31,7 +31,7 @@ A practical introduction to Ghost Office — what it is, how it works, and how t
 
 ## Overview
 
-Ghost Office is a drop-in configuration layer for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that transforms it into an autonomous AI software company. It provides **18 specialized agents** across **7 departments**, coordinated by a master orchestrator that breaks down tasks, delegates to the right agents, runs quality gates, and delivers production-ready results.
+Ghost Office is a drop-in configuration layer for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that transforms it into an autonomous AI software company. It provides **19 specialized agents** across **7 departments**, coordinated by a master orchestrator that breaks down tasks, delegates to the right agents, runs quality gates, and delivers production-ready results.
 
 Think of it as hiring an entire engineering department — product managers, architects, backend/frontend engineers, QA, security, DevOps, and more — all available through your terminal.
 
@@ -39,9 +39,9 @@ Think of it as hiring an entire engineering department — product managers, arc
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| Agents | 18 | Specialized AI experts across 7 departments |
-| Skills | 54 | Domain knowledge packs with real code examples |
-| Commands | 23 | Slash commands for common operations |
+| Agents | 19 | Specialized AI experts across 7 departments |
+| Skills | 55 | Domain knowledge packs with real code examples |
+| Commands | 24 | Slash commands for common operations |
 | Workflows | 6 | Multi-phase orchestrated processes |
 | Rules | 12 | Enforced guidelines across 7 categories |
 | Hooks | 13 | Automated safety checks and lifecycle events |
@@ -61,7 +61,7 @@ Think of it as hiring an entire engineering department — product managers, arc
                           │
                           ▼
 ┌──────────────────────────────────────────────────────────┐
-│                  SLASH COMMANDS (23)                      │
+│                  SLASH COMMANDS (24)                      │
 │  /implement-feature  /fix-bug  /deploy-staging  etc.     │
 └─────────────────────────┬────────────────────────────────┘
                           │
@@ -74,7 +74,7 @@ Think of it as hiring an entire engineering department — product managers, arc
           ┌───────────────┼───────────────┐
           ▼               ▼               ▼
 ┌────────────────┐ ┌────────────┐ ┌──────────────┐
-│  AGENTS (18)   │ │ RULES (12) │ │  HOOKS (13)  │
+│  AGENTS (19)   │ │ RULES (12) │ │  HOOKS (13)  │
 │  Specialized   │ │ Enforced   │ │  Automated   │
 │  AI experts    │ │ guidelines │ │  safety nets │
 └───────┬────────┘ └────────────┘ └──────────────┘
@@ -141,12 +141,12 @@ Edit `CLAUDE.md` to match your project's tech stack, architecture, and conventio
 ```
 ghost-office/
 ├── .claude/
-│   ├── agents/       # 18 agent definitions (1 orchestrator + 17 specialists)
-│   ├── commands/     # 23 slash commands
+│   ├── agents/       # 19 agent definitions (1 orchestrator + 18 specialists)
+│   ├── commands/     # 24 slash commands
 │   ├── workflows/    # 6 workflow definitions
 │   ├── memory/       # 6 knowledge docs + 7 domain templates
 │   │   └── domains/  #   erp, ecommerce, saas, healthcare, fintech, education, cms
-│   ├── skills/       # 54 domain knowledge packs with code examples
+│   ├── skills/       # 55 domain knowledge packs with code examples
 │   ├── rules/        # 12 guidelines across 7 categories
 │   │   ├── common/   #   coding-style, git-workflow, security, testing, performance
 │   │   ├── cicd/     #   CI/CD best practices
@@ -177,7 +177,7 @@ ghost-office/
 
 ## Commands Reference
 
-All 23 slash commands, grouped by function:
+All 24 slash commands, grouped by function:
 
 ### Development
 
@@ -200,6 +200,7 @@ All 23 slash commands, grouped by function:
 | `/github-setup` | Set up GitHub repo with branch protection and workflows |
 | `/infra-plan` | Plan and design cloud infrastructure architecture |
 | `/cost-review` | Analyze cloud spending and recommend optimizations |
+| `/ansible` | Run Ansible playbooks, deployments, diagnostics, inventory management |
 | `/acodax-deploy` | Deploy Acodax Property project to production |
 
 ### Operations
@@ -250,7 +251,7 @@ The orchestrator automatically routes your task to the right agents. You do not 
 | **Product** | product-manager, ui-ux-designer | Requirements, user stories, wireframes, design systems |
 | **Engineering** | architecture-agent, backend-engineer, frontend-engineer, database-engineer, prompt-engineer | System design, APIs, UI, schemas, migrations, AI features |
 | **Quality** | qa-agent, security-agent | Test writing, security audits, compliance checks |
-| **Operations** | devops-engineer, monitoring-agent, performance-agent | CI/CD, deployments, observability, optimization |
+| **Operations** | devops-engineer, ansible-agent, monitoring-agent, performance-agent | CI/CD, Ansible, deployments, observability, optimization |
 | **Marketing** | content-strategist, social-media-manager | Content planning, SEO, campaigns, community |
 | **Support** | support-agent, documentation-agent | Bug triage, docs, changelogs, ADRs |
 | **IT** | ms-it-admin | Microsoft 365, Entra ID, Teams, Exchange |
@@ -262,6 +263,7 @@ The master orchestrator routes tasks automatically:
 - **Feature request** → product-manager → architecture-agent → engineers → qa-agent
 - **Bug report** → support-agent → relevant engineer → qa-agent
 - **Deployment** → devops-engineer → monitoring-agent
+- **Ansible/config management** → ansible-agent
 - **Security issue** → security-agent (immediate priority)
 - **Incident** → monitoring-agent → devops-engineer → engineers
 
@@ -563,7 +565,7 @@ A suggested progression for teams new to DevOps and this toolkit.
 Ensure you are running Claude Code from a directory containing the `.claude/` folder:
 
 ```bash
-ls .claude/commands/    # Should list 23 .md files
+ls .claude/commands/    # Should list 24 .md files
 ```
 
 ### Agents not spawning
@@ -641,5 +643,5 @@ The `examples/` directory contains complete `CLAUDE.md` templates for real-world
 - Read [CLAUDE.md](CLAUDE.md) for the full project reference
 - Read [AGENTS.md](AGENTS.md) for detailed agent routing and orchestration rules
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) to add your own agents, skills, or commands
-- Explore `.claude/skills/` to browse all 54 knowledge packs
+- Explore `.claude/skills/` to browse all 55 knowledge packs
 - Try `/analyze-project` on your own codebase to see the agents in action

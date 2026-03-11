@@ -60,7 +60,7 @@ It's not a toy — it has production-grade safety:
 ```
 What's in the box:
 
-📦 18 agents (product, engineering, QA, security, devops, marketing, support, IT)
+📦 19 agents (product, engineering, QA, security, devops, marketing, support, IT)
 ⚡ 23 slash commands (/implement-feature, /fix-bug, /deploy-production, etc.)
 🧠 54 domain skills (AWS, Terraform, K8s, Laravel, Vue, PostgreSQL, SEO...)
 🔒 12 safety hooks
@@ -109,7 +109,7 @@ Built for Claude Code, but the patterns work for any AI coding assistant.
 
 ### Title
 ```
-I built an autonomous AI software company you can drop into any project — 18 agents, 54 skills, 23 commands (open source)
+I built an autonomous AI software company you can drop into any project — 19 agents, 55 skills, 24 commands (open source)
 ```
 
 ### Body
@@ -132,7 +132,7 @@ When you type `/implement-feature "Add user authentication with OAuth"`, the orc
 7. Documentation agent writes the API docs
 
 **What's inside:**
-- 18 agents with department-based specialization
+- 19 agents with department-based specialization
 - 54 domain knowledge skills (AWS, Terraform, K8s, Docker, Laravel, Vue, PostgreSQL, SEO, etc.)
 - 23 slash commands for common workflows
 - 6 end-to-end workflows (feature dev, bug fix, release, incident response, etc.)
@@ -255,7 +255,7 @@ Key design decisions:
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
-The repo has 54 skills, 23 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
+The repo has 55 skills, 24 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
 
 https://github.com/bipinks/ghost-office
 
@@ -302,7 +302,7 @@ GitHub: https://github.com/bipinks/ghost-office
 ```
 🚀 Just open-sourced my Claude Code workspace — it turns your assistant into a full AI software company.
 
-**18 agents** across 7 departments, coordinated by a master orchestrator:
+**19 agents** across 7 departments, coordinated by a master orchestrator:
 - Product: requirements, wireframes, design systems
 - Engineering: backend, frontend, database, architecture, AI/prompts
 - Quality: testing (80%+ coverage), security audits

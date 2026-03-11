@@ -12,11 +12,11 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 
 ```
 .claude/
-├── agents/      — 18 agents (1 orchestrator + 17 departments)
-├── commands/    — 23 slash commands
+├── agents/      — 19 agents (1 orchestrator + 18 specialists)
+├── commands/    — 24 slash commands
 ├── workflows/   — 6 workflow definitions
 ├── memory/      — 6 knowledge docs + 7 domain templates
-├── skills/      — 54 domain knowledge packs
+├── skills/      — 55 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
 ├── hooks/       — 13 safety/audit/lifecycle hooks
 ├── status/      — Runtime: agent status, todos, errors, session history
@@ -24,14 +24,14 @@ Claude Code native workspace — markdown agents, skills, commands, rules, and h
 └── settings.json
 ```
 
-## Agents (18)
+## Agents (19)
 
 | Dept | Agents |
 |------|--------|
 | Product | product-manager, ui-ux-designer |
 | Engineering | architecture-agent, backend-engineer, frontend-engineer, database-engineer, prompt-engineer |
 | Quality | qa-agent, security-agent |
-| Operations | devops-engineer, monitoring-agent, performance-agent |
+| Operations | devops-engineer, ansible-agent, monitoring-agent, performance-agent |
 | Marketing | content-strategist, social-media-manager |
 | Support | support-agent, documentation-agent |
 | IT | ms-it-admin |

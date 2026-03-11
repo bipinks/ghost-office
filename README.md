@@ -108,7 +108,7 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/set-domain <name>` | Switch domain knowledge |
 | `/agent-status` | Live agent progress and task tracking |
 
-[All 23 commands →](.claude/commands/)
+[All 24 commands →](.claude/commands/)
 
 ---
 
@@ -526,7 +526,7 @@ Switch domain knowledge with `/set-domain <name>`:
 ```
 your-project/
 ├── .claude/                 Auto-discovered by Claude Code
-│   ├── agents/              18 agents (1 orchestrator + 17 specialists)
+│   ├── agents/              19 agents (1 orchestrator + 18 specialists)
 │   ├── commands/            23 slash commands
 │   ├── workflows/           6 workflow definitions
 │   ├── memory/              6 knowledge docs + 7 domain templates

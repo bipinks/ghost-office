@@ -22,6 +22,7 @@ permissionMode: default
 | Testing, QA | qa-agent |
 | Security audits | security-agent |
 | CI/CD, deployments | devops-engineer |
+| Ansible playbooks, server config mgmt | ansible-agent |
 | Monitoring, incidents | monitoring-agent |
 | Performance, cost | performance-agent |
 | Content, SEO | content-strategist |
