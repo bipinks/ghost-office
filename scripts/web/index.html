@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Office — AI Software Company</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a2e;
+  --bg-card: #16162a;
+  --bg-elevated: #222236;
+  --border-primary: #2a2a4a;
+  --border-accent: #3a3a5a;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-primary: #6366f1;
+  --accent-primary-light: #818cf8;
+  --accent-success: #22c55e;
+  --accent-warning: #eab308;
+  --accent-error: #ef4444;
+  --accent-info: #3b82f6;
+  --accent-purple: #a855f7;
+  --accent-cyan: #06b6d4;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── Animated Background ── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.bg-glow {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(120px); opacity: 0.15;
+}
+.bg-glow-1 { top: -200px; left: -100px; background: var(--accent-primary); }
+.bg-glow-2 { bottom: -200px; right: -100px; background: var(--accent-purple); }
+
+/* ── Navbar ── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-primary);
+}
+.navbar-brand {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: var(--text-primary);
+}
+.navbar-logo {
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+}
+.navbar-logo svg { width: 36px; height: 36px; }
+.navbar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.navbar-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+.navbar-links { display: flex; gap: 8px; }
+.navbar-links a {
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+.navbar-links a:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+.navbar-links a.primary {
+  background: var(--accent-primary); color: white;
+}
+.navbar-links a.primary:hover { background: var(--accent-primary-light); }
+
+/* ── Hero Section ── */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 32px 80px;
+}
+.hero-inner {
+  max-width: 900px; text-align: center;
+}
+.hero-logo {
+  margin-bottom: 28px;
+  animation: float 6s ease-in-out infinite;
+}
+.hero-logo svg {
+  filter: drop-shadow(0 8px 32px rgba(99,102,241,0.3));
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 999px;
+  font-size: 13px; font-weight: 500; color: var(--accent-primary-light);
+  margin-bottom: 32px;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-success);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, var(--accent-primary-light), var(--accent-cyan), var(--accent-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-desc {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--text-secondary);
+  max-width: 640px; margin: 0 auto 48px;
+  line-height: 1.7;
+}
+.hero-actions {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px;
+  font-size: 15px; font-weight: 600;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none; cursor: pointer;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
+  color: white;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.4);
+}
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-accent);
+}
+.btn-secondary:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-primary);
+}
+
+/* ── Stats Row ── */
+.stats-row {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 32px 80px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.stat-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+}
+.stat-number {
+  font-size: 40px; font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+.stat-number.indigo { color: var(--accent-primary-light); }
+.stat-number.green { color: var(--accent-success); }
+.stat-number.purple { color: var(--accent-purple); }
+.stat-number.cyan { color: var(--accent-cyan); }
+.stat-number.yellow { color: var(--accent-warning); }
+.stat-label {
+  font-size: 14px; color: var(--text-muted); font-weight: 500;
+}
+
+/* ── Departments Section ── */
+.section {
+  position: relative; z-index: 1;
+  max-width: 1100px; margin: 0 auto;
+  padding: 80px 32px;
+}
+.section-header {
+  text-align: center; margin-bottom: 48px;
+}
+.section-header h2 {
+  font-size: 32px; font-weight: 700; letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.section-header p {
+  font-size: 16px; color: var(--text-secondary); max-width: 560px; margin: 0 auto;
+}
+.dept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.dept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.3s;
+}
+.dept-card:hover {
+  border-color: var(--border-accent);
+  background: var(--bg-elevated);
+}
+.dept-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.dept-card h3 {
+  font-size: 17px; font-weight: 600; margin-bottom: 8px;
+}
+.dept-card p {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+  margin-bottom: 16px;
+}
+.dept-agents {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.agent-tag {
+  padding: 3px 10px;
+  font-size: 12px; font-weight: 500; font-family: var(--font-mono);
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 999px;
+  color: var(--accent-primary-light);
+}
+
+/* ── Quick Start Section ── */
+.quickstart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.qs-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  text-decoration: none; color: inherit;
+  transition: all 0.3s;
+  display: block;
+}
+.qs-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.08);
+}
+.qs-card .icon {
+  font-size: 28px; margin-bottom: 16px;
+}
+.qs-card h3 {
+  font-size: 16px; font-weight: 600; margin-bottom: 8px;
+}
+.qs-card p {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+}
+.qs-card code {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent-cyan);
+}
+
+/* ── Footer ── */
+.footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border-primary);
+  padding: 40px 32px;
+  text-align: center;
+}
+.footer p {
+  font-size: 14px; color: var(--text-muted);
+}
+.footer a { color: var(--accent-primary-light); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ── Live Indicator ── */
+.live-status {
+  position: relative; z-index: 1;
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 32px 80px;
+}
+.live-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.live-banner-left {
+  display: flex; align-items: center; gap: 16px;
+}
+.live-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent-success);
+  box-shadow: 0 0 12px rgba(34,197,94,0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+.live-banner h3 { font-size: 16px; font-weight: 600; }
+.live-banner p { font-size: 14px; color: var(--text-secondary); }
+.live-session {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--text-muted); background: var(--bg-primary);
+  padding: 8px 16px; border-radius: var(--radius-md);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .navbar { padding: 0 16px; }
+  .navbar-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero h1 { font-size: 32px; }
+  .hero-desc { font-size: 16px; }
+  .hero-actions { flex-direction: column; align-items: center; }
+  .btn { width: 100%; max-width: 280px; justify-content: center; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); padding: 0 20px 60px; }
+  .section { padding: 60px 20px; }
+  .dept-grid { grid-template-columns: 1fr; }
+  .quickstart-grid { grid-template-columns: 1fr; }
+  .live-banner { flex-direction: column; text-align: center; }
+  .mobile-nav {
+    display: flex; gap: 8px;
+  }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-number { font-size: 32px; }
+  .navbar-title { font-size: 16px; }
+}
+.mobile-nav { display: none; }
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex; gap: 4px;
+  }
+  .mobile-nav a {
+    padding: 8px 12px; font-size: 13px; font-weight: 500;
+    color: var(--text-secondary); text-decoration: none;
+    border-radius: var(--radius-sm);
+  }
+  .mobile-nav a.primary {
+    background: var(--accent-primary); color: white;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a class="navbar-brand" href="/">
+    <div class="navbar-logo"><svg viewBox="0 0 120 120" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><rect width="120" height="120" rx="28" fill="url(#lg)"/><path d="M60 22c-18.8 0-34 14.3-34 32v30c0 2 1.2 3.8 3 4.6 1.8.8 4 .4 5.4-1l5.6-5.6 5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L57 82l5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L74 82l5.6 5.6c1.4 1.4 3.6 1.8 5.4 1 1.8-.8 3-2.6 3-4.6V54c0-17.7-15.2-32-34-32z" fill="#fff" opacity=".95"/><ellipse cx="47" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="73" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="49" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/><ellipse cx="75" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/></svg></div>
+    <div>
+      <div class="navbar-title">Ghost Office</div>
+      <div class="navbar-subtitle">AI Software Company</div>
+    </div>
+  </a>
+  <div class="navbar-links">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/analytics.html">Analytics</a>
+    <a href="https://github.com/bipinks/ghost-office" target="_blank">GitHub</a>
+    <a href="/dashboard.html" class="primary">Open Dashboard &rarr;</a>
+  </div>
+  <div class="mobile-nav">
+    <a href="/dashboard.html" class="primary">Dashboard</a>
+    <a href="/analytics.html">Analytics</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo">
+      <svg viewBox="0 0 120 120" fill="none" width="88" height="88"><defs><linearGradient id="hl" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><rect width="120" height="120" rx="28" fill="url(#hl)"/><path d="M60 22c-18.8 0-34 14.3-34 32v30c0 2 1.2 3.8 3 4.6 1.8.8 4 .4 5.4-1l5.6-5.6 5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L57 82l5.6 5.6c1.6 1.6 4.2 1.6 5.8 0L74 82l5.6 5.6c1.4 1.4 3.6 1.8 5.4 1 1.8-.8 3-2.6 3-4.6V54c0-17.7-15.2-32-34-32z" fill="#fff" opacity=".95"/><ellipse cx="47" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="73" cy="55" rx="6" ry="7" fill="#6366f1"/><ellipse cx="49" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/><ellipse cx="75" cy="52" rx="2.5" ry="2.5" fill="#fff" opacity=".9"/></svg>
+    </div>
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Autonomous AI Agents
+    </div>
+    <h1>Your AI-Powered<br><span class="gradient">Software Company</span></h1>
+    <p class="hero-desc">
+      18 specialized agents across 7 departments — product, engineering, QA, security, DevOps, marketing, and support — coordinated by a master orchestrator.
+    </p>
+    <div class="hero-actions">
+      <a href="/dashboard.html" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Agent Dashboard
+      </a>
+      <a href="/analytics.html" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-row" id="stats-row">
+  <div class="stat-card">
+    <div class="stat-number indigo">18</div>
+    <div class="stat-label">AI Agents</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number green">7</div>
+    <div class="stat-label">Departments</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple">54</div>
+    <div class="stat-label">Skills</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan">23</div>
+    <div class="stat-label">Commands</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number yellow">13</div>
+    <div class="stat-label">Safety Hooks</div>
+  </div>
+</div>
+
+<!-- Live Status -->
+<div class="live-status">
+  <div class="live-banner" id="live-banner" style="display:none">
+    <div class="live-banner-left">
+      <div class="live-dot"></div>
+      <div>
+        <h3 id="live-title">Session Active</h3>
+        <p id="live-desc">Agents are working</p>
+      </div>
+    </div>
+    <div class="live-session" id="live-session"></div>
+  </div>
+</div>
+
+<!-- Departments -->
+<section class="section">
+  <div class="section-header">
+    <h2>7 Departments, 18 Agents</h2>
+    <p>Each agent is a domain expert with specialized skills, coordinated by a master orchestrator.</p>
+  </div>
+  <div class="dept-grid">
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(99,102,241,0.12); color:var(--accent-primary-light)">&#128206;</div>
+      <h3>Product</h3>
+      <p>Feature planning, user stories, acceptance criteria, wireframes, and design systems.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">product-manager</span>
+        <span class="agent-tag">ui-ux-designer</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(34,197,94,0.12); color:var(--accent-success)">&#9881;</div>
+      <h3>Engineering</h3>
+      <p>System architecture, backend APIs, frontend UI, database schemas, and AI integration.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">architecture</span>
+        <span class="agent-tag">backend</span>
+        <span class="agent-tag">frontend</span>
+        <span class="agent-tag">database</span>
+        <span class="agent-tag">prompt-engineer</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(239,68,68,0.12); color:var(--accent-error)">&#128737;</div>
+      <h3>Quality &amp; Security</h3>
+      <p>Test writing, bug verification, security audits, compliance checks, and pen testing.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">qa-agent</span>
+        <span class="agent-tag">security-agent</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(6,182,212,0.12); color:var(--accent-cyan)">&#9729;</div>
+      <h3>Operations</h3>
+      <p>CI/CD pipelines, deployments, monitoring, incident response, and performance tuning.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">devops</span>
+        <span class="agent-tag">monitoring</span>
+        <span class="agent-tag">performance</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(168,85,247,0.12); color:var(--accent-purple)">&#9998;</div>
+      <h3>Marketing</h3>
+      <p>Content strategy, SEO optimization, social media campaigns, and community management.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">content-strategist</span>
+        <span class="agent-tag">social-media</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(234,179,8,0.12); color:var(--accent-warning)">&#128218;</div>
+      <h3>Support &amp; Docs</h3>
+      <p>Bug triage, client setup, documentation, changelogs, and architecture decision records.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">support-agent</span>
+        <span class="agent-tag">documentation</span>
+      </div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-icon" style="background:rgba(59,130,246,0.12); color:var(--accent-info)">&#9881;</div>
+      <h3>IT Administration</h3>
+      <p>Microsoft 365, Entra ID, Teams, Exchange Online, Intune, and compliance policies.</p>
+      <div class="dept-agents">
+        <span class="agent-tag">ms-it-admin</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section class="section">
+  <div class="section-header">
+    <h2>Quick Start</h2>
+    <p>Get started with the most common operations.</p>
+  </div>
+  <div class="quickstart-grid">
+    <a href="/dashboard.html" class="qs-card">
+      <div class="icon">&#128200;</div>
+      <h3>Agent Dashboard</h3>
+      <p>Monitor all agents in real time — status, progress, errors, and workflow phases.</p>
+      <code>./scripts/agent-dashboard.sh --web</code>
+    </a>
+    <a href="/analytics.html" class="qs-card">
+      <div class="icon">&#128202;</div>
+      <h3>Analytics</h3>
+      <p>Cross-session charts, agent performance metrics, error breakdowns, and token usage.</p>
+      <code>GET /api/analytics/summary</code>
+    </a>
+    <div class="qs-card">
+      <div class="icon">&#128640;</div>
+      <h3>Implement a Feature</h3>
+      <p>End-to-end feature development with automatic agent coordination and quality gates.</p>
+      <code>/implement-feature "your feature"</code>
+    </div>
+    <div class="qs-card">
+      <div class="icon">&#128027;</div>
+      <h3>Fix a Bug</h3>
+      <p>Investigate, fix, and verify bugs with regression tests automatically written.</p>
+      <code>/fix-bug "describe the issue"</code>
+    </div>
+    <div class="qs-card">
+      <div class="icon">&#128274;</div>
+      <h3>Security Scan</h3>
+      <p>Full audit against CIS benchmarks and OWASP — secrets, IAM, encryption, and more.</p>
+      <code>/security-scan</code>
+    </div>
+    <div class="qs-card">
+      <div class="icon">&#9889;</div>
+      <h3>Deploy</h3>
+      <p>Ship to staging or production with safety checks, backups, and rollback plans.</p>
+      <code>/deploy-staging</code>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Ghost Office &mdash; 18 agents, 54 skills, 23 commands, 6 workflows, 13 hooks &bull; <a href="https://github.com/bipinks/ghost-office" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+// Check for active session and show live banner
+(function checkLiveStatus() {
+  fetch('/api/sessions')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return;
+      const sessions = data.sessions || data;
+      if (Array.isArray(sessions) && sessions.length > 0) {
+        const latest = sessions[0];
+        const banner = document.getElementById('live-banner');
+        const title = document.getElementById('live-title');
+        const desc = document.getElementById('live-desc');
+        const sess = document.getElementById('live-session');
+        if (banner) {
+          banner.style.display = 'flex';
+          title.textContent = 'Live Session Active';
+          desc.textContent = (latest.agent_count || '?') + ' agents tracked';
+          sess.textContent = (latest.session_id || latest.id || '').substring(0, 12) + '...';
+        }
+      }
+    })
+    .catch(() => {});
+
+  // Also try agents.json for a quick status check
+  fetch('/data/agents.json')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || !data.agents) return;
+      const agents = data.agents;
+      const active = agents.filter(a => a.status === 'active' || a.status === 'working').length;
+      const done = agents.filter(a => a.status === 'done' || a.status === 'completed').length;
+      const banner = document.getElementById('live-banner');
+      if (banner && agents.length > 0) {
+        banner.style.display = 'flex';
+        document.getElementById('live-title').textContent = 'Session Active';
+        document.getElementById('live-desc').textContent = active + ' active, ' + done + ' completed of ' + agents.length + ' agents';
+        if (!document.getElementById('live-session').textContent) {
+          document.getElementById('live-session').textContent = (data.session_id || 'current').substring(0, 16);
+        }
+      }
+    })
+    .catch(() => {});
+})();
+</script>
+
+</body>
+</html>

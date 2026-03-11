@@ -1,4 +1,8 @@
-# Autonomous AI Software Company — Agent Instructions
+<div align="center">
+<img src="assets/logo.svg" alt="Ghost Office" width="64" height="64">
+
+# Ghost Office — Agent Instructions
+</div>
 
 18 agents (7 departments), 54 skills, 23 commands, 6 workflows, 13 hooks, 7 domain templates.
 

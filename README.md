@@ -1,6 +1,8 @@
 <div align="center">
 
-# Autonomous AI Software Company
+<img src="assets/logo.svg" alt="Ghost Office" width="100" height="100">
+
+# Ghost Office
 
 ### Drop a folder into any project. Get an entire engineering department.
 

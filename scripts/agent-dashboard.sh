@@ -29,8 +29,18 @@ ERRORS_DIR="$STATUS_DIR/errors"
 MESSAGES_DIR="$STATUS_DIR/messages"
 HISTORY_FILE="$STATUS_DIR/history.json"
 STALE_THRESHOLD=3600  # 1 hour
-WEB_DIR="$(dirname "$0")/web"
-WIDTH=64
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WEB_DIR="$SCRIPT_DIR/web"
+
+# --- Adaptive terminal width ---
+get_term_width() {
+  local w
+  w=$(tput cols 2>/dev/null || echo 80)
+  [ "$w" -lt 60 ] && w=60
+  [ "$w" -gt 200 ] && w=200
+  echo "$w"
+}
+WIDTH=$(get_term_width)
 
 # --- Parse arguments ---
 USE_COLOR=true
@@ -71,10 +81,16 @@ if [ "$USE_COLOR" = true ]; then
   RESET="\033[0m"; BOLD="\033[1m"; DIM="\033[2m"
   GREEN="\033[32m"; YELLOW="\033[33m"; RED="\033[31m"
   CYAN="\033[36m"; MAGENTA="\033[35m"; WHITE="\033[37m"
+  BLUE="\033[34m"
   BG_BLUE="\033[44m"; BG_RED="\033[41m"
+  BRIGHT_GREEN="\033[92m"; BRIGHT_YELLOW="\033[93m"; BRIGHT_RED="\033[91m"
+  BRIGHT_CYAN="\033[96m"; BRIGHT_MAGENTA="\033[95m"
 else
   RESET="" BOLD="" DIM="" GREEN="" YELLOW="" RED=""
-  CYAN="" MAGENTA="" WHITE="" BG_BLUE="" BG_RED=""
+  CYAN="" MAGENTA="" WHITE="" BLUE=""
+  BG_BLUE="" BG_RED=""
+  BRIGHT_GREEN="" BRIGHT_YELLOW="" BRIGHT_RED=""
+  BRIGHT_CYAN="" BRIGHT_MAGENTA=""
 fi
 
 # --- Dependency check ---
@@ -84,8 +100,6 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # --- Session management ---
-# When --session <id> is provided, resolve the session data source.
-# The current live session is in agents.json; past sessions are in history.json.
 VIEWING_HISTORY_SESSION=false
 
 resolve_session_target() {
@@ -93,21 +107,17 @@ resolve_session_target() {
     return
   fi
 
-  # Check if the active session matches
   if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
     local current_sid
     current_sid="$(jq -r '.session_id // ""' "$AGENTS_FILE" 2>/dev/null)"
     if [ -n "$current_sid" ]; then
-      # Match full ID or prefix
       if [ "$current_sid" = "$TARGET_SESSION" ] || \
          [[ "$current_sid" == "$TARGET_SESSION"* ]]; then
-        # Already viewing the active session, nothing special needed
         return
       fi
     fi
   fi
 
-  # Check history for the session
   if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
     local match
     match="$(jq -r --arg sid "$TARGET_SESSION" '
@@ -137,7 +147,6 @@ resolve_session_target() {
   exit 1
 }
 
-# Count total available sessions (1 active + N historical)
 count_sessions() {
   local count=0
   if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
@@ -153,8 +162,6 @@ count_sessions() {
   echo "$count"
 }
 
-# Build a history session's agents.json-like structure from history data
-# This lets the existing render functions work with historical sessions
 build_history_agents_file() {
   local session_id="$1"
   local tmp_file="$STATUS_DIR/.history_view.json"
@@ -202,22 +209,79 @@ progress_bar() {
   fi
   local filled=$(( (completed * width) / total ))
   local empty=$(( width - filled ))
-  printf '%s' "${GREEN}"
-  for ((i=0; i<filled; i++)); do printf '█'; done
-  printf '%s' "${DIM}"
+  printf '%b' "${BRIGHT_GREEN}"
+  for ((i=0; i<filled; i++)); do printf '▓'; done
+  printf '%b' "${DIM}"
   for ((i=0; i<empty; i++)); do printf '░'; done
-  printf '%s' "${RESET}"
+  printf '%b' "${RESET}"
+}
+
+# --- Box drawing helpers ---
+draw_box_top() {
+  local w=${1:-$WIDTH}
+  printf '┌'; printf '─%.0s' $(seq 1 $((w - 2))); printf '┐\n'
+}
+
+draw_box_bottom() {
+  local w=${1:-$WIDTH}
+  printf '└'; printf '─%.0s' $(seq 1 $((w - 2))); printf '┘\n'
+}
+
+draw_box_separator() {
+  local w=${1:-$WIDTH}
+  printf '├'; printf '─%.0s' $(seq 1 $((w - 2))); printf '┤\n'
+}
+
+draw_box_line() {
+  local content="$1" w=${2:-$WIDTH}
+  local plain_content
+  plain_content="$(printf '%b' "$content" | sed 's/\x1b\[[0-9;]*m//g')"
+  local len=${#plain_content}
+  local padding=$((w - 4 - len))
+  [ "$padding" -lt 0 ] && padding=0
+  printf '│ %b%*s │\n' "$content" "$padding" ""
 }
 
 separator() {
-  printf '%s\n' "$(printf '─%.0s' $(seq 1 "$WIDTH"))"
+  printf '%b' "${DIM}"
+  printf '─%.0s' $(seq 1 "$WIDTH")
+  printf '%b\n' "${RESET}"
+}
+
+# --- Differential update helpers ---
+RENDER_COUNT=0
+LAST_VIEW=""
+declare -A PREV_VALUES 2>/dev/null || true
+
+move_to() { printf '\033[%d;%dH' "$1" "$2"; }
+clear_eol() { printf '\033[K'; }
+
+write_at() {
+  local row=$1 col=$2
+  shift 2
+  move_to "$row" "$col"
+  printf '%b' "$@"
+  clear_eol
+}
+
+needs_full_redraw() {
+  if [ "$RENDER_COUNT" -eq 0 ] || [ "$LAST_VIEW" != "$VIEW_MODE" ]; then
+    return 0  # true
+  fi
+  # Also redraw on terminal resize
+  local current_width
+  current_width=$(get_term_width)
+  if [ "$current_width" != "$WIDTH" ]; then
+    WIDTH=$current_width
+    return 0
+  fi
+  return 1  # false
 }
 
 # --- Department display order ---
 DEPARTMENTS=("Orchestrator" "Product" "Engineering" "Quality" "Operations" "Marketing" "Support" "IT" "Other")
 
 # --- Workflow phase inference ---
-# Maps active agent patterns to workflow phases
 infer_workflow_phase() {
   if [ ! -f "$AGENTS_FILE" ] || ! jq empty "$AGENTS_FILE" 2>/dev/null; then
     echo ""
@@ -228,7 +292,6 @@ infer_workflow_phase() {
   running="$(jq -r '[.agents | to_entries[] | select(.value.status == "running") | .key] | join(",")' "$AGENTS_FILE" 2>/dev/null)"
   completed="$(jq -r '[.agents | to_entries[] | select(.value.status == "completed") | .key] | join(",")' "$AGENTS_FILE" 2>/dev/null)"
 
-  # Infer phase from agent patterns
   if echo "$running" | grep -q "product-manager"; then
     echo "Phase 1: Requirements"
   elif echo "$running" | grep -q "architecture-agent"; then
@@ -288,7 +351,6 @@ DETAIL_AGENT=""
 AGENT_INDEX_MAP=()
 SESSION_LIST_INDEX_MAP=()
 
-# If viewing a historical session, swap AGENTS_FILE to the temp view
 if [ "$VIEWING_HISTORY_SESSION" = true ]; then
   AGENTS_FILE="$(build_history_agents_file "$TARGET_SESSION")"
 fi
@@ -332,7 +394,6 @@ handle_export() {
       dur_str="--"
     fi
 
-    # Todo progress
     local todo_str="--"
     local todo_file="$TODOS_DIR/${name}.json"
     if [ -f "$todo_file" ] && jq empty "$todo_file" 2>/dev/null; then
@@ -350,7 +411,6 @@ handle_export() {
 
   echo ""
 
-  # Errors section
   if [ -d "$ERRORS_DIR" ]; then
     local has_errors=false
     for ef in "$ERRORS_DIR"/*.json; do
@@ -416,7 +476,6 @@ handle_history() {
     printf "  Agents: ${CYAN}%s${RESET}  Duration: ${YELLOW}%s${RESET}  Tokens: %s\n" \
       "$agent_count" "$dur_str" "$tok_str"
 
-    # List agents in this session
     jq -r --arg sid "$session_id" '
       .sessions[] | select(.session_id == $sid) | .agents[] |
       "    \(.department)/\(.name) — \(.duration_seconds)s"
@@ -443,7 +502,6 @@ handle_analytics() {
   printf "${BOLD}Agent Performance Analytics${RESET}\n\n"
   separator
 
-  # Per-agent stats: avg duration, total runs, total errors
   printf "\n  ${BOLD}%-24s %6s %8s %8s %8s${RESET}\n" "Agent" "Runs" "Avg" "Min" "Max"
   separator
 
@@ -468,7 +526,6 @@ handle_analytics() {
   printf '\n'
   separator
 
-  # Department summary
   printf "\n  ${BOLD}Department Summary${RESET}\n\n"
   printf "  ${BOLD}%-16s %6s %10s${RESET}\n" "Department" "Runs" "Avg Time"
   separator
@@ -485,7 +542,6 @@ handle_analytics() {
     printf "  %-16s %6s %10s\n" "$dept" "$runs" "$avg_str"
   done
 
-  # Session trends
   printf '\n'
   separator
   printf "\n  ${BOLD}Session Trends (last 10)${RESET}\n\n"
@@ -513,7 +569,6 @@ handle_web() {
     exit 1
   fi
 
-  # Copy status files to web dir for serving
   mkdir -p "$WEB_DIR/data" 2>/dev/null
   [ -f "$AGENTS_FILE" ] && cp "$AGENTS_FILE" "$WEB_DIR/data/agents.json" 2>/dev/null
   [ -f "$HISTORY_FILE" ] && cp "$HISTORY_FILE" "$WEB_DIR/data/history.json" 2>/dev/null
@@ -529,7 +584,6 @@ handle_web() {
   local port=8686
   local server_py="$WEB_DIR/server.py"
 
-  # Hint about Docker option if available
   local project_root
   project_root="$(cd "$SCRIPT_DIR/.." && pwd)"
   if [ -f "$project_root/docker-compose.yml" ] && command -v docker >/dev/null 2>&1; then
@@ -539,7 +593,6 @@ handle_web() {
   echo "Starting web dashboard on http://localhost:$port"
   echo "Press Ctrl+C to stop."
 
-  # Use custom server.py (supports message API) or fall back to static server
   if command -v python3 >/dev/null 2>&1; then
     if [ -f "$server_py" ]; then
       python3 "$server_py" "$port"
@@ -596,7 +649,6 @@ handle_sessions_list() {
 
   local idx=0
 
-  # Active session
   if [ -f "$AGENTS_FILE" ] && jq empty "$AGENTS_FILE" 2>/dev/null; then
     local active_sid active_count
     active_sid="$(jq -r '.session_id // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
@@ -618,7 +670,6 @@ handle_sessions_list() {
     fi
   fi
 
-  # Historical sessions
   if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
     jq -r '.sessions | reverse | .[0:9][] |
       "\(.session_id)\t\(.started_at // "?")\t\(.total_duration // 0)\t\(.agents | length)"
@@ -674,26 +725,33 @@ render_overview() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   if [ ! -f "$AGENTS_FILE" ] || ! jq empty "$AGENTS_FILE" 2>/dev/null; then
-    printf '\033[2J\033[H'
-    printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD                          $current_time"
-    printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  No active session"
-    separator
-    printf '\n'
-    printf '  %sNo active session. Waiting for agents...%s\n' "${DIM}" "${RESET}"
-    printf '  %sStart a multi-agent task to see activity.%s\n' "${DIM}" "${RESET}"
-    printf '\n'
-    printf '  %s[h] history  [s] analytics  [q] quit%s\n' "${DIM}" "${RESET}"
+    if needs_full_redraw; then
+      printf '\033[2J\033[H'
+      draw_box_top
+      draw_box_line "${BOLD}◆ Ghost Office — Agent Dashboard${RESET}"
+      draw_box_line "${DIM}No active session${RESET}"
+      draw_box_bottom
+      printf '\n'
+      printf '  %sWaiting for agents to start...%s\n' "${DIM}" "${RESET}"
+      printf '  %sStart a multi-agent task to see activity.%s\n' "${DIM}" "${RESET}"
+      printf '\n'
+      separator
+      printf "  ${DIM}[h] history  [s] analytics  [l] sessions  [q] quit${RESET}\n"
+    else
+      write_at 2 3 "${DIM}No active session                        ${RESET}"
+    fi
     return
   fi
 
   local session_id short_session
   session_id="$(jq -r '.session_id // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
-  short_session="${session_id:0:12}"
+  short_session="${session_id:0:16}"
 
-  local active_count completed_count total_count earliest_start
+  local active_count completed_count total_count error_count earliest_start
   active_count="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$AGENTS_FILE" 2>/dev/null)" || active_count=0
   completed_count="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$AGENTS_FILE" 2>/dev/null)" || completed_count=0
   total_count="$(jq '[.agents | to_entries[]] | length' "$AGENTS_FILE" 2>/dev/null)" || total_count=0
+  error_count="$(jq '[.agents | to_entries[] | select(.value.error_count > 0)] | length' "$AGENTS_FILE" 2>/dev/null)" || error_count=0
   earliest_start="$(jq -r '[.agents[].started_at] | sort | first // empty' "$AGENTS_FILE" 2>/dev/null)"
 
   local session_duration="--"
@@ -705,117 +763,200 @@ render_overview() {
     fi
   fi
 
-  # Workflow phase
   local phase
   phase="$(infer_workflow_phase)"
 
-  printf '\033[2J\033[H'
+  if needs_full_redraw; then
+    printf '\033[2J\033[H'
 
-  # Header
-  if [ "$VIEWING_HISTORY_SESSION" = true ]; then
-    printf "${BOLD}${BG_RED}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD (HISTORY)                $current_time"
-    printf "${BG_RED}${WHITE}%-${WIDTH}s${RESET}\n" "  Session: $short_session                    [l] live"
-  else
-    printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DASHBOARD                          $current_time"
-    printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Session: $short_session                    Refresh: ${REFRESH_INTERVAL}s"
-  fi
-  if [ -n "$phase" ]; then
-    printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Workflow: $phase"
-  fi
-  separator
+    # Header box
+    draw_box_top
+    if [ "$VIEWING_HISTORY_SESSION" = true ]; then
+      draw_box_line "${BOLD}${RED}◆ Ghost Office — HISTORY${RESET}                          ${DIM}$current_time${RESET}"
+    else
+      draw_box_line "${BOLD}◆ Ghost Office — Agent Dashboard${RESET}              ${DIM}$current_time${RESET}"
+    fi
+    draw_box_line "${DIM}Session:${RESET} $short_session   ${DIM}│${RESET}   ${DIM}Uptime:${RESET} $session_duration"
+    if [ -n "$phase" ]; then
+      draw_box_line "${BRIGHT_CYAN}▶ $phase${RESET}"
+    fi
+    draw_box_bottom
 
-  # Build agent index
-  AGENT_INDEX_MAP=()
-  local idx=0
-
-  for dept in "${DEPARTMENTS[@]}"; do
-    local agents_in_dept
-    agents_in_dept="$(jq -r --arg d "$dept" '
-      [.agents | to_entries[] | select(.value.department == $d) | .key] | .[]
-    ' "$AGENTS_FILE" 2>/dev/null)"
-
-    [ -z "$agents_in_dept" ] && continue
-
+    # Summary bar
     printf '\n'
-    printf '  %s%s%s\n' "${BOLD}${MAGENTA}" "$dept" "${RESET}"
+    printf "  ${BOLD}Total:${RESET} ${BRIGHT_CYAN}%d${RESET}    ${BRIGHT_YELLOW}● Active: %d${RESET}    ${BRIGHT_GREEN}✓ Done: %d${RESET}    ${BRIGHT_RED}✗ Errors: %d${RESET}\n" \
+      "$total_count" "$active_count" "$completed_count" "$error_count"
+    printf '\n'
 
-    while IFS= read -r agent; do
-      [ -z "$agent" ] && continue
-      idx=$((idx + 1))
-      AGENT_INDEX_MAP+=("$agent")
+    # Agent list
+    AGENT_INDEX_MAP=()
+    local idx=0
 
-      local status started_at
-      status="$(jq -r --arg a "$agent" '.agents[$a].status // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
-      started_at="$(jq -r --arg a "$agent" '.agents[$a].started_at // empty' "$AGENTS_FILE" 2>/dev/null)"
+    for dept in "${DEPARTMENTS[@]}"; do
+      local agents_in_dept
+      agents_in_dept="$(jq -r --arg d "$dept" '
+        [.agents | to_entries[] | select(.value.department == $d) | .key] | .[]
+      ' "$AGENTS_FILE" 2>/dev/null)"
 
-      # Duration
-      local duration_str=""
-      if [ "$status" = "running" ] && [ -n "$started_at" ]; then
-        local s_epoch
-        s_epoch="$(date -d "$started_at" +%s 2>/dev/null)" || s_epoch=0
-        if [ "$s_epoch" -gt 0 ] && [ "$now_epoch" -gt 0 ]; then
-          local dur=$((now_epoch - s_epoch))
-          duration_str="$(format_duration $dur)"
-          if [ "$dur" -gt "$STALE_THRESHOLD" ]; then
-            duration_str="${RED}${duration_str} STALE${RESET}"
+      [ -z "$agents_in_dept" ] && continue
+
+      printf '  %s%s── %s %s%s\n' "${BOLD}" "${MAGENTA}" "$dept" "$(printf '─%.0s' $(seq 1 $((WIDTH - ${#dept} - 8))))" "${RESET}"
+
+      while IFS= read -r agent; do
+        [ -z "$agent" ] && continue
+        idx=$((idx + 1))
+        AGENT_INDEX_MAP+=("$agent")
+
+        local status started_at
+        status="$(jq -r --arg a "$agent" '.agents[$a].status // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
+        started_at="$(jq -r --arg a "$agent" '.agents[$a].started_at // empty' "$AGENTS_FILE" 2>/dev/null)"
+
+        local duration_str=""
+        if [ "$status" = "running" ] && [ -n "$started_at" ]; then
+          local s_epoch
+          s_epoch="$(date -d "$started_at" +%s 2>/dev/null)" || s_epoch=0
+          if [ "$s_epoch" -gt 0 ] && [ "$now_epoch" -gt 0 ]; then
+            local dur=$((now_epoch - s_epoch))
+            duration_str="$(format_duration $dur)"
+            if [ "$dur" -gt "$STALE_THRESHOLD" ]; then
+              duration_str="${RED}${duration_str} STALE${RESET}"
+            fi
+          fi
+        elif [ "$status" = "completed" ]; then
+          local dur_s
+          dur_s="$(jq -r --arg a "$agent" '.agents[$a].duration_seconds // 0' "$AGENTS_FILE" 2>/dev/null)" || dur_s=0
+          duration_str="$(format_duration "$dur_s")"
+        fi
+
+        local indicator label
+        case "$status" in
+          running)   indicator="${BRIGHT_YELLOW}●${RESET}"; label="${BRIGHT_YELLOW}ACTIVE${RESET}" ;;
+          completed) indicator="${BRIGHT_GREEN}✓${RESET}"; label="${BRIGHT_GREEN}DONE  ${RESET}" ;;
+          *)         indicator="${DIM}○${RESET}"; label="${DIM}IDLE  ${RESET}" ;;
+        esac
+
+        local err_count
+        err_count="$(get_error_count "$agent")"
+        local err_indicator=""
+        if [ "$err_count" -gt 0 ] 2>/dev/null; then
+          err_indicator=" ${BRIGHT_RED}✗${err_count}${RESET}"
+        fi
+
+        local todo_progress=""
+        local todo_file="$TODOS_DIR/${agent}.json"
+        if [ -f "$todo_file" ] && jq empty "$todo_file" 2>/dev/null; then
+          local t_completed t_total
+          t_completed="$(jq '.progress.completed // 0' "$todo_file" 2>/dev/null)" || t_completed=0
+          t_total="$(jq '.progress.total // 0' "$todo_file" 2>/dev/null)" || t_total=0
+          if [ "$t_total" -gt 0 ]; then
+            todo_progress=" $(progress_bar "$t_completed" "$t_total" 8) ${DIM}${t_completed}/${t_total}${RESET}"
           fi
         fi
-      elif [ "$status" = "completed" ]; then
-        local dur_s
-        dur_s="$(jq -r --arg a "$agent" '.agents[$a].duration_seconds // 0' "$AGENTS_FILE" 2>/dev/null)" || dur_s=0
-        duration_str="$(format_duration "$dur_s")"
-      fi
 
-      # Status indicator
-      local indicator label
-      case "$status" in
-        running)   indicator="${YELLOW}${BOLD}●${RESET}"; label="${YELLOW}RUNNING${RESET}" ;;
-        completed) indicator="${GREEN}✓${RESET}"; label="${GREEN}DONE${RESET}" ;;
-        *)         indicator="${DIM}○${RESET}"; label="${DIM}IDLE${RESET}" ;;
-      esac
+        printf "  ${DIM}[%d]${RESET} %b %-22s %b  %-8s%b%b\n" \
+          "$idx" "$indicator" "$agent" "$label" "$duration_str" "$todo_progress" "$err_indicator"
 
-      # Error indicator
-      local err_count
-      err_count="$(get_error_count "$agent")"
-      local err_indicator=""
-      if [ "$err_count" -gt 0 ] 2>/dev/null; then
-        err_indicator=" ${RED}✗${err_count}${RESET}"
-      fi
+      done <<< "$agents_in_dept"
+      printf '\n'
+    done
 
-      # Todo progress
-      local todo_progress=""
-      local todo_file="$TODOS_DIR/${agent}.json"
-      if [ -f "$todo_file" ] && jq empty "$todo_file" 2>/dev/null; then
-        local t_completed t_total
-        t_completed="$(jq '.progress.completed // 0' "$todo_file" 2>/dev/null)" || t_completed=0
-        t_total="$(jq '.progress.total // 0' "$todo_file" 2>/dev/null)" || t_total=0
-        if [ "$t_total" -gt 0 ]; then
-          todo_progress=" $(progress_bar "$t_completed" "$t_total" 6) ${t_completed}/${t_total}"
+    # Token usage
+    local total_tokens
+    total_tokens="$(jq '[.agents[].tokens.total // 0] | add // 0' "$AGENTS_FILE" 2>/dev/null)" || total_tokens=0
+
+    separator
+    printf "  Session: ${CYAN}%s${RESET}" "$session_duration"
+    if [ "$total_tokens" -gt 0 ] 2>/dev/null; then
+      printf "  │  Tokens: ${CYAN}%s${RESET}" "$total_tokens"
+    fi
+    printf '\n'
+    separator
+    printf "  ${DIM}[1-%d] detail  [l] sessions  [h] history  [s] stats  [e] errors${RESET}\n" "$idx"
+    printf "  ${DIM}[w] workflow  [m] messages  [c] command  [q] quit${RESET}\n"
+  else
+    # --- Differential update: only update changing values ---
+    # Update time
+    write_at 2 "$((WIDTH - 13))" "${DIM}$current_time${RESET}"
+
+    # Update session duration
+    write_at 3 3 "${DIM}Session:${RESET} $short_session   ${DIM}│${RESET}   ${DIM}Uptime:${RESET} $session_duration"
+
+    # Update phase
+    if [ -n "$phase" ]; then
+      write_at 4 3 "${BRIGHT_CYAN}▶ $phase${RESET}"
+    fi
+
+    # Update summary bar (row 7)
+    write_at 7 3 "${BOLD}Total:${RESET} ${BRIGHT_CYAN}${total_count}${RESET}    ${BRIGHT_YELLOW}● Active: ${active_count}${RESET}    ${BRIGHT_GREEN}✓ Done: ${completed_count}${RESET}    ${BRIGHT_RED}✗ Errors: ${error_count}${RESET}"
+
+    # Update agent rows - find each agent's row and update duration/progress
+    local row=9
+    for dept in "${DEPARTMENTS[@]}"; do
+      local agents_in_dept
+      agents_in_dept="$(jq -r --arg d "$dept" '
+        [.agents | to_entries[] | select(.value.department == $d) | .key] | .[]
+      ' "$AGENTS_FILE" 2>/dev/null)"
+
+      [ -z "$agents_in_dept" ] && continue
+      row=$((row + 1))  # department header
+
+      while IFS= read -r agent; do
+        [ -z "$agent" ] && continue
+
+        local status started_at
+        status="$(jq -r --arg a "$agent" '.agents[$a].status // "unknown"' "$AGENTS_FILE" 2>/dev/null)"
+        started_at="$(jq -r --arg a "$agent" '.agents[$a].started_at // empty' "$AGENTS_FILE" 2>/dev/null)"
+
+        local duration_str=""
+        if [ "$status" = "running" ] && [ -n "$started_at" ]; then
+          local s_epoch
+          s_epoch="$(date -d "$started_at" +%s 2>/dev/null)" || s_epoch=0
+          if [ "$s_epoch" -gt 0 ] && [ "$now_epoch" -gt 0 ]; then
+            local dur=$((now_epoch - s_epoch))
+            duration_str="$(format_duration $dur)"
+            if [ "$dur" -gt "$STALE_THRESHOLD" ]; then
+              duration_str="${RED}${duration_str} STALE${RESET}"
+            fi
+          fi
+        elif [ "$status" = "completed" ]; then
+          local dur_s
+          dur_s="$(jq -r --arg a "$agent" '.agents[$a].duration_seconds // 0' "$AGENTS_FILE" 2>/dev/null)" || dur_s=0
+          duration_str="$(format_duration "$dur_s")"
         fi
-      fi
 
-      printf "  ${DIM}[%d]${RESET} %b %-20s %b  %-8s%b%b\n" \
-        "$idx" "$indicator" "$agent" "$label" "$duration_str" "$todo_progress" "$err_indicator"
+        local indicator label
+        case "$status" in
+          running)   indicator="${BRIGHT_YELLOW}●${RESET}"; label="${BRIGHT_YELLOW}ACTIVE${RESET}" ;;
+          completed) indicator="${BRIGHT_GREEN}✓${RESET}"; label="${BRIGHT_GREEN}DONE  ${RESET}" ;;
+          *)         indicator="${DIM}○${RESET}"; label="${DIM}IDLE  ${RESET}" ;;
+        esac
 
-    done <<< "$agents_in_dept"
-  done
+        local err_count
+        err_count="$(get_error_count "$agent")"
+        local err_indicator=""
+        if [ "$err_count" -gt 0 ] 2>/dev/null; then
+          err_indicator=" ${BRIGHT_RED}✗${err_count}${RESET}"
+        fi
 
-  # Footer
-  printf '\n'
-  separator
-  printf "  Active: ${YELLOW}%d${RESET}  Completed: ${GREEN}%d${RESET}  Session: %s\n" \
-    "$active_count" "$completed_count" "$session_duration"
+        local todo_progress=""
+        local todo_file="$TODOS_DIR/${agent}.json"
+        if [ -f "$todo_file" ] && jq empty "$todo_file" 2>/dev/null; then
+          local t_completed t_total
+          t_completed="$(jq '.progress.completed // 0' "$todo_file" 2>/dev/null)" || t_completed=0
+          t_total="$(jq '.progress.total // 0' "$todo_file" 2>/dev/null)" || t_total=0
+          if [ "$t_total" -gt 0 ]; then
+            todo_progress=" $(progress_bar "$t_completed" "$t_total" 8) ${DIM}${t_completed}/${t_total}${RESET}"
+          fi
+        fi
 
-  # Token usage (best-effort)
-  local total_tokens
-  total_tokens="$(jq '[.agents[].tokens.total // 0] | add // 0' "$AGENTS_FILE" 2>/dev/null)" || total_tokens=0
-  if [ "$total_tokens" -gt 0 ] 2>/dev/null; then
-    printf "  Tokens: ${CYAN}%s${RESET}\n" "$total_tokens"
+        # Update the status, duration, and progress inline
+        write_at "$row" 35 "%b  %-8s%b%b" "$label" "$duration_str" "$todo_progress" "$err_indicator"
+
+        row=$((row + 1))
+      done <<< "$agents_in_dept"
+      row=$((row + 1))  # blank line after department
+    done
   fi
-
-  separator
-  printf "  ${DIM}[1-%d] detail  [l] sessions  [h] history  [s] stats  [e] errors${RESET}\n" "$idx"
-  printf "  ${DIM}[w] workflow  [m] messages  [c] command  [q] quit${RESET}\n"
 }
 
 # --- Render detail view ---
@@ -845,34 +986,36 @@ render_detail() {
     duration_str="$(format_duration "$dur_s")"
   fi
 
-  local status_display
+  local status_display status_icon
   case "$status" in
-    running)   status_display="${YELLOW}${BOLD}RUNNING${RESET}" ;;
-    completed) status_display="${GREEN}DONE${RESET}" ;;
-    *)         status_display="${DIM}IDLE${RESET}" ;;
+    running)   status_display="${BRIGHT_YELLOW}ACTIVE${RESET}"; status_icon="${BRIGHT_YELLOW}●${RESET}" ;;
+    completed) status_display="${BRIGHT_GREEN}DONE${RESET}"; status_icon="${BRIGHT_GREEN}✓${RESET}" ;;
+    *)         status_display="${DIM}IDLE${RESET}"; status_icon="${DIM}○${RESET}" ;;
   esac
 
-  # Header
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT DETAIL: $agent"
-  printf "${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  Department: $department                   $current_time"
-  separator
+  # Header box
+  draw_box_top
+  draw_box_line "${BOLD}${agent}${RESET}"
+  draw_box_line "${DIM}Department:${RESET} $department   ${DIM}│${RESET}   $current_time"
+  draw_box_bottom
   printf '\n'
-  printf "  Status: %b" "$status_display"
-  [ -n "$duration_str" ] && printf " (%s)" "$duration_str"
+
+  printf "  %b Status: %b" "$status_icon" "$status_display"
+  [ -n "$duration_str" ] && printf "  ${DIM}(%s)${RESET}" "$duration_str"
   printf '\n'
 
   # Error count
   local err_count
   err_count="$(get_error_count "$agent")"
   if [ "$err_count" -gt 0 ] 2>/dev/null; then
-    printf "  Errors: ${RED}%s${RESET}\n" "$err_count"
+    printf "  ${BRIGHT_RED}✗${RESET} Errors: ${BRIGHT_RED}%s${RESET}\n" "$err_count"
   fi
 
   # Tokens
   local tokens
   tokens="$(get_token_info "$agent")"
   if [ "$tokens" -gt 0 ] 2>/dev/null; then
-    printf "  Tokens: ${CYAN}%s${RESET}\n" "$tokens"
+    printf "  ${CYAN}⚡${RESET} Tokens: ${CYAN}%s${RESET}\n" "$tokens"
   fi
   printf '\n'
 
@@ -885,12 +1028,14 @@ render_detail() {
     t_pending="$(jq '.progress.pending // 0' "$todo_file" 2>/dev/null)" || t_pending=0
     t_total="$(jq '.progress.total // 0' "$todo_file" 2>/dev/null)" || t_total=0
 
-    printf '  %s%sTasks:%s\n' "${BOLD}" "${WHITE}" "${RESET}"
+    draw_box_separator
+    draw_box_line "${BOLD}Tasks${RESET}"
+    draw_box_separator
 
     jq -r '.todos[] | "\(.status)\t\(.content)"' "$todo_file" 2>/dev/null | while IFS=$'\t' read -r t_status t_content; do
       case "$t_status" in
-        completed)   printf '  %s✓ %s%s\n' "${GREEN}" "$t_content" "${RESET}" ;;
-        in_progress) printf '  %s● %s%s\n' "${YELLOW}${BOLD}" "$t_content" "${RESET}" ;;
+        completed)   printf '  %s✓ %s%s\n' "${BRIGHT_GREEN}" "$t_content" "${RESET}" ;;
+        in_progress) printf '  %s▶ %s%s\n' "${BRIGHT_YELLOW}${BOLD}" "$t_content" "${RESET}" ;;
         pending)     printf '  %s○ %s%s\n' "${DIM}" "$t_content" "${RESET}" ;;
       esac
     done
@@ -899,7 +1044,7 @@ render_detail() {
     if [ "$t_total" -gt 0 ]; then
       local pct=$(( (t_completed * 100) / t_total ))
       printf '  Progress: '
-      progress_bar "$t_completed" "$t_total" 16
+      progress_bar "$t_completed" "$t_total" 20
       printf ' %d/%d (%d%%)\n' "$t_completed" "$t_total" "$pct"
     fi
   else
@@ -914,7 +1059,9 @@ render_detail() {
     ecount="$(jq '.errors | length' "$error_file" 2>/dev/null)" || ecount=0
     if [ "$ecount" -gt 0 ]; then
       printf '\n'
-      printf '  %s%sRecent Errors:%s\n' "${BOLD}" "${RED}" "${RESET}"
+      draw_box_separator
+      draw_box_line "${BOLD}${RED}Errors${RESET}"
+      draw_box_separator
       jq -r '.errors | reverse | .[0:5][] | "\(.timestamp)\t\(.tool)\t\(.message)"' "$error_file" 2>/dev/null | \
         while IFS=$'\t' read -r ts tool msg; do
           local short_msg="${msg:0:50}"
@@ -936,11 +1083,12 @@ render_errors() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_RED}${WHITE}%-${WIDTH}s${RESET}\n" "  ERROR LOG                                $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}${RED}⚠ Error Log${RESET}                                      ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   if [ ! -d "$ERRORS_DIR" ]; then
-    printf '\n  %sNo errors recorded.%s\n' "${DIM}" "${RESET}"
+    printf '\n  %s✓ No errors recorded.%s\n' "${BRIGHT_GREEN}" "${RESET}"
     printf '\n'
     separator
     printf "  ${DIM}[b] back  │  [q] quit${RESET}\n"
@@ -959,7 +1107,7 @@ render_errors() {
     [ "$ecount" -eq 0 ] && continue
 
     has_errors=true
-    printf '\n  %s%s%s (%d errors)\n' "${BOLD}${RED}" "$agent_name" "${RESET}" "$ecount"
+    printf '\n  %s%s●%s %s%s%s (%d errors)\n' "${BRIGHT_RED}" "" "${RESET}" "${BOLD}" "$agent_name" "${RESET}" "$ecount"
 
     jq -r '.errors | reverse | .[0:5][] | "\(.timestamp)\t\(.tool)\t\(.message)"' "$ef" 2>/dev/null | \
       while IFS=$'\t' read -r ts tool msg; do
@@ -969,7 +1117,7 @@ render_errors() {
   done
 
   if [ "$has_errors" = false ]; then
-    printf '\n  %sNo errors recorded. Clean run!%s\n' "${GREEN}" "${RESET}"
+    printf '\n  %s✓ No errors recorded. Clean run!%s\n' "${BRIGHT_GREEN}" "${RESET}"
   fi
 
   printf '\n'
@@ -983,8 +1131,9 @@ render_workflow() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  WORKFLOW PHASES                          $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}⟳ Workflow Phases${RESET}                                    ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   if [ ! -f "$AGENTS_FILE" ] || ! jq empty "$AGENTS_FILE" 2>/dev/null; then
     printf '\n  %sNo active session.%s\n' "${DIM}" "${RESET}"
@@ -997,7 +1146,6 @@ render_workflow() {
   local phase
   phase="$(infer_workflow_phase)"
 
-  # Define standard phases
   local -a phases=("Requirements" "Design" "Implementation" "Testing" "Security Review" "Deploy & Docs")
   local -a phase_agents=(
     "product-manager"
@@ -1014,7 +1162,6 @@ render_workflow() {
     local p_agents="${phase_agents[$i]}"
     local phase_num=$((i + 1))
 
-    # Check status of agents in this phase
     local phase_status="pending"
     local any_running=false any_completed=false
     IFS=',' read -ra agent_list <<< "$p_agents"
@@ -1033,22 +1180,21 @@ render_workflow() {
 
     local icon color
     case "$phase_status" in
-      completed) icon="✓"; color="${GREEN}" ;;
-      running)   icon="●"; color="${YELLOW}${BOLD}" ;;
+      completed) icon="✓"; color="${BRIGHT_GREEN}" ;;
+      running)   icon="▶"; color="${BRIGHT_YELLOW}${BOLD}" ;;
       pending)   icon="○"; color="${DIM}" ;;
     esac
 
     printf "  %b%s Phase %d: %s%s\n" "$color" "$icon" "$phase_num" "$p" "${RESET}"
 
-    # Show agents under this phase
     for pa in "${agent_list[@]}"; do
       local ast
       ast="$(jq -r --arg a "$pa" '.agents[$a].status // "none"' "$AGENTS_FILE" 2>/dev/null)"
       if [ "$ast" != "none" ]; then
         local sub_icon
         case "$ast" in
-          completed) sub_icon="${GREEN}✓${RESET}" ;;
-          running)   sub_icon="${YELLOW}●${RESET}" ;;
+          completed) sub_icon="${BRIGHT_GREEN}✓${RESET}" ;;
+          running)   sub_icon="${BRIGHT_YELLOW}●${RESET}" ;;
           *)         sub_icon="${DIM}○${RESET}" ;;
         esac
         printf "      %b %s\n" "$sub_icon" "$pa"
@@ -1072,8 +1218,9 @@ render_history_interactive() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  SESSION HISTORY                          $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}Session History${RESET}                                      ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   if [ ! -f "$HISTORY_FILE" ] || ! jq empty "$HISTORY_FILE" 2>/dev/null; then
     printf '\n  %sNo session history found.%s\n' "${DIM}" "${RESET}"
@@ -1108,8 +1255,9 @@ render_stats_interactive() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT ANALYTICS                          $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}Agent Analytics${RESET}                                      ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   if [ ! -f "$HISTORY_FILE" ] || ! jq empty "$HISTORY_FILE" 2>/dev/null; then
     printf '\n  %sNo history data for analytics.%s\n' "${DIM}" "${RESET}"
@@ -1143,13 +1291,13 @@ render_session_list() {
   now_epoch="$(date -u +%s 2>/dev/null)" || now_epoch=0
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  SESSION LIST                             $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}Session List${RESET}                                         ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   SESSION_LIST_INDEX_MAP=()
   local idx=0
 
-  # Active session (from original agents.json, not the history view)
   local orig_agents="$STATUS_DIR/agents.json"
   if [ -f "$orig_agents" ] && jq empty "$orig_agents" 2>/dev/null; then
     local active_sid active_count
@@ -1163,7 +1311,6 @@ render_session_list() {
       running_count="$(jq '[.agents | to_entries[] | select(.value.status == "running")] | length' "$orig_agents" 2>/dev/null)" || running_count=0
       completed_count="$(jq '[.agents | to_entries[] | select(.value.status == "completed")] | length' "$orig_agents" 2>/dev/null)" || completed_count=0
 
-      # Session duration
       local earliest_start session_dur_str="--"
       earliest_start="$(jq -r '[.agents[].started_at] | sort | first // empty' "$orig_agents" 2>/dev/null)"
       if [ -n "$earliest_start" ]; then
@@ -1174,19 +1321,16 @@ render_session_list() {
         fi
       fi
 
-      # Progress bar
-      local total_tasks=$((running_count + completed_count))
       local pbar
       pbar="$(progress_bar "$completed_count" "$active_count" 8)"
 
       printf '\n'
-      printf "  ${BOLD}[%d]${RESET} ${GREEN}●${RESET} ${BOLD}%-20s${RESET} %b ${GREEN}%d${RESET}/${CYAN}%d${RESET}\n" \
+      printf "  ${BOLD}[%d]${RESET} ${BRIGHT_GREEN}●${RESET} ${BOLD}%-20s${RESET} %b ${GREEN}%d${RESET}/${CYAN}%d${RESET}\n" \
         "$idx" "${active_sid:0:20}" "$pbar" "$completed_count" "$active_count"
-      printf "      Started %s ago · ${YELLOW}%d running${RESET}\n" "$session_dur_str" "$running_count"
+      printf "      Started %s ago · ${BRIGHT_YELLOW}%d running${RESET}\n" "$session_dur_str" "$running_count"
     fi
   fi
 
-  # Historical sessions (use process substitution to avoid subshell)
   if [ -f "$HISTORY_FILE" ] && jq empty "$HISTORY_FILE" 2>/dev/null; then
     while IFS=$'\t' read -r sid started dur agents; do
       [ -z "$sid" ] && continue
@@ -1219,8 +1363,9 @@ render_messages() {
   current_time="$(date -u +"%H:%M:%S UTC")"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  AGENT MESSAGES                           $current_time"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}✉ Agent Messages${RESET}                                     ${DIM}$current_time${RESET}"
+  draw_box_bottom
 
   if [ ! -d "$MESSAGES_DIR" ]; then
     printf '\n  %sNo messages directory found.%s\n' "${DIM}" "${RESET}"
@@ -1245,19 +1390,18 @@ render_messages() {
     if [ "$total" -gt 0 ]; then
       found=1
       printf '\n  %s%s%s  total:%d' "${BOLD}" "$agent_name" "${RESET}" "$total"
-      [ "$pending" -gt 0 ] && printf "  ${YELLOW}pending:%d${RESET}" "$pending"
-      [ "$delivered" -gt 0 ] && printf "  ${CYAN}delivered:%d${RESET}" "$delivered"
-      [ "$acked" -gt 0 ] && printf "  ${GREEN}acked:%d${RESET}" "$acked"
+      [ "$pending" -gt 0 ] && printf "  ${BRIGHT_YELLOW}pending:%d${RESET}" "$pending"
+      [ "$delivered" -gt 0 ] && printf "  ${BRIGHT_CYAN}delivered:%d${RESET}" "$delivered"
+      [ "$acked" -gt 0 ] && printf "  ${BRIGHT_GREEN}acked:%d${RESET}" "$acked"
       printf '\n'
 
-      # Show last 3 messages
       jq -r '.messages | reverse | .[0:3][] | "\(.status)\t\(.type)\t\(.from)\t\(.content[0:60])"' "$msg_file" 2>/dev/null | \
         while IFS=$'\t' read -r status mtype mfrom mcontent; do
           local color="$DIM"
           case "$status" in
-            pending)      color="$YELLOW" ;;
-            delivered)    color="$CYAN" ;;
-            acknowledged) color="$GREEN" ;;
+            pending)      color="$BRIGHT_YELLOW" ;;
+            delivered)    color="$BRIGHT_CYAN" ;;
+            acknowledged) color="$BRIGHT_GREEN" ;;
           esac
           printf '    %s[%s] %s → %s%s\n' "$color" "$mtype" "$mfrom" "$mcontent" "${RESET}"
         done
@@ -1312,11 +1456,12 @@ MSGEOF
 
 # --- Send message (interactive command mode) ---
 send_message() {
-  local target="$1"  # agent name or "master-orchestrator"
+  local target="$1"
 
   printf '\033[2J\033[H'
-  printf "${BOLD}${BG_BLUE}${WHITE}%-${WIDTH}s${RESET}\n" "  SEND COMMAND TO: $target"
-  separator
+  draw_box_top
+  draw_box_line "${BOLD}Send Command to: $target${RESET}"
+  draw_box_bottom
 
   printf '\n  Message types: instruction, question, priority, note\n'
   if [ "$target" = "master-orchestrator" ]; then
@@ -1324,7 +1469,6 @@ send_message() {
   fi
   printf '\n'
 
-  # Show cursor for input
   printf '\033[?25h'
 
   printf '  Type [default=instruction]: '
@@ -1336,7 +1480,6 @@ send_message() {
   local content=""
   read -r content </dev/tty 2>/dev/null || content=""
 
-  # Hide cursor again
   printf '\033[?25l'
 
   if [ -z "$content" ]; then
@@ -1345,12 +1488,11 @@ send_message() {
     return
   fi
 
-  # Escape quotes in content for JSON safety
   content="$(printf '%s' "$content" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 
   if command -v jq >/dev/null 2>&1; then
     write_message_file "$target" "$msg_type" "$content"
-    printf '\n  %s✓ Message sent to %s%s\n' "${GREEN}" "$target" "${RESET}"
+    printf '\n  %s✓ Message sent to %s%s\n' "${BRIGHT_GREEN}" "$target" "${RESET}"
   else
     printf '\n  %sError: jq is required for messaging.%s\n' "${RED}" "${RESET}"
   fi
@@ -1372,6 +1514,9 @@ while true; do
     sessions)  render_session_list ;;
   esac
 
+  RENDER_COUNT=$((RENDER_COUNT + 1))
+  LAST_VIEW="$VIEW_MODE"
+
   if [ "$RUN_ONCE" = "true" ]; then
     break
   fi
@@ -1381,7 +1526,6 @@ while true; do
       q|Q) break ;;
       b|B)
         if [ "$VIEW_MODE" = "overview" ] && [ "$VIEWING_HISTORY_SESSION" = true ]; then
-          # From historical overview, go back to session list
           VIEW_MODE="sessions"
         elif [ "$VIEW_MODE" != "overview" ]; then
           VIEW_MODE="overview"
@@ -1413,11 +1557,9 @@ while true; do
             local entry_type="${entry%%:*}"
             local entry_sid="${entry#*:}"
             if [ "$entry_type" = "active" ]; then
-              # Switch to live session view
               AGENTS_FILE="$STATUS_DIR/agents.json"
               VIEWING_HISTORY_SESSION=false
             else
-              # Switch to historical session view
               AGENTS_FILE="$(build_history_agents_file "$entry_sid")"
               VIEWING_HISTORY_SESSION=true
               TARGET_SESSION="$entry_sid"
