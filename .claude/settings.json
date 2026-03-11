@@ -1,12 +1,4 @@
 {
-  "project_type": "ai_software_company",
-  "default_agent": "master-orchestrator",
-  "autonomy_enabled": true,
-  "parallel_task_execution": true,
-  "logging_enabled": true,
-  "auto_recovery_enabled": true,
-  "auto_test_required": true,
-  "devops_enabled": true,
   "permissions": {
     "allow": [
       "Read",
@@ -26,7 +18,12 @@
       "mcp__filesystem__directory_tree",
       "mcp__filesystem__search_files",
       "mcp__filesystem__get_file_info",
-      "mcp__filesystem__list_allowed_directories"
+      "mcp__filesystem__list_allowed_directories",
+      "Bash(npm ls puppeteer)",
+      "Bash(lsof -ti:9222)",
+      "Bash(xargs kill -9)",
+      "Bash(pkill -f \"capture-screenshots\")",
+      "Bash(npm install --no-save ws)"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -41,6 +38,9 @@
       "Read(.env)",
       "Read(*.pem)",
       "Read(*.key)"
+    ],
+    "additionalDirectories": [
+      "/Users/bipin/MyProjects/devops/ghost-office/.claude/agents"
     ]
   },
   "hooks": {
@@ -192,5 +192,13 @@
         ]
       }
     ]
-  }
+  },
+  "project_type": "ai_software_company",
+  "default_agent": "master-orchestrator",
+  "autonomy_enabled": true,
+  "parallel_task_execution": true,
+  "logging_enabled": true,
+  "auto_recovery_enabled": true,
+  "auto_test_required": true,
+  "devops_enabled": true
 }

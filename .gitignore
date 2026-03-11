@@ -45,6 +45,12 @@ specs/
 INVOICE-MODULE-SUMMARY.md
 SPECS-INDEX.md
 
+# Private/company-specific files (local only, not open-sourced)
+scripts/acodax.mjs
+.claude/commands/acodax-deploy.md
+.claude/skills/acodax-erp-office-admin/
+.claude/skills/deploy-acodax-property/
+
 # Build artifacts
 dist/
 build/

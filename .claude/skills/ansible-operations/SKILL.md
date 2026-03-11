@@ -7,7 +7,7 @@ allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 
 # Ansible Operations — Project Configuration
 
-Customize this skill with your infrastructure details. The ansible-agent reads this before every task.
+Customize this skill with your infrastructure details. The devops-engineer reads this before every Ansible task.
 
 ## Project Location
 

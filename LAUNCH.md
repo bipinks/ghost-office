@@ -7,92 +7,80 @@
 
 ## X (Twitter) — Thread
 
-### Tweet 1 (Main)
+> All tweets verified under 280 characters.
+
+### Tweet 1 — Hook (280 chars)
 ```
-I built an entire AI software company you can drop into any project.
+I built an AI software company you can drop into any project.
 
-18 specialized agents. 7 departments. 54 domain skills. All coordinated by a master orchestrator.
+18 agents. 7 departments. 53 skills. One orchestrator.
 
-Just copy one folder, run Claude Code, and you have:
-→ Product managers
-→ Engineers
-→ QA + Security
-→ DevOps
-→ Marketing
-→ IT admin
+Copy a folder → run Claude Code → get product managers, engineers, QA, security, DevOps, and more.
 
 Open source. Zero install.
 
 github.com/bipinks/ghost-office
 ```
 
-### Tweet 2 (How it works)
+### Tweet 2 — How it works (275 chars)
 ```
 How it works:
 
-You type: /implement-feature "Add invoice PDF generation"
+You type:
+/implement-feature "Add invoice PDF generation"
 
-The orchestrator automatically:
-1. Assigns a product manager to write requirements
-2. An architect designs the solution
-3. Backend + frontend engineers build it (in parallel)
-4. QA writes tests (80%+ coverage)
-5. Security agent reviews it
-6. DevOps updates the pipeline
+The orchestrator assigns:
+→ Product manager writes specs
+→ Architect designs it
+→ Backend + frontend build in parallel
+→ QA writes tests
+→ Security reviews
+→ DevOps updates pipeline
 
-One command. Full feature lifecycle.
+One command.
 ```
 
-### Tweet 3 (Safety)
+### Tweet 3 — Safety (271 chars)
 ```
-It's not a toy — it has production-grade safety:
+It's not a toy — production-grade safety built in:
 
 • Blocks force-push to protected branches
-• Scans every file write for hardcoded secrets
-• Warns before terraform destroy / kubectl delete
-• Enforces multi-tenant isolation in migrations
-• Audit logs for all MS365 operations
+• Scans for hardcoded secrets
+• Warns before terraform destroy
+• Enforces multi-tenant isolation
+• Audit logs for MS365 ops
 
-13 hooks running automatically on every action.
+13 hooks running on every action. Automatically.
 ```
 
-### Tweet 4 (What's inside)
+### Tweet 4 — What's inside (278 chars)
 ```
 What's in the box:
 
-📦 19 agents (product, engineering, QA, security, devops, marketing, support, IT)
-⚡ 23 slash commands (/implement-feature, /fix-bug, /deploy-production, etc.)
-🧠 54 domain skills (AWS, Terraform, K8s, Laravel, Vue, PostgreSQL, SEO...)
-🔒 12 safety hooks
-📋 6 end-to-end workflows
-📚 6 knowledge base docs
-📊 Live agent dashboard (terminal + web) with history & analytics
+📦 18 agents across 7 departments
+⚡ 23 slash commands
+🧠 53 domain skills (AWS, Terraform, K8s, Docker, Laravel, Vue...)
+🔒 13 safety hooks
+📋 6 workflows
+📊 Live dashboard (terminal + web)
 
-100% markdown, JSON, and shell scripts. No plugins. No build step.
+100% markdown + JSON + shell. No plugins. No build step.
 ```
 
-### Tweet 5 (Dashboard)
+### Tweet 5 — Dashboard (277 chars)
 ```
-The thing that surprised people most: there's a live dashboard.
+It has a live dashboard.
 
-While agents work in parallel, open a second terminal → run one script → see this:
+While agents work in parallel, open a second terminal and watch:
 
-╔══════════════════════════════════════╗
-║  ENGINEERING                         ║
-║  ● backend-engineer  RUNNING  4m 23s ║
-║    ████████░░  3/5 tasks             ║
-║  ● frontend-engineer RUNNING  3m 11s ║
-║    ██████░░░░  2/4 tasks             ║
-║  ✓ architecture      DONE    1m 47s  ║
-╠══════════════════════════════════════╣
-║  Active: 2  │  Done: 1  │  6m uptime ║
-╚══════════════════════════════════════╝
+● backend-engineer  RUNNING 4m 23s ████████░░ 3/5
+● frontend-engineer RUNNING 3m 11s ██████░░░░ 2/4
+✓ architecture      DONE    1m 47s ██████████ 4/4
 
-Press a number → drill into that agent's task list.
---web for a dark-mode browser version.
+Terminal TUI or dark-mode web UI.
 ```
 
-### Tweet 6 (CTA)
+### Tweet 6 — CTA (184 chars)
 ```
 It's MIT licensed. Use it however you want.
 
@@ -109,7 +97,7 @@ Built for Claude Code, but the patterns work for any AI coding assistant.
 
 ### Title
 ```
-I built an autonomous AI software company you can drop into any project — 19 agents, 55 skills, 24 commands (open source)
+I built an autonomous AI software company you can drop into any project — 18 agents, 53 skills, 23 commands (open source)
 ```
 
 ### Body
@@ -132,11 +120,11 @@ When you type `/implement-feature "Add user authentication with OAuth"`, the orc
 7. Documentation agent writes the API docs
 
 **What's inside:**
-- 19 agents with department-based specialization
-- 54 domain knowledge skills (AWS, Terraform, K8s, Docker, Laravel, Vue, PostgreSQL, SEO, etc.)
+- 18 agents with department-based specialization
+- 53 domain knowledge skills (AWS, Terraform, K8s, Docker, Laravel, Vue, PostgreSQL, SEO, etc.)
 - 23 slash commands for common workflows
 - 6 end-to-end workflows (feature dev, bug fix, release, incident response, etc.)
-- 12 safety hooks (secret detection, force-push prevention, infra safety)
+- 13 safety hooks (secret detection, force-push prevention, infra safety)
 - 6 knowledge base documents for persistent context
 - Built-in ERP domain expertise (accounting, inventory, sales, HR, procurement)
 - **Live agent dashboard** (terminal TUI + web UI) with per-agent task tracking
@@ -200,8 +188,8 @@ Built a Claude Code workspace with 18 specialized agents across 7 departments. Y
 
 - A master orchestrator that breaks down tasks and assigns them to specialist agents
 - Backend, frontend, database, DevOps, QA, security, and more
-- 54 domain skills with real-world patterns (not just "best practices" fluff)
-- 12 safety hooks that prevent common mistakes (secret leaks, force-push, destructive ops)
+- 53 domain skills with real-world patterns (not just "best practices" fluff)
+- 13 safety hooks that prevent common mistakes (secret leaks, force-push, destructive ops)
 - 23 slash commands for workflows like /implement-feature, /fix-bug, /deploy-production
 
 It's not a SaaS — it's markdown files. Zero install. MIT licensed.
@@ -226,7 +214,7 @@ I built a Claude Code workspace that organizes 18 specialized AI agents into 7 d
 
 You copy a `.claude/` directory into any project. No install, no plugins — it's markdown, JSON, and shell scripts that Claude Code auto-discovers.
 
-When you type `/implement-feature "Add invoice PDF generation"`, the orchestrator assigns a product manager, architect, engineers, QA, security reviewer, and documentation writer — each with domain-specific knowledge from 54 skill packs.
+When you type `/implement-feature "Add invoice PDF generation"`, the orchestrator assigns a product manager, architect, engineers, QA, security reviewer, and documentation writer — each with domain-specific knowledge from 53 skill packs.
 
 Key design decisions:
 
@@ -255,7 +243,7 @@ Key design decisions:
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
-The repo has 55 skills, 24 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
+The repo has 53 skills, 23 commands, 6 workflows, 12 rule sets, and a persistent knowledge base. All validated with a test suite.
 
 https://github.com/bipinks/ghost-office
 
@@ -281,7 +269,7 @@ One command kicks off an entire feature lifecycle:
 → Documentation
 → Deployment preparation
 
-The workspace includes 54 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 12 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
+The workspace includes 53 domain knowledge skills covering AWS, Terraform, Kubernetes, Docker, Laravel, Vue.js, PostgreSQL, and more. 13 safety hooks prevent common mistakes like committing secrets or force-pushing to production.
 
 There's also a live agent dashboard — open a second terminal, run one script, and watch all agents work in parallel with real-time task progress bars, workflow phase tracking, and session history. A dark-themed web version runs on localhost:8686 (or via `docker compose up dashboard`).
 
@@ -302,7 +290,7 @@ GitHub: https://github.com/bipinks/ghost-office
 ```
 🚀 Just open-sourced my Claude Code workspace — it turns your assistant into a full AI software company.
 
-**19 agents** across 7 departments, coordinated by a master orchestrator:
+**18 agents** across 7 departments, coordinated by a master orchestrator:
 - Product: requirements, wireframes, design systems
 - Engineering: backend, frontend, database, architecture, AI/prompts
 - Quality: testing (80%+ coverage), security audits
@@ -311,9 +299,9 @@ GitHub: https://github.com/bipinks/ghost-office
 - Support: issue triage, documentation
 - IT: Microsoft 365 administration
 
-**54 domain skills** with real patterns (not generic advice)
+**53 domain skills** with real patterns (not generic advice)
 **23 slash commands** for common workflows
-**12 safety hooks** (secret detection, force-push blocking, infra safety)
+**13 safety hooks** (secret detection, force-push blocking, infra safety)
 **6 workflows** (feature dev, bug fix, release, incident response)
 **Live dashboard** — watch agents work in parallel from a second terminal:
 

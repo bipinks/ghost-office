@@ -6,7 +6,7 @@ LABEL description="Agent Dashboard Web Server" \
 WORKDIR /app
 
 # Copy server and static assets
-COPY server.py dashboard.html analytics.html ./
+COPY server.py dashboard.html analytics.html index.html ./
 
 # Create data directory for SQLite (writable by nobody)
 RUN mkdir -p /app/data && chown nobody:nogroup /app/data

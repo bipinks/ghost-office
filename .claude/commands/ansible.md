@@ -10,27 +10,27 @@ Task: $ARGUMENTS
 
 ### Agent
 
-- **ansible-agent** — Execute the requested Ansible operation
+- **devops-engineer** — Execute the requested Ansible operation using `ansible-patterns` and `ansible-operations` skills
 
 ### Workflow
 
-1. **ansible-agent**: Analyze the request
+1. **devops-engineer**: Analyze the request
    - Read the `ansible-operations` skill for project context
    - Identify target hosts, playbooks, or roles involved
    - Determine if this is an existing playbook run or new playbook creation
 
-2. **ansible-agent**: Plan and validate
+2. **devops-engineer**: Plan and validate
    - For existing playbooks: identify the correct playbook and parameters
    - For new playbooks: design idempotent tasks following existing patterns
    - For destructive operations: require explicit user confirmation
 
-3. **ansible-agent**: Execute
+3. **devops-engineer**: Execute
    - Run from `/Users/bipin/MyProjects/devops/ansible`
    - Use `--check` (dry run) first for production hosts
    - Execute with appropriate `--limit` and `--extra-vars`
    - Capture and report results
 
-4. **ansible-agent**: Report
+4. **devops-engineer**: Report
    - Hosts: reached / changed / failed / unreachable
    - Tasks: ok / changed / skipped / failed
    - Any errors or warnings with context

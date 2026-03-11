@@ -120,22 +120,6 @@ node scripts/ms365.mjs remove-from-group <email> <group>
 node scripts/ms365.mjs token                 # Get access token
 ```
 
-### Acodax ERP Operations
-```bash
-# User and system management
-node scripts/acodax.mjs list-users [filter]
-node scripts/acodax.mjs user-info <user-id>
-node scripts/acodax.mjs create-user <username> <email> <pwd> <first> [last] [role_id] [branch_id]
-node scripts/acodax.mjs update-user <user-id> <field> <value>
-node scripts/acodax.mjs change-password <user-id> <new-pwd>
-node scripts/acodax.mjs change-status <user-id> <0|1>
-node scripts/acodax.mjs delete-user <user-id>
-node scripts/acodax.mjs roles                # List roles
-node scripts/acodax.mjs branches             # List branches
-node scripts/acodax.mjs companies            # List companies
-node scripts/acodax.mjs token                # Get access token
-```
-
 ### Project Validation
 ```bash
 # Validate .claude structure

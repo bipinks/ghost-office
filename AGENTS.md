@@ -4,7 +4,7 @@
 # Ghost Office — Agent Instructions
 </div>
 
-19 agents (7 departments), 55 skills, 24 commands, 6 workflows, 13 hooks, 7 domain templates.
+18 agents (7 departments), 53 skills, 23 commands, 6 workflows, 13 hooks, 7 domain templates.
 
 ## Principles
 
@@ -29,8 +29,7 @@
 | prompt-engineer | Engineering | Prompt design, chatbots, AI features |
 | qa-agent | Quality | Test writing, bug verification, regression testing |
 | security-agent | Quality | Security reviews, pen testing, compliance |
-| devops-engineer | Operations | Pipeline setup, server config, deployments |
-| ansible-agent | Operations | Ansible playbooks, inventory, server configuration |
+| devops-engineer | Operations | Pipeline setup, server config, Ansible, deployments |
 | monitoring-agent | Operations | Monitoring, incident triage, RCA |
 | performance-agent | Operations | Performance issues, optimization, cost analysis |
 | content-strategist | Marketing | Content planning, copywriting, SEO audits |
@@ -41,7 +40,7 @@
 
 ## Orchestration
 
-**Auto-routing**: Feature → product-manager → architecture → engineers → qa. Bug → support → engineer → qa. Deploy → devops → monitoring. Ansible/config mgmt → ansible-agent. Security → security-agent (immediate). Incident → monitoring → devops → engineers.
+**Auto-routing**: Feature → product-manager → architecture → engineers → qa. Bug → support → engineer → qa. Deploy → devops → monitoring. Ansible/config mgmt → devops-engineer. Security → security-agent (immediate). Incident → monitoring → devops → engineers.
 
 **Parallel execution**: Backend + frontend (after design). Security + architecture review (post-implementation). Docs + deployment prep.
 
@@ -78,11 +77,11 @@ Before any change: no hardcoded secrets, least-privilege IAM, encryption at rest
 
 ```
 .claude/
-  agents/    — 19 agents (7 departments)
-  commands/  — 24 slash commands
+  agents/    — 18 agents (7 departments)
+  commands/  — 23 slash commands
   workflows/ — 6 workflow definitions
   memory/    — 6 knowledge docs + 7 domain templates
-  skills/    — 55 domain knowledge packs
+  skills/    — 53 domain knowledge packs
   rules/     — 12 guidelines (7 categories)
   hooks/     — 12 safety/audit hooks
   status/    — Runtime: agent status, todos, errors, history

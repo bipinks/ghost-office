@@ -21,8 +21,7 @@ permissionMode: default
 | AI prompts, LLM integration | prompt-engineer |
 | Testing, QA | qa-agent |
 | Security audits | security-agent |
-| CI/CD, deployments | devops-engineer |
-| Ansible playbooks, server config mgmt | ansible-agent |
+| CI/CD, deployments, Ansible | devops-engineer |
 | Monitoring, incidents | monitoring-agent |
 | Performance, cost | performance-agent |
 | Content, SEO | content-strategist |

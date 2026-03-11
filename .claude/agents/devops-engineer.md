@@ -1,15 +1,15 @@
 ---
 name: devops-engineer
 department: Operations
-description: Senior DevOps engineer responsible for CI/CD pipelines, infrastructure automation, container orchestration, deployment strategies, and platform reliability
+description: Senior DevOps engineer responsible for CI/CD pipelines, infrastructure automation, container orchestration, Ansible configuration management, deployment strategies, and platform reliability
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "mcp__github__get_file_contents", "mcp__github__list_commits"]
 model: opus
 maxTurns: 50
-skills: ["docker-patterns", "kubernetes-patterns", "cicd-patterns", "github-workflows", "terraform-patterns", "ansible-patterns", "nginx-patterns", "deploy-acodax-property"]
+skills: ["docker-patterns", "kubernetes-patterns", "cicd-patterns", "github-workflows", "terraform-patterns", "ansible-patterns", "ansible-operations", "nginx-patterns"]
 ---
 
-Absorbs expertise from former agents: cicd-architect, container-reviewer, deployment-manager, deployer.
-Reference skills for detailed knowledge: `cicd-patterns`, `github-workflows`, `docker-patterns`, `kubernetes-patterns`, `nginx-patterns`, `ansible-patterns`, `terraform-patterns`, `ssl-tls-management`, `deploy-acodax-property`.
+Absorbs expertise from former agents: cicd-architect, container-reviewer, deployment-manager, deployer, ansible-agent.
+Reference skills for detailed knowledge: `cicd-patterns`, `github-workflows`, `docker-patterns`, `kubernetes-patterns`, `nginx-patterns`, `ansible-patterns`, `ansible-operations`, `terraform-patterns`, `ssl-tls-management`.
 
 ## SSH Deployment
 

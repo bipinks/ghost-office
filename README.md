@@ -10,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Agents](https://img.shields.io/badge/agents-18-blue)](.claude/agents/)
-[![Skills](https://img.shields.io/badge/skills-54-green)](.claude/skills/)
+[![Skills](https://img.shields.io/badge/skills-53-green)](.claude/skills/)
 [![Commands](https://img.shields.io/badge/commands-23-orange)](.claude/commands/)
 [![Domains](https://img.shields.io/badge/domains-7-purple)](.claude/memory/domains/)
 
@@ -108,7 +108,7 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/set-domain <name>` | Switch domain knowledge |
 | `/agent-status` | Live agent progress and task tracking |
 
-[All 24 commands →](.claude/commands/)
+[All 23 commands →](.claude/commands/)
 
 ---
 
@@ -477,7 +477,7 @@ Plus deny rules blocking `DROP DATABASE`, `rm -rf /`, and force-push to protecte
 
 ---
 
-## 54 Skills
+## 53 Skills
 
 Agents reference deep knowledge packs — not guessing, applying proven patterns:
 
@@ -526,11 +526,11 @@ Switch domain knowledge with `/set-domain <name>`:
 ```
 your-project/
 ├── .claude/                 Auto-discovered by Claude Code
-│   ├── agents/              19 agents (1 orchestrator + 18 specialists)
+│   ├── agents/              18 agents (1 orchestrator + 17 specialists)
 │   ├── commands/            23 slash commands
 │   ├── workflows/           6 workflow definitions
 │   ├── memory/              6 knowledge docs + 7 domain templates
-│   ├── skills/              54 domain knowledge packs
+│   ├── skills/              53 domain knowledge packs
 │   ├── rules/               12 guidelines (7 categories)
 │   ├── hooks/               13 safety/audit/lifecycle hooks
 │   ├── status/              Runtime: agent status, todos, errors, history

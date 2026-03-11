@@ -103,7 +103,6 @@ journalctl -u docker --since "1h ago"   # Docker system logs
 ### Available Scripts (scripts/)
 ```bash
 node scripts/ms365.mjs <command>        # Microsoft 365 operations
-node scripts/acodax.mjs <command>       # Acodax ERP operations
 node scripts/setup.js                   # Project setup
 node scripts/validate-structure.js      # Validate .claude structure
 ```

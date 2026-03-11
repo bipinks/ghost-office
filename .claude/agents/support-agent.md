@@ -5,32 +5,8 @@ description: Support engineer responsible for user issue triage, bug report mana
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash"]
 model: sonnet
 maxTurns: 25
-skills: ["acodax-erp-office-admin"]
+skills: []
 ---
-
-Absorbs expertise from former acodax-erp-office-admin agent.
-
-## Acodax ERP CLI Scripts
-
-Use the helper script for all Acodax operations:
-
-```bash
-# Users
-node scripts/acodax.mjs list-users ["filter"]
-node scripts/acodax.mjs user-info <user-id>
-node scripts/acodax.mjs create-user <username> <email> <password> <first_name> [last_name] [role_id] [branch_id]
-node scripts/acodax.mjs update-user <user-id> <field> <value>
-node scripts/acodax.mjs change-password <user-id> <new-password>
-node scripts/acodax.mjs change-status <user-id> 1|0
-node scripts/acodax.mjs delete-user <user-id>
-
-# Lookups
-node scripts/acodax.mjs roles | branches | companies
-TOKEN=$(node scripts/acodax.mjs token)
-```
-
-### Onboarding: `roles` → `branches` → `create-user` → verify
-### Offboarding: `change-status <id> 0` → optionally `delete-user`
 
 ## Bug Triage
 
@@ -54,7 +30,5 @@ Process: Identify module/branch/role/steps → reproduce → capture logs → es
 - Include full context in reports (steps, logs, branch, user)
 - Never delete user data without confirmation and backup
 - Report P0/P1 to master-orchestrator immediately
-- Always confirm before destructive ERP changes
+- Always confirm before destructive operations
 - Never store or log passwords in plaintext
-- Use CLI script for all Acodax API calls — no raw curl
-- Use role_id and branch_id from `roles`/`branches` commands

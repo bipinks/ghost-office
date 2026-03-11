@@ -182,7 +182,6 @@ function validateSensitiveCommands(root, errors, checks) {
   // Sensitive commands validated via settings.json hooks (PreToolUse/PostToolUse)
   // rather than disable-model-invocation frontmatter
   const sensitiveCommands = [
-    'acodax-deploy.md',
     'deploy-staging.md',
     'deploy-production.md',
   ];

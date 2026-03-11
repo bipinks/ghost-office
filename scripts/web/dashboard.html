@@ -400,6 +400,169 @@ body {
   .main { padding: 16px; }
   .topbar { padding: 0 12px; }
 }
+
+/* ── Organization Chart ── */
+.org-chart {
+  padding: 8px 0 32px;
+  overflow-x: auto;
+  min-width: 0;
+}
+.org-level { display: flex; justify-content: center; gap: 16px; }
+.org-level-ceo { margin-bottom: 0; }
+
+/* CEO / Orchestrator Node */
+.org-ceo {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  border: 1.5px solid var(--accent-primary);
+  border-radius: var(--radius-lg);
+  padding: 20px 40px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 30px rgba(99,102,241,0.1);
+}
+.org-ceo:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 40px rgba(99,102,241,0.2);
+  transform: translateY(-2px);
+}
+.org-node-icon { font-size: 2rem; margin-bottom: 6px; }
+.org-node-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.org-node-role { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.org-node-status {
+  display: inline-block; margin-top: 8px; padding: 2px 10px;
+  border-radius: 12px; font-size: 0.7rem; font-weight: 600;
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* Connector SVG */
+.org-connector-main {
+  display: flex; justify-content: center;
+  width: 100%; max-width: 1200px; margin: 0 auto;
+}
+.org-lines-svg { width: 100%; height: 50px; }
+
+/* Department cards row */
+.org-level-depts {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+}
+.org-dept {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.org-dept:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* Department header */
+.org-dept-header {
+  padding: 12px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 600; font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-primary);
+}
+.org-dept-icon { font-size: 1.1rem; }
+.org-dept-header.dept-Product { background: linear-gradient(135deg, rgba(59,130,246,0.12), transparent); color: var(--accent-info); }
+.org-dept-header.dept-Engineering { background: linear-gradient(135deg, rgba(168,85,247,0.12), transparent); color: var(--accent-purple); }
+.org-dept-header.dept-Quality { background: linear-gradient(135deg, rgba(34,197,94,0.12), transparent); color: var(--accent-success); }
+.org-dept-header.dept-Operations { background: linear-gradient(135deg, rgba(234,179,8,0.12), transparent); color: var(--accent-warning); }
+.org-dept-header.dept-Marketing { background: linear-gradient(135deg, rgba(6,182,212,0.12), transparent); color: var(--accent-cyan); }
+.org-dept-header.dept-Support { background: linear-gradient(135deg, rgba(239,68,68,0.12), transparent); color: var(--accent-error); }
+.org-dept-header.dept-IT { background: linear-gradient(135deg, rgba(99,102,241,0.12), transparent); color: var(--accent-primary); }
+
+/* Agent nodes inside departments */
+.org-dept-agents { padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.org-agent-node {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: background 0.15s ease;
+}
+.org-agent-node:hover { background: var(--bg-tertiary); }
+
+/* Status dot */
+.org-agent-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-top: 4px; flex-shrink: 0;
+  background: var(--text-muted);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 0 transparent;
+}
+.org-agent-dot.active {
+  background: var(--accent-success);
+  box-shadow: 0 0 8px rgba(34,197,94,0.5);
+  animation: org-pulse 2s ease-in-out infinite;
+}
+.org-agent-dot.done { background: var(--accent-info); }
+.org-agent-dot.error {
+  background: var(--accent-error);
+  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+}
+.org-agent-dot.idle { background: var(--text-muted); }
+
+@keyframes org-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(34,197,94,0.3); }
+  50% { box-shadow: 0 0 12px rgba(34,197,94,0.6); }
+}
+
+.org-agent-name { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.org-agent-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
+
+/* Legend */
+.org-legend {
+  display: flex; align-items: center; gap: 16px; justify-content: center;
+  margin-top: 28px; padding: 12px 20px;
+  background: var(--bg-secondary); border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+  max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.org-legend-title {
+  font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.org-legend-items { display: flex; gap: 16px; }
+.org-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-secondary); }
+.org-legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.org-legend-dot.idle { background: var(--text-muted); }
+.org-legend-dot.active { background: var(--accent-success); }
+.org-legend-dot.done { background: var(--accent-info); }
+.org-legend-dot.error { background: var(--accent-error); }
+
+/* Stats bar */
+.org-stats {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.org-stat-card {
+  background: var(--bg-secondary); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm); padding: 10px 18px;
+  text-align: center;
+}
+.org-stat-value { font-size: 1.3rem; font-weight: 700; font-family: var(--font-mono); }
+.org-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+/* Responsive: stack departments on smaller screens */
+@media (max-width: 1200px) {
+  .org-level-depts { grid-template-columns: repeat(4, 1fr); }
+  .org-connector-main { display: none; }
+}
+@media (max-width: 768px) {
+  .org-level-depts { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .org-level-depts { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -440,6 +603,9 @@ body {
     </button>
     <button class="nav-item" data-tab="messages" onclick="showTab('messages')">
       <span class="icon">&#9993;</span> Messages
+    </button>
+    <button class="nav-item" data-tab="org" onclick="showTab('org')">
+      <span class="icon">&#9878;</span> Organization
     </button>
     <div class="nav-divider"></div>
     <button class="nav-item" data-tab="analytics" onclick="showTab('analytics')">
@@ -527,6 +693,246 @@ body {
   <div class="tab-content" id="tab-messages">
     <div class="section-title">&#9993; Agent Messages</div>
     <div class="messages-grid" id="messages-grid"></div>
+  </div>
+
+  <!-- Organization Tab -->
+  <div class="tab-content" id="tab-org">
+    <div class="org-chart">
+
+      <!-- CEO / Orchestrator -->
+      <div class="org-level org-level-ceo">
+        <div class="org-node org-ceo" data-agent="master-orchestrator">
+          <div class="org-node-icon">&#9878;</div>
+          <div class="org-node-title">Master Orchestrator</div>
+          <div class="org-node-role">Plans, assigns, tracks, delivers</div>
+          <div class="org-node-status" id="org-status-master-orchestrator"></div>
+        </div>
+      </div>
+
+      <!-- Connector lines from CEO to departments -->
+      <div class="org-connector-main">
+        <svg class="org-lines-svg" viewBox="0 0 1200 50" preserveAspectRatio="none">
+          <line x1="600" y1="0" x2="600" y2="25" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="86" y1="25" x2="1114" y2="25" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="86" y1="25" x2="86" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="257" y1="25" x2="257" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="429" y1="25" x2="429" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="600" y1="25" x2="600" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="771" y1="25" x2="771" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="943" y1="25" x2="943" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+          <line x1="1114" y1="25" x2="1114" y2="50" stroke="var(--border-accent)" stroke-width="2"/>
+        </svg>
+      </div>
+
+      <!-- Department row -->
+      <div class="org-level org-level-depts">
+
+        <!-- Product -->
+        <div class="org-dept" data-dept="Product">
+          <div class="org-dept-header dept-Product">
+            <span class="org-dept-icon">&#128203;</span>
+            <span class="org-dept-name">Product</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="product-manager">
+              <div class="org-agent-dot" id="org-dot-product-manager"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Product Manager</div>
+                <div class="org-agent-desc">Requirements, user stories, prioritization</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="ui-ux-designer">
+              <div class="org-agent-dot" id="org-dot-ui-ux-designer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">UI/UX Designer</div>
+                <div class="org-agent-desc">Wireframes, design systems, accessibility</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engineering -->
+        <div class="org-dept" data-dept="Engineering">
+          <div class="org-dept-header dept-Engineering">
+            <span class="org-dept-icon">&#9881;</span>
+            <span class="org-dept-name">Engineering</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="architecture-agent">
+              <div class="org-agent-dot" id="org-dot-architecture-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Architect</div>
+                <div class="org-agent-desc">System design, ADRs, tech decisions</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="backend-engineer">
+              <div class="org-agent-dot" id="org-dot-backend-engineer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Backend Engineer</div>
+                <div class="org-agent-desc">APIs, services, integrations</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="frontend-engineer">
+              <div class="org-agent-dot" id="org-dot-frontend-engineer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Frontend Engineer</div>
+                <div class="org-agent-desc">UI components, state, responsive</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="database-engineer">
+              <div class="org-agent-dot" id="org-dot-database-engineer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Database Engineer</div>
+                <div class="org-agent-desc">Schema, migrations, query optimization</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="prompt-engineer">
+              <div class="org-agent-dot" id="org-dot-prompt-engineer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Prompt Engineer</div>
+                <div class="org-agent-desc">AI prompts, LLM integration, chatbots</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quality -->
+        <div class="org-dept" data-dept="Quality">
+          <div class="org-dept-header dept-Quality">
+            <span class="org-dept-icon">&#9989;</span>
+            <span class="org-dept-name">Quality</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="qa-agent">
+              <div class="org-agent-dot" id="org-dot-qa-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">QA Engineer</div>
+                <div class="org-agent-desc">Tests, coverage, regression, CI gates</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="security-agent">
+              <div class="org-agent-dot" id="org-dot-security-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Security Engineer</div>
+                <div class="org-agent-desc">Audits, pen testing, compliance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operations -->
+        <div class="org-dept" data-dept="Operations">
+          <div class="org-dept-header dept-Operations">
+            <span class="org-dept-icon">&#9879;</span>
+            <span class="org-dept-name">Operations</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="devops-engineer">
+              <div class="org-agent-dot" id="org-dot-devops-engineer"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">DevOps Engineer</div>
+                <div class="org-agent-desc">CI/CD, Docker, Ansible, cloud infra</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="monitoring-agent">
+              <div class="org-agent-dot" id="org-dot-monitoring-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Monitoring Agent</div>
+                <div class="org-agent-desc">Observability, alerts, incident triage</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="performance-agent">
+              <div class="org-agent-dot" id="org-dot-performance-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Performance Agent</div>
+                <div class="org-agent-desc">Profiling, optimization, cost analysis</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marketing -->
+        <div class="org-dept" data-dept="Marketing">
+          <div class="org-dept-header dept-Marketing">
+            <span class="org-dept-icon">&#128227;</span>
+            <span class="org-dept-name">Marketing</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="content-strategist">
+              <div class="org-agent-dot" id="org-dot-content-strategist"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Content Strategist</div>
+                <div class="org-agent-desc">Content planning, SEO, copywriting</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="social-media-manager">
+              <div class="org-agent-dot" id="org-dot-social-media-manager"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Social Media Manager</div>
+                <div class="org-agent-desc">Campaigns, community, analytics</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="org-dept" data-dept="Support">
+          <div class="org-dept-header dept-Support">
+            <span class="org-dept-icon">&#128218;</span>
+            <span class="org-dept-name">Support</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="support-agent">
+              <div class="org-agent-dot" id="org-dot-support-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Support Agent</div>
+                <div class="org-agent-desc">Bug triage, client setup, admin</div>
+              </div>
+            </div>
+            <div class="org-agent-node" data-agent="documentation-agent">
+              <div class="org-agent-dot" id="org-dot-documentation-agent"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">Documentation Agent</div>
+                <div class="org-agent-desc">API docs, changelogs, ADRs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IT -->
+        <div class="org-dept" data-dept="IT">
+          <div class="org-dept-header dept-IT">
+            <span class="org-dept-icon">&#128421;</span>
+            <span class="org-dept-name">IT</span>
+          </div>
+          <div class="org-dept-agents">
+            <div class="org-agent-node" data-agent="ms-it-admin">
+              <div class="org-agent-dot" id="org-dot-ms-it-admin"></div>
+              <div class="org-agent-info">
+                <div class="org-agent-name">MS 365 IT Admin</div>
+                <div class="org-agent-desc">Entra ID, Teams, Exchange, Intune</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /org-level-depts -->
+
+      <!-- Legend -->
+      <div class="org-legend">
+        <div class="org-legend-title">Agent Status</div>
+        <div class="org-legend-items">
+          <div class="org-legend-item"><span class="org-legend-dot idle"></span> Idle</div>
+          <div class="org-legend-item"><span class="org-legend-dot active"></span> Active</div>
+          <div class="org-legend-item"><span class="org-legend-dot done"></span> Completed</div>
+          <div class="org-legend-item"><span class="org-legend-dot error"></span> Error</div>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="org-stats" id="org-stats"></div>
+
+    </div>
   </div>
 
   <!-- Analytics Tab -->
@@ -685,6 +1091,9 @@ function updateDashboard(data) {
   }
   if (currentTab === 'workflow') {
     updateWorkflowFull(data.workflow, list);
+  }
+  if (currentTab === 'org') {
+    updateOrgChart(agents, list);
   }
 
   // Update detail panel if open
@@ -1102,6 +1511,74 @@ function formatTokens(t) {
   const out = t.output || 0;
   if (inp === 0 && out === 0) return '';
   return fmtNum(inp) + ' in / ' + fmtNum(out) + ' out';
+}
+
+// ── Organization Chart ──
+function updateOrgChart(agentsMap, list) {
+  // Update status dots for each agent
+  const allAgentNodes = document.querySelectorAll('.org-agent-dot');
+  allAgentNodes.forEach(dot => {
+    const node = dot.closest('.org-agent-node');
+    if (!node) return;
+    const name = node.dataset.agent;
+    const agent = agentsMap[name];
+    dot.className = 'org-agent-dot ' + (agent ? (agent.status || 'idle') : 'idle');
+  });
+
+  // Update orchestrator status
+  const orchStatus = document.getElementById('org-status-master-orchestrator');
+  if (orchStatus) {
+    const orch = agentsMap['master-orchestrator'];
+    if (orch) {
+      const s = orch.status || 'idle';
+      const labels = { active: 'Running', done: 'Completed', error: 'Error', idle: 'Idle' };
+      const colors = { active: 'var(--accent-success)', done: 'var(--accent-info)', error: 'var(--accent-error)', idle: 'var(--text-muted)' };
+      orchStatus.textContent = labels[s] || s;
+      orchStatus.style.background = (colors[s] || 'var(--text-muted)') + '22';
+      orchStatus.style.color = colors[s] || 'var(--text-muted)';
+    } else {
+      orchStatus.textContent = 'Idle';
+      orchStatus.style.background = 'var(--text-muted)22';
+      orchStatus.style.color = 'var(--text-muted)';
+    }
+  }
+
+  // Update stats bar
+  const statsEl = document.getElementById('org-stats');
+  if (statsEl) {
+    const total = list.length;
+    const active = list.filter(a => a.status === 'active').length;
+    const done = list.filter(a => a.status === 'done').length;
+    const errs = list.filter(a => a.status === 'error').length;
+    const idle = 18 - total;
+    const depts = new Set(list.map(a => a.department).filter(Boolean));
+    statsEl.innerHTML = `
+      <div class="org-stat-card"><div class="org-stat-value" style="color:var(--text-primary)">${18}</div><div class="org-stat-label">Total Agents</div></div>
+      <div class="org-stat-card"><div class="org-stat-value" style="color:var(--accent-primary)">${7}</div><div class="org-stat-label">Departments</div></div>
+      <div class="org-stat-card"><div class="org-stat-value" style="color:var(--accent-success)">${active}</div><div class="org-stat-label">Active Now</div></div>
+      <div class="org-stat-card"><div class="org-stat-value" style="color:var(--accent-info)">${done}</div><div class="org-stat-label">Completed</div></div>
+      <div class="org-stat-card"><div class="org-stat-value" style="color:var(--text-muted)">${idle}</div><div class="org-stat-label">Idle</div></div>
+      ${errs ? `<div class="org-stat-card"><div class="org-stat-value" style="color:var(--accent-error)">${errs}</div><div class="org-stat-label">Errors</div></div>` : ''}
+    `;
+  }
+
+  // Make agent nodes clickable to open detail panel
+  document.querySelectorAll('.org-agent-node').forEach(node => {
+    if (node.dataset.bound) return;
+    node.dataset.bound = '1';
+    node.addEventListener('click', () => {
+      const name = node.dataset.agent;
+      if (agentsMap[name]) openPanel(name);
+    });
+  });
+  // Make orchestrator clickable
+  const ceoNode = document.querySelector('.org-ceo');
+  if (ceoNode && !ceoNode.dataset.bound) {
+    ceoNode.dataset.bound = '1';
+    ceoNode.addEventListener('click', () => {
+      if (agentsMap['master-orchestrator']) openPanel('master-orchestrator');
+    });
+  }
 }
 
 // ── Init ──
