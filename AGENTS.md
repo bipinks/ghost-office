@@ -4,7 +4,7 @@
 # Ghost Office — Agent Instructions
 </div>
 
-18 agents (7 departments), 53 skills, 23 commands, 6 workflows, 13 hooks, 7 domain templates.
+19 agents (7 departments), 54 skills, 25 commands, 6 workflows, 13 hooks, 7 domain templates.
 
 ## Principles
 
@@ -30,6 +30,7 @@
 | qa-agent | Quality | Test writing, bug verification, regression testing |
 | security-agent | Quality | Security reviews, pen testing, compliance |
 | devops-engineer | Operations | Pipeline setup, server config, Ansible, deployments |
+| laravel-forge-agent | Operations | Laravel Forge servers, sites, deployments, SSL, workers |
 | monitoring-agent | Operations | Monitoring, incident triage, RCA |
 | performance-agent | Operations | Performance issues, optimization, cost analysis |
 | content-strategist | Marketing | Content planning, copywriting, SEO audits |
@@ -40,7 +41,7 @@
 
 ## Orchestration
 
-**Auto-routing**: Feature → product-manager → architecture → engineers → qa. Bug → support → engineer → qa. Deploy → devops → monitoring. Ansible/config mgmt → devops-engineer. Security → security-agent (immediate). Incident → monitoring → devops → engineers.
+**Auto-routing**: Feature → product-manager → architecture → engineers → qa. Bug → support → engineer → qa. Deploy → devops → monitoring. Ansible/config mgmt → devops-engineer. Laravel Forge → laravel-forge-agent. Security → security-agent (immediate). Incident → monitoring → devops → engineers.
 
 **Parallel execution**: Backend + frontend (after design). Security + architecture review (post-implementation). Docs + deployment prep.
 
@@ -77,11 +78,11 @@ Before any change: no hardcoded secrets, least-privilege IAM, encryption at rest
 
 ```
 .claude/
-  agents/    — 18 agents (7 departments)
-  commands/  — 23 slash commands
+  agents/    — 19 agents (7 departments)
+  commands/  — 25 slash commands
   workflows/ — 6 workflow definitions
   memory/    — 6 knowledge docs + 7 domain templates
-  skills/    — 53 domain knowledge packs
+  skills/    — 54 domain knowledge packs
   rules/     — 12 guidelines (7 categories)
   hooks/     — 12 safety/audit hooks
   status/    — Runtime: agent status, todos, errors, history

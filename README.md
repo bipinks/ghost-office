@@ -6,12 +6,12 @@
 
 ### Drop a folder into any project. Get an entire engineering department.
 
-**18 AI agents** across **7 departments** — product, engineering, quality, operations, marketing, support, and IT — all coordinated by a master orchestrator. Powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+**19 AI agents** across **7 departments** — product, engineering, quality, operations, marketing, support, and IT — all coordinated by a master orchestrator. Powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Agents](https://img.shields.io/badge/agents-18-blue)](.claude/agents/)
-[![Skills](https://img.shields.io/badge/skills-53-green)](.claude/skills/)
-[![Commands](https://img.shields.io/badge/commands-23-orange)](.claude/commands/)
+[![Agents](https://img.shields.io/badge/agents-19-blue)](.claude/agents/)
+[![Skills](https://img.shields.io/badge/skills-54-green)](.claude/skills/)
+[![Commands](https://img.shields.io/badge/commands-25-orange)](.claude/commands/)
 [![Domains](https://img.shields.io/badge/domains-7-purple)](.claude/memory/domains/)
 
 </div>
@@ -80,7 +80,7 @@ Then activate your domain: `/set-domain <name>` (erp, ecommerce, saas, healthcar
 <tr><td><b>Product</b></td><td>product-manager, ui-ux-designer</td><td>Requirements, user stories, wireframes, design systems</td></tr>
 <tr><td><b>Engineering</b></td><td>architecture, backend, frontend, database, prompt-engineer</td><td>System design, APIs, UI, schemas, AI integration</td></tr>
 <tr><td><b>Quality</b></td><td>qa-agent, security-agent</td><td>Tests, security audits, OWASP, compliance</td></tr>
-<tr><td><b>Operations</b></td><td>devops-engineer, monitoring-agent, performance-agent</td><td>CI/CD, deployments, observability, optimization</td></tr>
+<tr><td><b>Operations</b></td><td>devops-engineer, laravel-forge-agent, monitoring-agent, performance-agent</td><td>CI/CD, Forge, deployments, observability, optimization</td></tr>
 <tr><td><b>Marketing</b></td><td>content-strategist, social-media-manager</td><td>Content strategy, SEO, campaigns, community</td></tr>
 <tr><td><b>Support</b></td><td>support-agent, documentation-agent</td><td>Issue triage, API docs, user guides, changelogs</td></tr>
 <tr><td><b>IT</b></td><td>ms-it-admin</td><td>Microsoft 365, Entra ID, Teams, Exchange</td></tr>
@@ -97,6 +97,7 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/implement-feature "..."` | Full lifecycle: requirements → design → code → test → docs |
 | `/fix-bug "..."` | Triage → investigate → fix → regression test → deploy |
 | `/deploy-production` | Security scan → staging → approval → production |
+| `/forge-site "..."` | New Forge site: site → repo → DB → .env → deploy → DNS → SSL |
 | `/investigate-incident "..."` | Triage → root cause → mitigation → post-mortem |
 | `/security-scan` | OWASP + CIS audit, secret detection, dependency scan |
 | `/analyze-project` | Architecture review, tech debt, recommendations |
@@ -108,7 +109,7 @@ The **master-orchestrator** coordinates everything — plans work, assigns agent
 | `/set-domain <name>` | Switch domain knowledge |
 | `/agent-status` | Live agent progress and task tracking |
 
-[All 23 commands →](.claude/commands/)
+[All 25 commands →](.claude/commands/)
 
 ---
 
@@ -264,11 +265,11 @@ Switch domain knowledge with `/set-domain <name>`:
 ```
 your-project/
 ├── .claude/                 Auto-discovered by Claude Code
-│   ├── agents/              18 agents (1 orchestrator + 17 specialists)
-│   ├── commands/            23 slash commands
+│   ├── agents/              19 agents (1 orchestrator + 18 specialists)
+│   ├── commands/            25 slash commands
 │   ├── workflows/           6 workflow definitions
 │   ├── memory/              6 knowledge docs + 7 domain templates
-│   ├── skills/              53 domain knowledge packs
+│   ├── skills/              54 domain knowledge packs
 │   ├── rules/               12 guidelines (7 categories)
 │   ├── hooks/               13 safety/audit/lifecycle hooks
 │   ├── status/              Runtime: agent status, todos, errors, history

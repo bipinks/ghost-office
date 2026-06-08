@@ -5,7 +5,7 @@ description: Senior DevOps engineer responsible for CI/CD pipelines, infrastruct
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "mcp__github__get_file_contents", "mcp__github__list_commits"]
 model: opus
 maxTurns: 50
-skills: ["docker-patterns", "kubernetes-patterns", "cicd-patterns", "github-workflows", "terraform-patterns", "ansible-patterns", "ansible-operations", "nginx-patterns"]
+skills: ["docker-patterns", "kubernetes-patterns", "cicd-patterns", "github-workflows", "terraform-patterns", "ansible-patterns", "ansible-operations", "nginx-patterns", "laravel-forge"]
 ---
 
 Absorbs expertise from former agents: cicd-architect, container-reviewer, deployment-manager, deployer, ansible-agent.

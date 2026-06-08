@@ -2,17 +2,17 @@
 
 ## Overview
 
-Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7 departments, 53 skills, 23 commands, 6 workflows, 13 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
+Fully autonomous AI software company: 1 master orchestrator + 18 agents across 7 departments, 54 skills, 25 commands, 6 workflows, 13 hooks. Use `/set-domain` to switch domain knowledge (erp, ecommerce, saas, healthcare, fintech, education, cms).
 
 ## Structure
 
 ```
 .claude/
-├── agents/      — 18 agents (1 orchestrator + 17 specialists)
-├── commands/    — 23 slash commands
+├── agents/      — 19 agents (1 orchestrator + 18 specialists)
+├── commands/    — 25 slash commands
 ├── workflows/   — 6 workflow definitions
 ├── memory/      — 6 knowledge docs + 7 domain templates
-├── skills/      — 53 domain knowledge packs
+├── skills/      — 54 domain knowledge packs
 ├── rules/       — 12 guidelines (7 categories)
 ├── hooks/       — 13 safety/audit/lifecycle hooks
 ├── status/      — Runtime agent status, todos, errors, session history
@@ -27,7 +27,7 @@ Fully autonomous AI software company: 1 master orchestrator + 17 agents across 7
 | Product | product-manager, ui-ux-designer | Requirements, wireframes, design systems |
 | Engineering | architecture, backend, frontend, database, prompt-engineer | System design, code, APIs, schemas, AI |
 | Quality | qa-agent, security-agent | Tests, security audits, compliance |
-| Operations | devops-engineer, monitoring, performance | CI/CD, Ansible, deployments, observability |
+| Operations | devops-engineer, laravel-forge-agent, monitoring, performance | CI/CD, Ansible, Forge, deployments, observability |
 | Marketing | content-strategist, social-media-manager | Content, SEO, campaigns |
 | Support | support-agent, documentation-agent | Triage, docs, changelogs |
 | IT | ms-it-admin | Microsoft 365 administration |
@@ -44,7 +44,7 @@ Agents reference `.claude/memory/` before decisions:
 
 ## Key Commands
 
-`/implement-feature`, `/fix-bug`, `/deploy-staging`, `/deploy-production`, `/analyze-project`, `/write-tests`, `/refactor-module`, `/monitor-system`, `/investigate-incident`, `/security-scan`, `/create-content`, `/social-media`, `/design-ui`, `/ai-prompt`, `/ansible`, `/set-domain`, `/agent-status`
+`/implement-feature`, `/fix-bug`, `/deploy-staging`, `/deploy-production`, `/analyze-project`, `/write-tests`, `/refactor-module`, `/monitor-system`, `/investigate-incident`, `/security-scan`, `/create-content`, `/social-media`, `/design-ui`, `/ai-prompt`, `/ansible`, `/forge-site`, `/set-domain`, `/agent-status`
 
 ## Agent Dashboard
 
