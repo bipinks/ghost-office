@@ -67,6 +67,19 @@ Required minimum: **server, domain, repo, branch, DB name, A-record IP**. Apply 
     - Request the Let's Encrypt cert (apex + `www`), poll until `installed`, then **activate** it.
     - After securing, verify: `http://` → `https://` redirect, apex 200 with a trusted cert, and `www` → apex over HTTPS. Confirm the ACME path is still served over HTTP so auto-renewal works.
 
+## Changing an existing site's branch (DESTRUCTIVE — follow exactly)
+
+If the request is to **change the deploy branch** of an existing site (not create one), do NOT treat it as a simple update. `POST .../git` re-clones the repo, which **wipes `vendor/` and resets `.env`** (empties `APP_KEY`, sets `DB_DATABASE=forge`). Skipping the steps below takes the live site down with a 500 (`No application encryption key`) and runs migrations against the wrong `forge` database. See the `laravel-forge` skill §4b.
+
+1. **Verify the target branch exists**: `git ls-remote --heads <repo> <branch>`.
+2. **Back up `.env` first**: `cp /home/forge/<domain>/.env /tmp/<domain>.env.bak` (and keep a copy via the env API).
+3. **Change the branch** with `POST .../git` — pass `{provider, repository, branch}` **without** `composer:false`. Poll until `repository_status: installed`.
+4. **Restore `.env`** from the backup (Forge will have reset it) — confirm `APP_KEY` and `DB_DATABASE` are the real values, not `forge`/empty.
+5. **Ensure the deploy script** still has `composer install` (re-add if missing), then **deploy**.
+6. **Rebuild config cache**: `php artisan optimize:clear && php artisan optimize` — verify cached `app.key` is non-empty and DB is the correct tenant DB.
+7. **Migrate the correct DB**: `php artisan migrate:status` then `migrate --force` against the tenant DB (e.g. `live_db_dms_*`), mindful of branch schema divergence — never the default `forge` db.
+8. **Verify**: 0 pending migrations, live URL returns 200.
+
 ## Credentials & Tools
 
 - Forge API token: `~/.laravel-forge/config.json` (`.token`). Base URL `https://forge.laravel.com/api/v1`. Read it without printing it.

@@ -270,6 +270,47 @@ fi
 echo "Deploy successful — health check passed"
 ```
 
+## 4b. Changing a Site's Deploy Branch (DESTRUCTIVE — read first)
+
+Changing a site's branch via `POST /servers/{id}/sites/{id}/git` (same repo, new branch) is **not a metadata update** — Forge **re-clones the repository**. This has bitten us in production:
+
+1. **Wipes `vendor/`** (gitignored) → the next deploy fails with `vendor/autoload.php: No such file or directory` unless the deploy script runs `composer install`.
+2. **Resets `.env`** from the repo's `.env.example` — empties `APP_KEY` and sets `DB_DATABASE=forge` (Forge only re-injects the real DB *password*). Result: migrations run against the wrong `forge` database, and the web app returns 500 `No application encryption key has been specified` (the deploy's `artisan optimize` caches the empty key).
+3. **Regenerates the deploy script** — passing `"composer": false` drops the `composer install` line.
+
+### Safe branch-change procedure
+
+```bash
+SID=<server-id>; SITE=<site-id>; SITEDIR=/home/forge/<domain>
+# 1. Back up the live .env BEFORE touching git
+ssh forge@<server-ip> "cp $SITEDIR/.env /tmp/<domain>.env.bak"
+#    (also: forge env:pull / GET .../env to keep a local copy)
+
+# 2. Change the branch (do NOT pass composer:false — keep composer install)
+curl -s -X POST -H "Authorization: Bearer $FORGE_API_TOKEN" -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"provider":"github","repository":"org/repo","branch":"<new-branch>"}' \
+  "https://forge.laravel.com/api/v1/servers/$SID/sites/$SITE/git"
+#    poll until repository_status == installed
+
+# 3. Restore the .env (Forge will have reset it) — at minimum APP_KEY + DB_DATABASE
+ssh forge@<server-ip> "cp /tmp/<domain>.env.bak $SITEDIR/.env"
+
+# 4. Make sure the deploy script has composer install, then deploy
+#    PUT .../deployment/script  (composer install --no-dev --optimize-autoloader)
+#    POST .../deployment/deploy
+
+# 5. Rebuild config cache from the restored .env and confirm the real DB
+ssh forge@<server-ip> "cd $SITEDIR && php artisan optimize:clear && php artisan optimize"
+
+# 6. Apply pending migrations to the CORRECT tenant DB (mind branch schema divergence)
+ssh forge@<server-ip> "cd $SITEDIR && php artisan migrate:status && php artisan migrate --force"
+```
+
+**Verify after:** `php artisan migrate:status` shows 0 pending; the cached config has a non-empty `app.key` and the right `DB_DATABASE`; the live URL returns 200.
+
+**Beware schema divergence:** different branches can have different migration sets. After the re-clone, run migrations against the tenant DB (e.g. `live_db_dms_*`), not the default `forge` db — and never assume the new branch's migrations are a clean superset of the old branch's.
+
 ## 5. Forge Variables
 
 Forge provides these variables in deployment scripts:
